@@ -7,3 +7,4 @@ model/client/CTP
 *.sh
 userConfig.js
 *.out
+/forever.log
