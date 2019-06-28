@@ -1,0 +1,40 @@
+{
+  "name": "nodequant",
+  "version": "1.10.0",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": 2017,
+      "sourceType": "module"
+    },
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "eqeqeq": [
+        "error"
+      ],
+      "curly": [
+        "error"
+      ]
+    }
+  },
+  "dependencies": {
+    "async": "^2.6.2",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "dateformat": "^3.0.3",
+    "debug": "~2.6.3",
+    "ejs": "~2.5.6",
+    "express": "^4.17.1",
+    "fixed-array": "^1.0.0",
+    "influx": "^5.2.0",
+    "mongodb": "^3.2.7",
+    "morgan": "^1.9.1",
+    "redis": "^2.7.1",
+    "serve-favicon": "~2.4.2",
+    "talib-binding": "^0.4.0"
+  }
+}
