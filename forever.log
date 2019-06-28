@@ -1,0 +1,109 @@
+CtpClient Node Addon Path:./CTP/linux/x64/NodeQuant.node
+>>>>>>>>>>  NodeQuant <<<<<<<<<<
+Date :9:57:12 AM
+6/27/2019, 9:57:12 AM,信息来源MainEngine ,Msg:MainEngine Start
+CtpClient Created
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Market Front 6.3.15_20190220 15:47:00 connected. --> Then Login
+docker0: File exists
+lxcbr0: File exists
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Market Front login request sended. return:0
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Trade Front connected.--> The Login
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Trade Front 6.3.15_20190220 15:47:00 connected. --> Then Authentication
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Trade Front Authentication request sent. Return:0
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Market Front login successfully
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Trade Front Authenticate Successfully.--> The Login
+docker0: No such file or directory
+lxcbr0: No such file or directory
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Trade Front login request sended. Return:0
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:CTP Trade Front login successfully
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo request sended. Return:0
+6/27/2019, 9:57:12 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo successfully. --> Then query all contracts.
+6/27/2019, 9:57:13 AM,信息来源CTP ,Msg:Trade Front query all contract: Received all contracts.
+6/27/2019, 9:57:13 AM,信息来源StrategyEngine ,Msg:StrategyEngine Start
+6/27/2019, 9:57:13 AM,信息来源y1909 ,Msg:y1909策略启动成功
+6/27/2019, 9:57:13 AM,信息来源p1909 ,Msg:p1909策略启动成功
+6/27/2019, 9:57:13 AM,信息来源ru1909 ,Msg:ru1909策略启动成功
+6/27/2019, 9:57:13 AM,信息来源CTP ,Msg:Market Subscribe y1909 Successfully.RequestId:0
+6/27/2019, 9:57:13 AM,信息来源MainEngine ,Msg:Subscribe y1909,Successful
+6/27/2019, 9:57:13 AM,信息来源CTP ,Msg:Market Subscribe p1909 Successfully.RequestId:0
+6/27/2019, 9:57:13 AM,信息来源MainEngine ,Msg:Subscribe p1909,Successful
+6/27/2019, 9:57:13 AM,信息来源CTP ,Msg:Market Subscribe ru1909 Successfully.RequestId:0
+6/27/2019, 9:57:13 AM,信息来源MainEngine ,Msg:Subscribe ru1909,Successful
+6/27/2019, 4:01:12 PM,信息来源StrategyEngine ,Msg:StrategyEngine Stop
+6/27/2019, 4:01:12 PM,信息来源MainEngine ,Msg:MainEngine Stop
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x7f1140000b28][578289665][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x2998ee8][578289665][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x7f1140021d08][-2057961470][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x29d90c8][-2057568254][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x7f1140021d08][-2056716285][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x29d90c8][-2056716285][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x7f1140021d08][-1438973948][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x29d90c8][-1438580732][ 4097]
+6/27/2019, 8:01:23 PM,信息来源MainEngine ,Msg:MainEngine ReStart
+CtpClient Created
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Trade Front connected.--> The Login
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Trade Front 6.3.15_20190220 15:47:00 connected. --> Then Authentication
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Trade Front Authentication request sent. Return:0
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Market Front 6.3.15_20190220 15:47:00 connected. --> Then Login
+docker0: Success
+lxcbr0: Success
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Market Front login request sended. return:0
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Market Front login successfully
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Trade Front Authenticate Successfully.--> The Login
+docker0: No such file or directory
+lxcbr0: No such file or directory
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Trade Front login request sended. Return:0
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:CTP Trade Front login successfully
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Trade Front confirm settlementInfo request sended. Return:0
+6/27/2019, 8:01:23 PM,信息来源CTP ,Msg:Trade Front confirm settlementInfo successfully. --> Then query all contracts.
+6/27/2019, 8:01:24 PM,信息来源CTP ,Msg:Trade Front query all contract: Received all contracts.
+6/27/2019, 8:01:24 PM,信息来源StrategyEngine ,Msg:StrategyEngine Start
+6/27/2019, 8:01:24 PM,信息来源y1909 ,Msg:y1909策略启动成功
+6/27/2019, 8:01:24 PM,信息来源p1909 ,Msg:p1909策略启动成功
+6/27/2019, 8:01:24 PM,信息来源ru1909 ,Msg:ru1909策略启动成功
+6/27/2019, 8:01:24 PM,信息来源CTP ,Msg:Market Subscribe y1909 Successfully.RequestId:0
+6/27/2019, 8:01:24 PM,信息来源MainEngine ,Msg:Subscribe y1909,Successful
+6/27/2019, 8:01:24 PM,信息来源CTP ,Msg:Market Subscribe p1909 Successfully.RequestId:0
+6/27/2019, 8:01:24 PM,信息来源MainEngine ,Msg:Subscribe p1909,Successful
+6/27/2019, 8:01:24 PM,信息来源CTP ,Msg:Market Subscribe ru1909 Successfully.RequestId:0
+6/27/2019, 8:01:24 PM,信息来源MainEngine ,Msg:Subscribe ru1909,Successful
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x7f1150018588][-1340932090][ 4097]
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x7f1140021d08][-1425473531][ 4097]
+出现错误来源CTP ,Msg:Trader Front Disconnected.
+出现错误来源CTP ,Msg:Trader Front Disconnected.
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x7f1144000e08][-1340932090][ 4097]
+出现错误来源CTP ,Msg:Market Front Disconnected.
+CThostFtdcUserApiImplBase::OnSessionDisconnected[0x29d90c8][-1425473531][ 4097]
+出现错误来源CTP ,Msg:Market Front Disconnected.
+6/28/2019, 2:41:23 AM,信息来源StrategyEngine ,Msg:StrategyEngine Stop
+6/28/2019, 2:41:23 AM,信息来源MainEngine ,Msg:MainEngine Stop
+6/28/2019, 8:11:38 AM,信息来源MainEngine ,Msg:MainEngine ReStart
+CtpClient Created
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Market Front 6.3.15_20190220 15:47:00 connected. --> Then Login
+docker0: Success
+lxcbr0: Success
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Market Front login request sended. return:0
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Trade Front connected.--> The Login
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Trade Front 6.3.15_20190220 15:47:00 connected. --> Then Authentication
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Trade Front Authentication request sent. Return:0
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Market Front login successfully
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Trade Front Authenticate Successfully.--> The Login
+docker0: No such file or directory
+lxcbr0: No such file or directory
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Trade Front login request sended. Return:0
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:CTP Trade Front login successfully
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo request sended. Return:0
+6/28/2019, 8:11:38 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo successfully. --> Then query all contracts.
+6/28/2019, 8:11:39 AM,信息来源CTP ,Msg:Trade Front query all contract: Received all contracts.
+6/28/2019, 8:11:39 AM,信息来源StrategyEngine ,Msg:StrategyEngine Start
+6/28/2019, 8:11:39 AM,信息来源y1909 ,Msg:y1909策略启动成功
+6/28/2019, 8:11:39 AM,信息来源p1909 ,Msg:p1909策略启动成功
+6/28/2019, 8:11:39 AM,信息来源ru1909 ,Msg:ru1909策略启动成功
+6/28/2019, 8:11:39 AM,信息来源CTP ,Msg:Market Subscribe y1909 Successfully.RequestId:0
+6/28/2019, 8:11:39 AM,信息来源MainEngine ,Msg:Subscribe y1909,Successful
+6/28/2019, 8:11:39 AM,信息来源CTP ,Msg:Market Subscribe p1909 Successfully.RequestId:0
+6/28/2019, 8:11:39 AM,信息来源MainEngine ,Msg:Subscribe p1909,Successful
+6/28/2019, 8:11:39 AM,信息来源CTP ,Msg:Market Subscribe ru1909 Successfully.RequestId:0
+6/28/2019, 8:11:39 AM,信息来源MainEngine ,Msg:Subscribe ru1909,Successful
+[0mGET / [32m200 [0m44.284 ms - 207[0m
+[0mGET / [32m200 [0m10.172 ms - 207[0m
