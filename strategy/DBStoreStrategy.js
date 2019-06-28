@@ -12,13 +12,18 @@ class DBStorStrategy extends BaseStrategy{
     OnClosedBar(closedBar)
     {
        console.log(this.name+"策略的"+closedBar.symbol+"K线结束,结束时间:"+closedBar.endDatetime.toLocaleString()+",Close价:"+closedBar.closePrice);
-       let barList = this._loadBarFromDB(this, closedBar.symbol, 50, KBarType.Second, 1);
-       console.log(barList);
+       // let barList = this._loadBarFromDB(this, closedBar.symbol, 50, KBarType.Second, 1);
+       // console.log(barList);
+       console.log(this.closedBarList);
     }
 
     OnNewBar(newBar)
     {
         console.log(this.name+"策略的"+newBar.symbol+"K线开始,开始时间"+newBar.startDatetime.toLocaleString()+",Open价:"+newBar.openPrice);
+    }
+
+    OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
+      this.closedBarList = ClosedBarList
     }
 
     OnTick(tick)
