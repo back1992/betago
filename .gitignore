@@ -6,3 +6,4 @@ model/client/CTP
 *.log
 *.sh
 userConfig.js
+*.out
