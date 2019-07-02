@@ -8,3 +8,4 @@ model/client/CTP
 userConfig.js
 *.out
 /forever.log
+/model/client/CTP/
