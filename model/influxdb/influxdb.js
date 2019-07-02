@@ -18,7 +18,7 @@ class InfluxDB{
         });
 
         this.pointsBuffer=[];
-        this.BufferSize=10;
+        this.BufferSize=20;
         this.BufferInProgress=false;
     }
 
@@ -220,7 +220,7 @@ class InfluxDB{
 
     nrrange([measurment, ufo, TickLookBackCount, sortDirection], callback){
       let influxClient = this;
-      sortDirection = (sortDirection<0)?"desc":"asc"
+      sortDirection = (sortDirection<0)?"desc":"asc";
       let influxQL = `SELECT * FROM ${measurment} ORDER BY time ${sortDirection} LIMIT ${TickLookBackCount}`;
       console.log(influxQL);
       influxClient.influx.query(influxQL).then(tickList => {
