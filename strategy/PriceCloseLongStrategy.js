@@ -43,7 +43,7 @@ class PriceCloseLongStrategy extends BaseStrategy{
         if (this.lastTick  && this.lastTick.lastPrice > tick.lastPrice ) {
           // console.log(this.lastTick , this.lastTick.lastPrice , tick.lastPrice )
           if (price > this.threadPrice ) {
-              this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+              this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
               this.sum += 1;
           }
         }
