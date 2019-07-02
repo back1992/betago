@@ -2,14 +2,14 @@
  * Created by Administrator on 2017/7/4.
  */
 let talib = require('talib-binding');
+const mongo = require('mongodb').MongoClient;
+const url = 'mongodb://localhost:27017';
 var BaseStrategy = require("./baseStrategy");
 require("../util/Position");
 require("../systemConfig");
-const mongo = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27017';
 
 /////////////////////// Private Method ///////////////////////////////////////////////
-class AirForceStrategy extends BaseStrategy {
+class AirForceIIStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -48,7 +48,6 @@ class AirForceStrategy extends BaseStrategy {
         var aroonosc = retAROONOSC[retAROONOSC.length - 1];
         var adx = retADX[retADX.length - 1];
         var rsi = retRSI[retRSI.length - 1];
-
         this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
         if (global.actionFlag[closedBar.symbol] <= -2 && this.signal <= -2) {
             this.flag = true;
@@ -59,7 +58,7 @@ class AirForceStrategy extends BaseStrategy {
     }
 
     OnNewBar(newBar) {
-        console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " thresholdPrice: " + this.thresholdPrice + " signal: " + this.signal);
+        console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
         mongo.connect(url, {useNewUrlParser: true}, (err, client) => {
             if (err) {
                 console.error(err);
@@ -99,7 +98,6 @@ class AirForceStrategy extends BaseStrategy {
         if (todayShortPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
-            this.flag = null;
         }
     }
 
@@ -167,4 +165,4 @@ class AirForceStrategy extends BaseStrategy {
     }
 }
 
-module.exports = AirForceStrategy;
+module.exports = AirForceIIStrategy;
