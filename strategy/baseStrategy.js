@@ -96,6 +96,7 @@ function _loadTickFromDB(myStrategy, symbol, LookBackDays) {
 
 //预加载Bar完成
 function _onFinishLoadBar(strategy, symbol, BarType, BarInterval, ClosedBarList) {
+  console.log(strategy, symbol, BarType, BarInterval, ClosedBarList);
     strategy.OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList);
 }
 
@@ -131,6 +132,7 @@ class BaseStrategy {
         }
         //预加载数据库中行情数据
         this.PreloadConfig = strategyConfig.PreloadConfig;
+        console.log(this.PreloadConfig);
         if (this.PreloadConfig !== undefined) {
             if (global.NodeQuant.MarketDataDBClient) {
                 if (this.PreloadConfig.BarType === KBarType.Tick) {
@@ -157,6 +159,7 @@ class BaseStrategy {
 
     //加载Bar完成
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
+      console.log(symbol, BarType, BarInterval, ClosedBarList);
     }
 
     /// <summary>
