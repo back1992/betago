@@ -96,7 +96,6 @@ function _loadTickFromDB(myStrategy, symbol, LookBackDays) {
 
 //预加载Bar完成
 function _onFinishLoadBar(strategy, symbol, BarType, BarInterval, ClosedBarList) {
-  console.log(strategy, symbol, BarType, BarInterval, ClosedBarList);
     strategy.OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList);
 }
 
@@ -132,7 +131,6 @@ class BaseStrategy {
         }
         //预加载数据库中行情数据
         this.PreloadConfig = strategyConfig.PreloadConfig;
-        console.log(this.PreloadConfig);
         if (this.PreloadConfig !== undefined) {
             if (global.NodeQuant.MarketDataDBClient) {
                 if (this.PreloadConfig.BarType === KBarType.Tick) {
@@ -204,18 +202,6 @@ class BaseStrategy {
         return score
     }
 
-    _needSleep(tick) {
-        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
-        let upperFutureName = contract.futureName.toUpperCase();
-        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-        let unit = tickFutureConfig.Unit;
-        let marginRate = tickFutureConfig.MarginRate;
-        if (global.Balance != undefined && tick.lastPrice * unit * marginRate > global.Balance) {
-            this.needSleep = true;
-        } else {
-            this.needSleep = false;
-        }
-    }
 
     _getAvilableSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
