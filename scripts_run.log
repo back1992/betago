@@ -124,3 +124,71 @@
 [33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
 [33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
 [32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:            16447
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m                                          [90mscript[39m  [37mforever[39m [37mpid[39m   [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] _kCq [90m/home/ubuntu/.nvm/versions/node/v8.11.2/bin/node[39m [90mbin/www[39m 16441   32473    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.581[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:            27678
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m                                          [90mscript[39m  [37mforever[39m [37mpid[39m   [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] FekN [90m/home/ubuntu/.nvm/versions/node/v8.11.2/bin/node[39m [90mbin/www[39m 27668   12693    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.814[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:             1267
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m                                          [90mscript[39m  [37mforever[39m [37mpid[39m   [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] rxfz [90m/home/ubuntu/.nvm/versions/node/v8.11.2/bin/node[39m [90mbin/www[39m 1261    19848    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.658[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:            19887
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m       [90mscript[39m  [37mforever[39m [37mpid[39m   [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] 6j9R [90m/usr/bin/node[39m [90mbin/www[39m 19881   23031    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.706[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:            15448
+[31merror[39m:   Forever cannot find process with id: 0
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:             3742
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m                                          [90mscript[39m  [37mforever[39m [37mpid[39m   [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] pdWi [90m/home/ubuntu/.nvm/versions/node/v8.11.2/bin/node[39m [90mbin/www[39m 3736    20259    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.798[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:            29988
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m                                          [90mscript[39m  [37mforever[39m [37mpid[39m  [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] ABbw [90m/home/ubuntu/.nvm/versions/node/v8.11.2/bin/node[39m [90mbin/www[39m 29980   8739    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.933[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:             9007
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m       [90mscript[39m  [37mforever[39m [37mpid[39m  [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] zxdd [90m/usr/bin/node[39m [90mbin/www[39m 9001    6101    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.689[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:            27152
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m                                          [90mscript[39m  [37mforever[39m [37mpid[39m  [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] 4DwN [90m/home/ubuntu/.nvm/versions/node/v8.11.2/bin/node[39m [90mbin/www[39m 27146   7937    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.537[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m
+3000/tcp:             8014
+[32minfo[39m:    Forever stopped process:
+[37m   [39m [37muid[39m  [90mcommand[39m       [90mscript[39m  [37mforever[39m [37mpid[39m   [37mid[39m [35mlogfile[39m                                              [33muptime[39m      
+[0] eqoA [90m/usr/bin/node[39m [90mbin/www[39m 8006    10379    [35m/home/ubuntu/project/nodequant/nodequant/forever.log[39m [33m0:0:0:0.688[39m 
+[33mwarn[39m:    --minUptime not set. Defaulting to: 1000ms
+[33mwarn[39m:    --spinSleepTime not set. Your script will exit if it does not stay up for at least 1000ms
+[32minfo[39m:    Forever processing file: [90m./bin/www[39m

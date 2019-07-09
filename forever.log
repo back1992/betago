@@ -1,692 +1,1579 @@
 CtpClient Node Addon Path:./CTP/linux/x64/NodeQuant.node
 >>>>>>>>>>  NodeQuant <<<<<<<<<<
-Date :8:31:03 AM
-(node:4015) Warning: N-API is an experimental feature and could change at any time.
-7/2/2019, 8:31:03 AM,信息来源MainEngine ,Msg:MainEngine Start
+Date :8:31:04 AM
+(node:10493) Warning: N-API is an experimental feature and could change at any time.
+7/9/2019, 8:31:04 AM,信息来源MainEngine ,Msg:MainEngine Start
 CtpClient Created
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Market Front 6.3.15_20190220 15:47:00 connected. --> Then Login
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Market Front 6.3.15_20190220 15:47:00 connected. --> Then Login
 br-e35d731f8eef: Success
 docker0: Success
 br-40ac6223940d: Success
 lxcbr0: Success
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Market Front login request sended. return:0
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front connected.--> The Login
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front 6.3.15_20190220 15:47:00 connected. --> Then Authentication
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front Authentication request sent. Return:0
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Market Front login successfully
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front Authenticate Successfully.--> The Login
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Market Front login request sended. return:0
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front connected.--> The Login
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front 6.3.15_20190220 15:47:00 connected. --> Then Authentication
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front Authentication request sent. Return:0
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Market Front login successfully
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front Authenticate Successfully.--> The Login
 br-e35d731f8eef: No such file or directory
 docker0: No such file or directory
 br-40ac6223940d: No such file or directory
 lxcbr0: No such file or directory
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front login request sended. Return:0
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:CTP Trade Front login successfully
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo request sended. Return:0
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo successfully. --> Then query all contracts.
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front query all contract: Received all contracts.
-7/2/2019, 8:31:04 AM,信息来源StrategyEngine ,Msg:StrategyEngine Start
-{ LookBackDays: 50, BarType: 'SecondKBar', BarInterval: 18 }
-SELECT * FROM zn1908 ORDER BY time desc LIMIT 3600
-7/2/2019, 8:31:04 AM,信息来源zn1908DBStoreStrategy ,Msg:zn1908DBStoreStrategy策略启动成功
-7/2/2019, 8:31:04 AM,信息来源CTP ,Msg:Market Subscribe zn1908 Successfully.RequestId:0
-7/2/2019, 8:31:04 AM,信息来源MainEngine ,Msg:Subscribe zn1908,Successful
-zn1908DBStoreStrategy策略的zn1908K线开始,开始时间7/2/2019, 1:00:00 AM,Open价:19600
-DBStorStrategy {
-  name: 'zn1908DBStoreStrategy',
-  symbols: { zn1908: { clientName: 'CTP' } },
-  KBarType: 'SecondKBar',
-  KBarInterval: 18,
-  Symbol_KBarListDic: {},
-  KBarMillSecondInterval: 18000,
-  Symbol_KBarId_TickListDic: { zn1908: { '86777800': [Array] } },
-  PreloadConfig: { LookBackDays: 50, BarType: 'SecondKBar', BarInterval: 18 } } 'zn1908' 'SecondKBar' 18 [ KBar {
-    Id: '86777750',
-    startDatetime: 2019-07-01T16:45:01.000Z,
-    endDatetime: 2019-07-01T16:45:16.500Z,
-    date: '7/2/2019',
-    timeStr: '12:45:01 AM',
-    symbol: 'zn1908',
-    openPrice: 19600,
-    highPrice: 19600,
-    lowPrice: 19600,
-    closePrice: 19600,
-    volume: 1554224,
-    openInterest: 250608 },
-  KBar {
-    Id: '86777751',
-    startDatetime: 2019-07-01T16:45:21.500Z,
-    endDatetime: 2019-07-01T16:45:35.000Z,
-    date: '7/2/2019',
-    timeStr: '12:45:21 AM',
-    symbol: 'zn1908',
-    openPrice: 19600,
-    highPrice: 19600,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 2139468,
-    openInterest: 250296 },
-  KBar {
-    Id: '86777752',
-    startDatetime: 2019-07-01T16:45:36.000Z,
-    endDatetime: 2019-07-01T16:45:53.500Z,
-    date: '7/2/2019',
-    timeStr: '12:45:36 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 2726638,
-    openInterest: 250240 },
-  KBar {
-    Id: '86777753',
-    startDatetime: 2019-07-01T16:45:54.500Z,
-    endDatetime: 2019-07-01T16:46:11.500Z,
-    date: '7/2/2019',
-    timeStr: '12:45:54 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19590,
-    lowPrice: 19580,
-    closePrice: 19585,
-    volume: 3119998,
-    openInterest: 250168 },
-  KBar {
-    Id: '86777754',
-    startDatetime: 2019-07-01T16:46:12.500Z,
-    endDatetime: 2019-07-01T16:46:27.500Z,
-    date: '7/2/2019',
-    timeStr: '12:46:12 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19585,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 1560436,
-    openInterest: 250168 },
-  KBar {
-    Id: '86777755',
-    startDatetime: 2019-07-01T16:46:30.000Z,
-    endDatetime: 2019-07-01T16:46:46.500Z,
-    date: '7/2/2019',
-    timeStr: '12:46:30 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 1365428,
-    openInterest: 250164 },
-  KBar {
-    Id: '86777756',
-    startDatetime: 2019-07-01T16:46:49.500Z,
-    endDatetime: 2019-07-01T16:47:05.000Z,
-    date: '7/2/2019',
-    timeStr: '12:46:49 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 1755628,
-    openInterest: 250154 },
-  KBar {
-    Id: '86777757',
-    startDatetime: 2019-07-01T16:47:07.500Z,
-    endDatetime: 2019-07-01T16:47:22.500Z,
-    date: '7/2/2019',
-    timeStr: '12:47:07 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 1365626,
-    openInterest: 250150 },
-  KBar {
-    Id: '86777758',
-    startDatetime: 2019-07-01T16:47:26.000Z,
-    endDatetime: 2019-07-01T16:47:40.500Z,
-    date: '7/2/2019',
-    timeStr: '12:47:26 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19585,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 975518,
-    openInterest: 250140 },
-  KBar {
-    Id: '86777759',
-    startDatetime: 2019-07-01T16:47:45.000Z,
-    endDatetime: 2019-07-01T16:47:55.500Z,
-    date: '7/2/2019',
-    timeStr: '12:47:45 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 1365822,
-    openInterest: 250140 },
-  KBar {
-    Id: '86777760',
-    startDatetime: 2019-07-01T16:48:00.000Z,
-    endDatetime: 2019-07-01T16:48:16.500Z,
-    date: '7/2/2019',
-    timeStr: '12:48:00 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19590,
-    volume: 585382,
-    openInterest: 250136 },
-  KBar {
-    Id: '86777761',
-    startDatetime: 2019-07-01T16:48:19.500Z,
-    endDatetime: 2019-07-01T16:48:32.000Z,
-    date: '7/2/2019',
-    timeStr: '12:48:19 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 780520,
-    openInterest: 250136 },
-  KBar {
-    Id: '86777762',
-    startDatetime: 2019-07-01T16:48:44.000Z,
-    endDatetime: 2019-07-01T16:48:52.000Z,
-    date: '7/2/2019',
-    timeStr: '12:48:44 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19590,
-    volume: 975664,
-    openInterest: 250134 },
-  KBar {
-    Id: '86777763',
-    startDatetime: 2019-07-01T16:48:59.000Z,
-    endDatetime: 2019-07-01T16:49:10.000Z,
-    date: '7/2/2019',
-    timeStr: '12:48:59 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 585406,
-    openInterest: 250130 },
-  KBar {
-    Id: '86777764',
-    startDatetime: 2019-07-01T16:49:12.000Z,
-    endDatetime: 2019-07-01T16:49:29.000Z,
-    date: '7/2/2019',
-    timeStr: '12:49:12 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19585,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 1561402,
-    openInterest: 250102 },
-  KBar {
-    Id: '86777765',
-    startDatetime: 2019-07-01T16:49:31.500Z,
-    endDatetime: 2019-07-01T16:49:46.500Z,
-    date: '7/2/2019',
-    timeStr: '12:49:31 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19585,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 1952220,
-    openInterest: 250076 },
-  KBar {
-    Id: '86777766',
-    startDatetime: 2019-07-01T16:49:49.500Z,
-    endDatetime: 2019-07-01T16:50:05.500Z,
-    date: '7/2/2019',
-    timeStr: '12:49:49 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19590,
-    volume: 1367112,
-    openInterest: 250082 },
-  KBar {
-    Id: '86777767',
-    startDatetime: 2019-07-01T16:50:08.000Z,
-    endDatetime: 2019-07-01T16:50:23.000Z,
-    date: '7/2/2019',
-    timeStr: '12:50:08 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 1954538,
-    openInterest: 250048 },
-  KBar {
-    Id: '86777768',
-    startDatetime: 2019-07-01T16:50:25.000Z,
-    endDatetime: 2019-07-01T16:50:40.000Z,
-    date: '7/2/2019',
-    timeStr: '12:50:25 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 1368552,
-    openInterest: 250046 },
-  KBar {
-    Id: '86777769',
-    startDatetime: 2019-07-01T16:50:45.000Z,
-    endDatetime: 2019-07-01T16:50:52.500Z,
-    date: '7/2/2019',
-    timeStr: '12:50:45 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 977584,
-    openInterest: 250040 },
-  KBar {
-    Id: '86777770',
-    startDatetime: 2019-07-01T16:51:04.500Z,
-    endDatetime: 2019-07-01T16:51:16.000Z,
-    date: '7/2/2019',
-    timeStr: '12:51:04 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 977770,
-    openInterest: 250030 },
-  KBar {
-    Id: '86777771',
-    startDatetime: 2019-07-01T16:51:18.500Z,
-    endDatetime: 2019-07-01T16:51:32.000Z,
-    date: '7/2/2019',
-    timeStr: '12:51:18 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19585,
-    lowPrice: 19585,
-    closePrice: 19585,
-    volume: 782240,
-    openInterest: 250030 },
-  KBar {
-    Id: '86777772',
-    startDatetime: 2019-07-01T16:51:38.000Z,
-    endDatetime: 2019-07-01T16:51:53.500Z,
-    date: '7/2/2019',
-    timeStr: '12:51:38 AM',
-    symbol: 'zn1908',
-    openPrice: 19585,
-    highPrice: 19590,
-    lowPrice: 19585,
-    closePrice: 19590,
-    volume: 1369392,
-    openInterest: 250010 },
-  KBar {
-    Id: '86777773',
-    startDatetime: 2019-07-01T16:51:58.000Z,
-    endDatetime: 2019-07-01T16:52:07.000Z,
-    date: '7/2/2019',
-    timeStr: '12:51:58 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19595,
-    lowPrice: 19590,
-    closePrice: 19595,
-    volume: 978258,
-    openInterest: 250006 },
-  KBar {
-    Id: '86777774',
-    startDatetime: 2019-07-01T16:52:21.000Z,
-    endDatetime: 2019-07-01T16:52:29.500Z,
-    date: '7/2/2019',
-    timeStr: '12:52:21 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19595,
-    closePrice: 19595,
-    volume: 978278,
-    openInterest: 250004 },
-  KBar {
-    Id: '86777775',
-    startDatetime: 2019-07-01T16:52:37.000Z,
-    endDatetime: 2019-07-01T16:52:47.000Z,
-    date: '7/2/2019',
-    timeStr: '12:52:37 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19595,
-    closePrice: 19595,
-    volume: 978356,
-    openInterest: 249980 },
-  KBar {
-    Id: '86777776',
-    startDatetime: 2019-07-01T16:52:48.500Z,
-    endDatetime: 2019-07-01T16:53:05.000Z,
-    date: '7/2/2019',
-    timeStr: '12:52:48 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19595,
-    closePrice: 19595,
-    volume: 1565640,
-    openInterest: 249978 },
-  KBar {
-    Id: '86777777',
-    startDatetime: 2019-07-01T16:53:06.000Z,
-    endDatetime: 2019-07-01T16:53:19.500Z,
-    date: '7/2/2019',
-    timeStr: '12:53:06 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19595,
-    closePrice: 19595,
-    volume: 978680,
-    openInterest: 249978 },
-  KBar {
-    Id: '86777778',
-    startDatetime: 2019-07-01T16:53:24.000Z,
-    endDatetime: 2019-07-01T16:53:38.500Z,
-    date: '7/2/2019',
-    timeStr: '12:53:24 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19595,
-    closePrice: 19595,
-    volume: 1174416,
-    openInterest: 249978 },
-  KBar {
-    Id: '86777779',
-    startDatetime: 2019-07-01T16:53:42.000Z,
-    endDatetime: 2019-07-01T16:53:59.000Z,
-    date: '7/2/2019',
-    timeStr: '12:53:42 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 1370226,
-    openInterest: 249966 },
-  KBar {
-    Id: '86777780',
-    startDatetime: 2019-07-01T16:54:03.000Z,
-    endDatetime: 2019-07-01T16:54:06.500Z,
-    date: '7/2/2019',
-    timeStr: '12:54:03 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19595,
-    closePrice: 19595,
-    volume: 587284,
-    openInterest: 249960 },
-  KBar {
-    Id: '86777781',
-    startDatetime: 2019-07-01T16:54:30.000Z,
-    endDatetime: 2019-07-01T16:54:34.000Z,
-    date: '7/2/2019',
-    timeStr: '12:54:30 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19595,
-    closePrice: 19595,
-    volume: 391528,
-    openInterest: 249960 },
-  KBar {
-    Id: '86777782',
-    startDatetime: 2019-07-01T16:54:36.000Z,
-    endDatetime: 2019-07-01T16:54:53.500Z,
-    date: '7/2/2019',
-    timeStr: '12:54:36 AM',
-    symbol: 'zn1908',
-    openPrice: 19595,
-    highPrice: 19595,
-    lowPrice: 19590,
-    closePrice: 19590,
-    volume: 1566140,
-    openInterest: 249954 },
-  KBar {
-    Id: '86777783',
-    startDatetime: 2019-07-01T16:54:54.500Z,
-    endDatetime: 2019-07-01T16:55:10.500Z,
-    date: '7/2/2019',
-    timeStr: '12:54:54 AM',
-    symbol: 'zn1908',
-    openPrice: 19590,
-    highPrice: 19605,
-    lowPrice: 19590,
-    closePrice: 19600,
-    volume: 3134366,
-    openInterest: 249928 },
-  KBar {
-    Id: '86777784',
-    startDatetime: 2019-07-01T16:55:12.000Z,
-    endDatetime: 2019-07-01T16:55:28.500Z,
-    date: '7/2/2019',
-    timeStr: '12:55:12 AM',
-    symbol: 'zn1908',
-    openPrice: 19600,
-    highPrice: 19605,
-    lowPrice: 19600,
-    closePrice: 19605,
-    volume: 1959666,
-    openInterest: 249886 },
-  KBar {
-    Id: '86777785',
-    startDatetime: 2019-07-01T16:55:30.500Z,
-    endDatetime: 2019-07-01T16:55:45.000Z,
-    date: '7/2/2019',
-    timeStr: '12:55:30 AM',
-    symbol: 'zn1908',
-    openPrice: 19600,
-    highPrice: 19605,
-    lowPrice: 19600,
-    closePrice: 19605,
-    volume: 1567970,
-    openInterest: 249882 },
-  KBar {
-    Id: '86777786',
-    startDatetime: 2019-07-01T16:55:50.500Z,
-    endDatetime: 2019-07-01T16:56:04.500Z,
-    date: '7/2/2019',
-    timeStr: '12:55:50 AM',
-    symbol: 'zn1908',
-    openPrice: 19605,
-    highPrice: 19605,
-    lowPrice: 19605,
-    closePrice: 19605,
-    volume: 1960232,
-    openInterest: 249850 },
-  KBar {
-    Id: '86777787',
-    startDatetime: 2019-07-01T16:56:07.500Z,
-    endDatetime: 2019-07-01T16:56:23.000Z,
-    date: '7/2/2019',
-    timeStr: '12:56:07 AM',
-    symbol: 'zn1908',
-    openPrice: 19605,
-    highPrice: 19610,
-    lowPrice: 19600,
-    closePrice: 19610,
-    volume: 2550246,
-    openInterest: 249758 },
-  KBar {
-    Id: '86777788',
-    startDatetime: 2019-07-01T16:56:24.000Z,
-    endDatetime: 2019-07-01T16:56:41.500Z,
-    date: '7/2/2019',
-    timeStr: '12:56:24 AM',
-    symbol: 'zn1908',
-    openPrice: 19610,
-    highPrice: 19610,
-    lowPrice: 19610,
-    closePrice: 19610,
-    volume: 2551876,
-    openInterest: 249680 },
-  KBar {
-    Id: '86777789',
-    startDatetime: 2019-07-01T16:56:42.500Z,
-    endDatetime: 2019-07-01T16:56:59.000Z,
-    date: '7/2/2019',
-    timeStr: '12:56:42 AM',
-    symbol: 'zn1908',
-    openPrice: 19610,
-    highPrice: 19610,
-    lowPrice: 19605,
-    closePrice: 19610,
-    volume: 2751386,
-    openInterest: 249650 },
-  KBar {
-    Id: '86777790',
-    startDatetime: 2019-07-01T16:57:00.000Z,
-    endDatetime: 2019-07-01T16:57:17.000Z,
-    date: '7/2/2019',
-    timeStr: '12:57:00 AM',
-    symbol: 'zn1908',
-    openPrice: 19610,
-    highPrice: 19615,
-    lowPrice: 19605,
-    closePrice: 19615,
-    volume: 3344996,
-    openInterest: 249486 },
-  KBar {
-    Id: '86777791',
-    startDatetime: 2019-07-01T16:57:18.000Z,
-    endDatetime: 2019-07-01T16:57:35.000Z,
-    date: '7/2/2019',
-    timeStr: '12:57:18 AM',
-    symbol: 'zn1908',
-    openPrice: 19615,
-    highPrice: 19620,
-    lowPrice: 19615,
-    closePrice: 19615,
-    volume: 2757276,
-    openInterest: 249392 },
-  KBar {
-    Id: '86777792',
-    startDatetime: 2019-07-01T16:57:37.500Z,
-    endDatetime: 2019-07-01T16:57:52.000Z,
-    date: '7/2/2019',
-    timeStr: '12:57:37 AM',
-    symbol: 'zn1908',
-    openPrice: 19615,
-    highPrice: 19615,
-    lowPrice: 19610,
-    closePrice: 19615,
-    volume: 1773238,
-    openInterest: 249394 },
-  KBar {
-    Id: '86777793',
-    startDatetime: 2019-07-01T16:57:54.000Z,
-    endDatetime: 2019-07-01T16:58:11.500Z,
-    date: '7/2/2019',
-    timeStr: '12:57:54 AM',
-    symbol: 'zn1908',
-    openPrice: 19610,
-    highPrice: 19615,
-    lowPrice: 19605,
-    closePrice: 19610,
-    volume: 2366688,
-    openInterest: 249222 },
-  KBar {
-    Id: '86777794',
-    startDatetime: 2019-07-01T16:58:12.500Z,
-    endDatetime: 2019-07-01T16:58:28.000Z,
-    date: '7/2/2019',
-    timeStr: '12:58:12 AM',
-    symbol: 'zn1908',
-    openPrice: 19605,
-    highPrice: 19610,
-    lowPrice: 19605,
-    closePrice: 19605,
-    volume: 2368658,
-    openInterest: 249158 },
-  KBar {
-    Id: '86777795',
-    startDatetime: 2019-07-01T16:58:31.500Z,
-    endDatetime: 2019-07-01T16:58:47.000Z,
-    date: '7/2/2019',
-    timeStr: '12:58:31 AM',
-    symbol: 'zn1908',
-    openPrice: 19605,
-    highPrice: 19605,
-    lowPrice: 19600,
-    closePrice: 19600,
-    volume: 2172712,
-    openInterest: 249114 },
-  KBar {
-    Id: '86777796',
-    startDatetime: 2019-07-01T16:58:50.000Z,
-    endDatetime: 2019-07-01T16:59:05.000Z,
-    date: '7/2/2019',
-    timeStr: '12:58:50 AM',
-    symbol: 'zn1908',
-    openPrice: 19600,
-    highPrice: 19605,
-    lowPrice: 19600,
-    closePrice: 19600,
-    volume: 2568532,
-    openInterest: 249062 },
-  KBar {
-    Id: '86777797',
-    startDatetime: 2019-07-01T16:59:06.500Z,
-    endDatetime: 2019-07-01T16:59:22.500Z,
-    date: '7/2/2019',
-    timeStr: '12:59:06 AM',
-    symbol: 'zn1908',
-    openPrice: 19600,
-    highPrice: 19610,
-    lowPrice: 19600,
-    closePrice: 19605,
-    volume: 2767174,
-    openInterest: 249018 },
-  KBar {
-    Id: '86777798',
-    startDatetime: 2019-07-01T16:59:25.000Z,
-    endDatetime: 2019-07-01T16:59:41.500Z,
-    date: '7/2/2019',
-    timeStr: '12:59:25 AM',
-    symbol: 'zn1908',
-    openPrice: 19605,
-    highPrice: 19610,
-    lowPrice: 19600,
-    closePrice: 19600,
-    volume: 2768604,
-    openInterest: 248960 },
-  KBar {
-    Id: '86777799',
-    startDatetime: 2019-07-01T16:59:42.500Z,
-    endDatetime: 2019-07-01T16:59:59.000Z,
-    date: '7/2/2019',
-    timeStr: '12:59:42 AM',
-    symbol: 'zn1908',
-    openPrice: 19600,
-    highPrice: 19605,
-    lowPrice: 19600,
-    closePrice: 19600,
-    volume: 2769752,
-    openInterest: 248910 } ]
-[0mGET / [32m200 [0m10.180 ms - 207[0m
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front login request sended. Return:0
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:CTP Trade Front login successfully
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo request sended. Return:0
+7/9/2019, 8:31:04 AM,信息来源CTP ,Msg:Trade Front confirm settlementInfo successfully. --> Then query all contracts.
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Trade Front query all contract: Received all contracts.
+7/9/2019, 8:31:05 AM,信息来源StrategyEngine ,Msg:StrategyEngine Start
+SELECT * FROM sp1909 ORDER BY time desc LIMIT 216000
+7/9/2019, 8:31:05 AM,信息来源sp1909PriceCloseLongStrategy ,Msg:sp1909PriceCloseLongStrategy策略启动成功
+SELECT * FROM ZC909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源ZC909CavalryIIStrategy ,Msg:ZC909CavalryIIStrategy策略启动成功
+SELECT * FROM OI909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源OI909AirForceIIStrategy ,Msg:OI909AirForceIIStrategy策略启动成功
+SELECT * FROM AP910 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源AP910AirForceIIStrategy ,Msg:AP910AirForceIIStrategy策略启动成功
+SELECT * FROM rb1910 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源rb1910AirForceIIStrategy ,Msg:rb1910AirForceIIStrategy策略启动成功
+SELECT * FROM au1912 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源au1912AirForceIIStrategy ,Msg:au1912AirForceIIStrategy策略启动成功
+SELECT * FROM bu1912 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源bu1912AirForceIIStrategy ,Msg:bu1912AirForceIIStrategy策略启动成功
+SELECT * FROM FG909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源FG909AirForceIIStrategy ,Msg:FG909AirForceIIStrategy策略启动成功
+SELECT * FROM jm1909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源jm1909AirForceIIStrategy ,Msg:jm1909AirForceIIStrategy策略启动成功
+SELECT * FROM RM909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源RM909CavalryIIStrategy ,Msg:RM909CavalryIIStrategy策略启动成功
+SELECT * FROM y1909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源y1909AirForceIIStrategy ,Msg:y1909AirForceIIStrategy策略启动成功
+SELECT * FROM sp1909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源sp1909CavalryIIStrategy ,Msg:sp1909CavalryIIStrategy策略启动成功
+SELECT * FROM i1909 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源i1909AirForceIIStrategy ,Msg:i1909AirForceIIStrategy策略启动成功
+SELECT * FROM ag1912 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源ag1912CavalryIIStrategy ,Msg:ag1912CavalryIIStrategy策略启动成功
+SELECT * FROM pb1908 ORDER BY time desc LIMIT 3600
+7/9/2019, 8:31:05 AM,信息来源pb1908CavalryIIStrategy ,Msg:pb1908CavalryIIStrategy策略启动成功
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe sp1909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe sp1909,Successful
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe ZC909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe ZC909,Successful
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe OI909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe OI909,Successful
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe AP910 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe AP910,Successful
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe rb1910 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe rb1910,Successful
+rb1910---7/9/2019, 11:00:00 PM flag: null signal: 0
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe au1912 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe au1912,Successful
+au1912---7/9/2019, 2:29:59 AM flag: null signal: 0
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe bu1912 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe bu1912,Successful
+bu1912---7/9/2019, 11:00:00 PM flag: null signal: 0
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe FG909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe FG909,Successful
+FG909---7/9/2019, 11:29:59 PM flag: null signal: 0
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe jm1909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe jm1909,Successful
+jm1909---7/9/2019, 10:59:59 PM flag: null signal: 0
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe RM909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe RM909,Successful
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe y1909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe y1909,Successful
+y1909---7/9/2019, 10:59:59 PM flag: null signal: 0
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe sp1909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe sp1909,Successful
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe i1909 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe i1909,Successful
+i1909---7/9/2019, 10:59:59 PM flag: null signal: 0
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe ag1912 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe ag1912,Successful
+7/9/2019, 8:31:05 AM,信息来源CTP ,Msg:Market Subscribe pb1908 Successfully.RequestId:0
+7/9/2019, 8:31:05 AM,信息来源MainEngine ,Msg:Subscribe pb1908,Successful
+y1909---7/9/2019, 9:00:00 AM flag: null signal: 0
+50
+AP910---7/9/2019, 9:00:00 AM flag: null signal: 0
+FG909---7/9/2019, 9:00:00 AM flag: null signal: 0
+50
+50
+i1909---7/9/2019, 9:00:00 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:00:00 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:00:00 AM flag: null signal: 0
+50
+bu1912---7/9/2019, 9:00:00 AM flag: null signal: 0
+50
+50
+rb1910---7/9/2019, 9:00:00 AM flag: null signal: 0
+50
+50
+50
+y1909---7/9/2019, 9:00:18 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:00:18 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:00:18 AM flag: false signal: 2
+50
+50
+rb1910---7/9/2019, 9:00:18 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:00:18 AM flag: null signal: 0
+50
+50
+i1909---7/9/2019, 9:00:18 AM flag: null signal: 1
+50
+jm1909---7/9/2019, 9:00:18 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:00:18 AM flag: null signal: 1
+50
+50
+y1909---7/9/2019, 9:00:36 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:00:36 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:00:36 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:00:36 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:00:36 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:00:36 AM flag: null signal: 1
+50
+50
+i1909---7/9/2019, 9:00:36 AM flag: null signal: 1
+50
+50
+jm1909---7/9/2019, 9:00:37 AM flag: false signal: 2
+50
+y1909---7/9/2019, 9:00:54 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:00:54 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:00:54 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:00:54 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:00:54 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:00:54 AM flag: null signal: 0
+50
+i1909---7/9/2019, 9:00:54 AM flag: null signal: 1
+50
+50
+jm1909---7/9/2019, 9:00:54 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:01:12 AM flag: null signal: 1
+50
+au1912---7/9/2019, 9:01:12 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:01:12 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:01:12 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:01:12 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:01:12 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:01:12 AM flag: false signal: 2
+50
+50
+50
+50
+FG909---7/9/2019, 9:01:12 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:01:30 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:01:30 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:01:30 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:01:30 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:01:30 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:01:30 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:01:30 AM flag: null signal: 0
+50
+50
+50
+y1909---7/9/2019, 9:01:30 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:01:48 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:01:48 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:01:48 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:01:48 AM flag: null signal: 0
+50
+AP910---7/9/2019, 9:01:48 AM flag: false signal: 2
+50
+50
+50
+y1909---7/9/2019, 9:01:48 AM flag: null signal: 1
+50
+50
+jm1909---7/9/2019, 9:01:49 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:01:49 AM flag: null signal: 0
+50
+y1909---7/9/2019, 9:02:06 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:02:06 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:02:06 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:02:06 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:02:06 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:02:06 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:02:06 AM flag: false signal: 2
+50
+50
+FG909---7/9/2019, 9:02:06 AM flag: null signal: 0
+50
+50
+50
+y1909---7/9/2019, 9:02:24 AM flag: null signal: 1
+50
+au1912---7/9/2019, 9:02:24 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:02:24 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:02:24 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:02:24 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:02:24 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:02:24 AM flag: false signal: 2
+50
+50
+50
+50
+FG909---7/9/2019, 9:02:24 AM flag: null signal: 0
+50
+50
+50
+bu1912---7/9/2019, 9:02:42 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:02:42 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:02:42 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:02:42 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:02:42 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:02:42 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:02:42 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:02:43 AM flag: null signal: 1
+50
+50
+y1909---7/9/2019, 9:03:00 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:03:00 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:03:00 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:03:00 AM flag: false signal: 1
+50
+i1909---7/9/2019, 9:03:00 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:03:00 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:03:00 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:03:00 AM flag: null signal: 1
+50
+50
+50
+50
+y1909---7/9/2019, 9:03:18 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:03:18 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:03:18 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:03:18 AM flag: false signal: 1
+50
+i1909---7/9/2019, 9:03:18 AM flag: null signal: 0
+50
+AP910---7/9/2019, 9:03:18 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:03:18 AM flag: null signal: 1
+50
+50
+50
+50
+jm1909---7/9/2019, 9:03:19 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:03:36 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:03:36 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:03:36 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:03:36 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:03:36 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:03:36 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:03:36 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:03:36 AM flag: null signal: 1
+50
+50
+50
+y1909---7/9/2019, 9:03:54 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:03:54 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:03:54 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:03:54 AM flag: false signal: 1
+50
+i1909---7/9/2019, 9:03:54 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:03:54 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:03:54 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:03:54 AM flag: null signal: 0
+50
+50
+50
+50
+y1909---7/9/2019, 9:04:12 AM flag: null signal: 0
+50
+50
+50
+au1912---7/9/2019, 9:04:12 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:04:12 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:04:12 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:04:12 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:04:12 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:04:12 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:04:12 AM flag: null signal: 0
+50
+50
+y1909---7/9/2019, 9:04:30 AM flag: null signal: 0
+50
+AP910---7/9/2019, 9:04:30 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:04:30 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:04:30 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:04:30 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:04:30 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:04:30 AM flag: null signal: 0
+50
+50
+jm1909---7/9/2019, 9:04:30 AM flag: false signal: 1
+50
+50
+AP910---7/9/2019, 9:04:48 AM flag: false signal: 2
+50
+50
+50
+au1912---7/9/2019, 9:04:48 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:04:48 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:04:48 AM flag: false signal: 1
+50
+i1909---7/9/2019, 9:04:48 AM flag: null signal: 0
+50
+y1909---7/9/2019, 9:04:48 AM flag: null signal: 0
+50
+50
+50
+jm1909---7/9/2019, 9:04:48 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:04:49 AM flag: null signal: 0
+50
+50
+AP910---7/9/2019, 9:05:06 AM flag: false signal: 1
+50
+50
+50
+au1912---7/9/2019, 9:05:06 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:05:06 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:05:06 AM flag: false signal: 1
+50
+50
+50
+i1909---7/9/2019, 9:05:06 AM flag: null signal: 1
+50
+jm1909---7/9/2019, 9:05:06 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:05:06 AM flag: null signal: 0
+50
+50
+FG909---7/9/2019, 9:05:07 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:05:24 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:05:24 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:05:24 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:05:24 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:05:24 AM flag: null signal: 1
+50
+50
+50
+FG909---7/9/2019, 9:05:24 AM flag: null signal: 0
+50
+y1909---7/9/2019, 9:05:25 AM flag: null signal: 0
+50
+jm1909---7/9/2019, 9:05:25 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:05:42 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:05:42 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:05:42 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:05:42 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:05:42 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:05:42 AM flag: null signal: 1
+50
+jm1909---7/9/2019, 9:05:42 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:05:42 AM flag: null signal: 1
+50
+50
+50
+y1909---7/9/2019, 9:06:00 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:06:00 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:06:00 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:06:00 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:06:00 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:06:00 AM flag: null signal: 1
+50
+jm1909---7/9/2019, 9:06:00 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:06:02 AM flag: null signal: 1
+50
+50
+y1909---7/9/2019, 9:06:18 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:06:18 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:06:18 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:06:18 AM flag: false signal: 1
+50
+50
+AP910---7/9/2019, 9:06:18 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:06:18 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:06:18 AM flag: null signal: 1
+50
+50
+jm1909---7/9/2019, 9:06:19 AM flag: false signal: 1
+50
+50
+50
+au1912---7/9/2019, 9:06:36 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:06:36 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:06:36 AM flag: false signal: 1
+50
+50
+AP910---7/9/2019, 9:06:36 AM flag: false signal: 0
+50
+i1909---7/9/2019, 9:06:36 AM flag: null signal: 1
+50
+50
+jm1909---7/9/2019, 9:06:36 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:06:36 AM flag: null signal: 0
+50
+FG909---7/9/2019, 9:06:36 AM flag: false signal: 2
+50
+50
+y1909---7/9/2019, 9:06:54 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:06:54 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:06:54 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:06:54 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:06:54 AM flag: null signal: 1
+50
+jm1909---7/9/2019, 9:06:54 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:06:54 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:06:54 AM flag: false signal: 2
+50
+50
+50
+50
+y1909---7/9/2019, 9:07:12 AM flag: null signal: 0
+50
+au1912---7/9/2019, 9:07:12 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:07:12 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:07:12 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:07:12 AM flag: null signal: 1
+50
+AP910---7/9/2019, 9:07:12 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:07:12 AM flag: false signal: 2
+50
+50
+50
+50
+50
+jm1909---7/9/2019, 9:07:14 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:07:30 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:07:30 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:07:30 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:07:30 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:07:30 AM flag: null signal: 1
+50
+jm1909---7/9/2019, 9:07:30 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:07:30 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:07:30 AM flag: false signal: 2
+50
+50
+50
+50
+50
+bu1912---7/9/2019, 9:07:48 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:07:48 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:07:48 AM flag: null signal: 1
+50
+AP910---7/9/2019, 9:07:48 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:07:48 AM flag: false signal: 2
+50
+50
+50
+y1909---7/9/2019, 9:07:48 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:07:49 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:07:48 AM flag: false signal: 1
+50
+50
+au1912---7/9/2019, 9:08:06 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:08:06 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:08:06 AM flag: null signal: 1
+50
+AP910---7/9/2019, 9:08:06 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:08:06 AM flag: false signal: 2
+50
+50
+bu1912---7/9/2019, 9:08:06 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:08:06 AM flag: null signal: 0
+50
+50
+jm1909---7/9/2019, 9:08:08 AM flag: false signal: 2
+50
+au1912---7/9/2019, 9:08:24 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:08:24 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:08:24 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:08:24 AM flag: null signal: 1
+50
+AP910---7/9/2019, 9:08:24 AM flag: false signal: 1
+50
+50
+50
+50
+jm1909---7/9/2019, 9:08:25 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:08:25 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:08:26 AM flag: null signal: 0
+50
+au1912---7/9/2019, 9:08:42 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:08:42 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:08:42 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:08:42 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:08:42 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:08:42 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:08:42 AM flag: null signal: 0
+50
+FG909---7/9/2019, 9:08:43 AM flag: false signal: 1
+50
+50
+50
+50
+y1909---7/9/2019, 9:09:00 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:09:00 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:09:00 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:09:00 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:09:00 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:09:00 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:09:00 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:09:00 AM flag: false signal: 1
+50
+50
+50
+50
+y1909---7/9/2019, 9:09:18 AM flag: null signal: 0
+50
+au1912---7/9/2019, 9:09:18 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:09:18 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:09:18 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:09:18 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:09:18 AM flag: false signal: 1
+50
+50
+50
+jm1909---7/9/2019, 9:09:18 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:09:18 AM flag: false signal: 1
+50
+50
+50
+AP910---7/9/2019, 9:09:36 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:09:36 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:09:36 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:09:36 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:09:36 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:09:36 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:09:36 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:09:36 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:09:54 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:09:54 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:09:54 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:09:54 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:09:54 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:09:54 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:09:54 AM flag: false signal: 0
+50
+50
+jm1909---7/9/2019, 9:09:54 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:10:12 AM flag: null signal: 0
+50
+AP910---7/9/2019, 9:10:12 AM flag: false signal: 0
+50
+au1912---7/9/2019, 9:10:12 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:10:12 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:10:12 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:10:12 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:10:12 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:10:12 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:10:12 AM flag: null signal: 1
+50
+50
+50
+y1909---7/9/2019, 9:10:30 AM flag: null signal: 0
+50
+AP910---7/9/2019, 9:10:30 AM flag: false signal: 0
+50
+50
+au1912---7/9/2019, 9:10:30 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:10:30 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:10:30 AM flag: false signal: 1
+50
+50
+50
+RM909---7/9/2019, 9:10:30 AM flag: null signal: 1
+i1909---7/9/2019, 9:10:30 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:10:30 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:10:30 AM flag: false signal: 0
+50
+50
+50
+au1912---7/9/2019, 9:10:48 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:10:48 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:10:48 AM flag: false signal: 1
+50
+50
+AP910---7/9/2019, 9:10:48 AM flag: false signal: 0
+50
+50
+50
+RM909---7/9/2019, 9:10:48 AM flag: null signal: 1
+i1909---7/9/2019, 9:10:48 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:10:48 AM flag: false signal: 2
+50
+y1909---7/9/2019, 9:10:49 AM flag: null signal: 1
+50
+50
+FG909---7/9/2019, 9:10:50 AM flag: false signal: 0
+50
+au1912---7/9/2019, 9:11:06 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:11:06 AM flag: false signal: 0
+50
+AP910---7/9/2019, 9:11:06 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:11:06 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:11:06 AM flag: null signal: 1
+i1909---7/9/2019, 9:11:06 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:11:06 AM flag: false signal: 2
+50
+y1909---7/9/2019, 9:11:06 AM flag: null signal: 1
+50
+50
+bu1912---7/9/2019, 9:11:06 AM flag: false signal: 1
+50
+50
+50
+50
+y1909---7/9/2019, 9:11:24 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:11:24 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:11:24 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:11:24 AM flag: false signal: 0
+50
+50
+AP910---7/9/2019, 9:11:24 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:11:24 AM flag: null signal: 1
+i1909---7/9/2019, 9:11:24 AM flag: false signal: 0
+50
+jm1909---7/9/2019, 9:11:24 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:11:25 AM flag: false signal: 0
+50
+50
+au1912---7/9/2019, 9:11:42 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:11:42 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:11:42 AM flag: false signal: 0
+50
+AP910---7/9/2019, 9:11:42 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:11:42 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:11:42 AM flag: null signal: 1
+i1909---7/9/2019, 9:11:42 AM flag: false signal: 0
+50
+jm1909---7/9/2019, 9:11:42 AM flag: false signal: 2
+50
+y1909---7/9/2019, 9:11:42 AM flag: null signal: 1
+50
+50
+50
+50
+50
+bu1912---7/9/2019, 9:12:00 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:12:00 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:12:00 AM flag: false signal: 0
+50
+jm1909---7/9/2019, 9:12:00 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:12:00 AM flag: false signal: 1
+50
+50
+RM909---7/9/2019, 9:12:00 AM flag: null signal: 1
+au1912---7/9/2019, 9:12:00 AM flag: false signal: 1
+50
+50
+AP910---7/9/2019, 9:12:00 AM flag: false signal: 0
+50
+50
+y1909---7/9/2019, 9:12:02 AM flag: false signal: 2
+50
+y1909---7/9/2019, 9:12:18 AM flag: false signal: 2
+50
+au1912---7/9/2019, 9:12:18 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:12:18 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:12:18 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:12:18 AM flag: false signal: 0
+50
+AP910---7/9/2019, 9:12:18 AM flag: false signal: 1
+50
+50
+50
+RM909---7/9/2019, 9:12:18 AM flag: null signal: 1
+50
+FG909---7/9/2019, 9:12:18 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:12:19 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:12:36 AM flag: false signal: 2
+50
+50
+au1912---7/9/2019, 9:12:36 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:12:36 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:12:36 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:12:36 AM flag: false signal: 0
+50
+jm1909---7/9/2019, 9:12:36 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:12:36 AM flag: false signal: 1
+50
+50
+RM909---7/9/2019, 9:12:36 AM flag: null signal: 1
+AP910---7/9/2019, 9:12:37 AM flag: false signal: 1
+50
+50
+50
+au1912---7/9/2019, 9:12:54 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:12:54 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:12:54 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:12:54 AM flag: false signal: 0
+50
+jm1909---7/9/2019, 9:12:54 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:12:54 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:12:54 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:12:54 AM flag: null signal: 1
+50
+y1909---7/9/2019, 9:12:54 AM flag: false signal: 2
+50
+50
+y1909---7/9/2019, 9:13:12 AM flag: false signal: 2
+50
+au1912---7/9/2019, 9:13:12 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:13:12 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:13:12 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:13:12 AM flag: false signal: 0
+50
+AP910---7/9/2019, 9:13:12 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:13:12 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:13:12 AM flag: null signal: 1
+50
+jm1909---7/9/2019, 9:13:12 AM flag: false signal: 1
+50
+50
+au1912---7/9/2019, 9:13:30 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:13:30 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:13:30 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:13:30 AM flag: false signal: 0
+50
+jm1909---7/9/2019, 9:13:30 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:13:30 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:13:30 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:13:30 AM flag: null signal: 1
+50
+y1909---7/9/2019, 9:13:31 AM flag: false signal: 2
+50
+50
+y1909---7/9/2019, 9:13:48 AM flag: false signal: 2
+50
+50
+bu1912---7/9/2019, 9:13:48 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:13:48 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:13:48 AM flag: false signal: 0
+50
+AP910---7/9/2019, 9:13:48 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:13:48 AM flag: false signal: 0
+50
+50
+RM909---7/9/2019, 9:13:48 AM flag: null signal: 1
+50
+au1912---7/9/2019, 9:13:49 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:13:49 AM flag: false signal: 2
+50
+50
+au1912---7/9/2019, 9:14:06 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:14:06 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:14:06 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:14:06 AM flag: false signal: 0
+50
+AP910---7/9/2019, 9:14:06 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:14:06 AM flag: false signal: 0
+50
+50
+50
+RM909---7/9/2019, 9:14:06 AM flag: null signal: 1
+y1909---7/9/2019, 9:14:06 AM flag: false signal: 2
+50
+50
+jm1909---7/9/2019, 9:14:06 AM flag: false signal: 2
+50
+50
+50
+au1912---7/9/2019, 9:14:24 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:14:24 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:14:24 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:14:24 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:14:24 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:14:24 AM flag: false signal: 0
+50
+50
+jm1909---7/9/2019, 9:14:24 AM flag: false signal: 2
+50
+50
+RM909---7/9/2019, 9:14:24 AM flag: null signal: 1
+y1909---7/9/2019, 9:14:25 AM flag: false signal: 2
+50
+y1909---7/9/2019, 9:14:42 AM flag: false signal: 2
+50
+50
+au1912---7/9/2019, 9:14:42 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:14:42 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:14:42 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:14:42 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:14:42 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:14:42 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:14:42 AM flag: false signal: 0
+50
+50
+50
+RM909---7/9/2019, 9:14:42 AM flag: null signal: 1
+AP910---7/9/2019, 9:15:00 AM flag: false signal: 0
+50
+y1909---7/9/2019, 9:15:00 AM flag: false signal: 1
+50
+50
+50
+RM909---7/9/2019, 9:15:00 AM flag: null signal: 1
+50
+au1912---7/9/2019, 9:15:00 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:15:00 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:15:00 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:15:00 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:15:00 AM flag: false signal: 0
+50
+jm1909---7/9/2019, 9:15:00 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:15:18 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:15:18 AM flag: false signal: 0
+50
+50
+50
+au1912---7/9/2019, 9:15:18 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:15:18 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:15:18 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:15:18 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:15:18 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:15:18 AM flag: false signal: 0
+50
+50
+50
+pb1908---7/9/2019, 9:15:19 AM flag: null signal: 0
+AP910---7/9/2019, 9:15:36 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:15:36 AM flag: false signal: 0
+50
+50
+50
+au1912---7/9/2019, 9:15:36 AM flag: false signal: 0
+50
+bu1912---7/9/2019, 9:15:36 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:15:36 AM flag: false signal: 0
+50
+50
+i1909---7/9/2019, 9:15:36 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:15:36 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:15:36 AM flag: false signal: 1
+50
+50
+50
+pb1908---7/9/2019, 9:15:39 AM flag: null signal: 0
+50
+au1912---7/9/2019, 9:15:54 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:15:54 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:15:54 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:15:54 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:15:54 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:15:54 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:15:54 AM flag: false signal: 0
+50
+50
+y1909---7/9/2019, 9:15:54 AM flag: false signal: 1
+50
+50
+pb1908---7/9/2019, 9:15:55 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:16:12 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:16:12 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:16:12 AM flag: false signal: 1
+50
+50
+AP910---7/9/2019, 9:16:12 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:16:12 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:16:12 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:16:12 AM flag: false signal: 1
+50
+50
+pb1908---7/9/2019, 9:16:12 AM flag: null signal: 0
+FG909---7/9/2019, 9:16:13 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:16:30 AM flag: false signal: 1
+50
+50
+au1912---7/9/2019, 9:16:30 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:16:30 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:16:30 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:16:30 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:16:30 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:16:30 AM flag: false signal: 2
+50
+50
+jm1909---7/9/2019, 9:16:31 AM flag: false signal: 1
+50
+50
+pb1908---7/9/2019, 9:16:32 AM flag: null signal: 0
+50
+au1912---7/9/2019, 9:16:48 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:16:48 AM flag: false signal: 0
+50
+50
+rb1910---7/9/2019, 9:16:48 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:16:48 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:16:48 AM flag: false signal: 1
+50
+50
+pb1908---7/9/2019, 9:16:48 AM flag: null signal: 0
+i1909---7/9/2019, 9:16:48 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:16:48 AM flag: false signal: 1
+50
+50
+y1909---7/9/2019, 9:16:50 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:17:06 AM flag: false signal: 1
+50
+au1912---7/9/2019, 9:17:06 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:17:06 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:17:06 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:17:06 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:17:06 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:17:06 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:17:06 AM flag: false signal: 1
+50
+50
+50
+50
+pb1908---7/9/2019, 9:17:07 AM flag: null signal: 0
+50
+au1912---7/9/2019, 9:17:24 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:17:24 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:17:24 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:17:24 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:17:24 AM flag: false signal: 1
+50
+50
+50
+i1909---7/9/2019, 9:17:24 AM flag: false signal: 2
+50
+jm1909---7/9/2019, 9:17:24 AM flag: false signal: 1
+50
+y1909---7/9/2019, 9:17:25 AM flag: false signal: 1
+50
+50
+pb1908---7/9/2019, 9:17:32 AM flag: null signal: 0
+50
+bu1912---7/9/2019, 9:17:42 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:17:42 AM flag: false signal: 2
+50
+50
+AP910---7/9/2019, 9:17:42 AM flag: false signal: 0
+50
+i1909---7/9/2019, 9:17:42 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:17:42 AM flag: false signal: 1
+50
+50
+au1912---7/9/2019, 9:17:42 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:17:42 AM flag: false signal: 2
+50
+50
+y1909---7/9/2019, 9:17:44 AM flag: false signal: 2
+50
+50
+pb1908---7/9/2019, 9:17:44 AM flag: null signal: 0
+y1909---7/9/2019, 9:18:00 AM flag: false signal: 2
+50
+50
+bu1912---7/9/2019, 9:18:00 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:18:00 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:18:00 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:18:00 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:18:00 AM flag: false signal: 0
+50
+50
+FG909---7/9/2019, 9:18:00 AM flag: false signal: 1
+50
+au1912---7/9/2019, 9:18:01 AM flag: false signal: 1
+50
+50
+50
+pb1908---7/9/2019, 9:18:02 AM flag: null signal: 0
+au1912---7/9/2019, 9:18:18 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:18:18 AM flag: false signal: 0
+50
+rb1910---7/9/2019, 9:18:18 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:18:18 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:18:18 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:18:18 AM flag: false signal: 0
+50
+50
+50
+y1909---7/9/2019, 9:18:19 AM flag: false signal: 2
+50
+50
+pb1908---7/9/2019, 9:18:19 AM flag: null signal: 0
+FG909---7/9/2019, 9:18:18 AM flag: false signal: 1
+50
+50
+50
+au1912---7/9/2019, 9:18:36 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:18:36 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:18:36 AM flag: false signal: 2
+50
+50
+pb1908---7/9/2019, 9:18:36 AM flag: null signal: 0
+i1909---7/9/2019, 9:18:36 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:18:36 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:18:36 AM flag: false signal: 0
+50
+50
+50
+y1909---7/9/2019, 9:18:36 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:18:36 AM flag: false signal: 1
+50
+50
+au1912---7/9/2019, 9:18:54 AM flag: false signal: 1
+50
+bu1912---7/9/2019, 9:18:54 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:18:54 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:18:54 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:18:54 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:18:54 AM flag: false signal: 0
+50
+50
+y1909---7/9/2019, 9:18:54 AM flag: false signal: 2
+50
+FG909---7/9/2019, 9:18:54 AM flag: false signal: 1
+50
+50
+pb1908---7/9/2019, 9:18:56 AM flag: null signal: 0
+50
+50
+au1912---7/9/2019, 9:19:12 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:19:12 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:19:12 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:19:12 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:19:12 AM flag: false signal: 0
+50
+FG909---7/9/2019, 9:19:12 AM flag: false signal: 1
+50
+50
+jm1909---7/9/2019, 9:19:12 AM flag: false signal: 2
+50
+50
+50
+pb1908---7/9/2019, 9:19:13 AM flag: null signal: 1
+y1909---7/9/2019, 9:19:13 AM flag: false signal: 2
+50
+y1909---7/9/2019, 9:19:30 AM flag: false signal: 2
+50
+50
+au1912---7/9/2019, 9:19:30 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:19:30 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:19:30 AM flag: false signal: 2
+50
+50
+i1909---7/9/2019, 9:19:30 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:19:30 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:19:30 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:19:30 AM flag: false signal: 1
+50
+50
+50
+pb1908---7/9/2019, 9:19:30 AM flag: null signal: 1
+50
+50
+au1912---7/9/2019, 9:19:48 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:19:48 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:19:48 AM flag: false signal: 1
+50
+50
+i1909---7/9/2019, 9:19:48 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:19:48 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:19:48 AM flag: false signal: 1
+50
+50
+50
+pb1908---7/9/2019, 9:19:48 AM flag: null signal: 1
+y1909---7/9/2019, 9:19:49 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:19:50 AM flag: false signal: 2
+50
+50
+y1909---7/9/2019, 9:20:06 AM flag: false signal: 1
+50
+50
+au1912---7/9/2019, 9:20:06 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:20:06 AM flag: false signal: 1
+50
+50
+rb1910---7/9/2019, 9:20:06 AM flag: false signal: 1
+50
+50
+sp1909---7/9/2019, 9:20:06 AM flag: null signal: 1
+pb1908---7/9/2019, 9:20:06 AM flag: null signal: 1
+i1909---7/9/2019, 9:20:06 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:20:06 AM flag: false signal: 2
+50
+AP910---7/9/2019, 9:20:06 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:20:06 AM flag: false signal: 1
+50
+50
+50
+50
+au1912---7/9/2019, 9:20:24 AM flag: false signal: 2
+50
+bu1912---7/9/2019, 9:20:24 AM flag: false signal: 1
+50
+rb1910---7/9/2019, 9:20:24 AM flag: false signal: 1
+50
+50
+sp1909---7/9/2019, 9:20:24 AM flag: null signal: 1
+i1909---7/9/2019, 9:20:24 AM flag: false signal: 1
+50
+jm1909---7/9/2019, 9:20:24 AM flag: false signal: 1
+50
+AP910---7/9/2019, 9:20:24 AM flag: false signal: 1
+50
+50
+50
+y1909---7/9/2019, 9:20:24 AM flag: false signal: 1
+50
+FG909---7/9/2019, 9:20:24 AM flag: false signal: 1
+50
+50
+pb1908---7/9/2019, 9:20:25 AM flag: null signal: 1

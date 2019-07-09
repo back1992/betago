@@ -21,6 +21,7 @@ class AirForceIIStrategy extends BaseStrategy {
         this.flag = null;
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
+        this.closedBarList = [];
         global.actionFlag = {};
         global.airForcePrice = {};
         global.stopPrice = {};
@@ -29,26 +30,31 @@ class AirForceIIStrategy extends BaseStrategy {
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar) {
         // let barList = this._loadBarFromDB(this, closedBar.symbol, 50, KBarType.Second, 1);
-        // console.log(barList);
-        this.closedBarList.push(closedBar);
-        this.closedBarList.shift();
-        this.openPrice = this.closedBarList.map(e => e["openPrice"]);
-        this.highPrice = this.closedBarList.map(e => e["highPrice"]);
-        this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
-        this.closeprice = this.closedBarList.map(e => e["closePrice"]);
-        var retMFI = talib.MFI(this.highPrice, this.lowPrice, this.closePrice, this.volume, 14);
-        var retCCI = talib.CCI(this.highPrice, this.lowPrice, this.closePrice, 14);
-        var retCMO = talib.CMO(this.closePrice, 14);
-        var retAROONOSC = talib.AROONOSC(this.highPrice, this.lowPrice, 14);
-        var retADX = talib.ADX(this.highPrice, this.lowPrice, this.closePrice, 14);
-        var retRSI = talib.RSI(this.closePrice, 14);
-        var mfi = retMFI[retMFI.length - 1];
-        var cci = retCCI[retCCI.length - 1];
-        var cmo = retCMO[retCMO.length - 1];
-        var aroonosc = retAROONOSC[retAROONOSC.length - 1];
-        var adx = retADX[retADX.length - 1];
-        var rsi = retRSI[retRSI.length - 1];
-        this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
+        if(this.closedBarList) {
+            this.closedBarList.push(closedBar);
+            if(this.closedBarList.length>50) {
+              this.closedBarList.shift();
+            }
+            console.log(this.closedBarList.length);
+            this.openPrice = this.closedBarList.map(e => e["openPrice"]);
+            this.highPrice = this.closedBarList.map(e => e["highPrice"]);
+            this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
+            this.closeprice = this.closedBarList.map(e => e["closePrice"]);
+            var retMFI = talib.MFI(this.highPrice, this.lowPrice, this.closePrice, this.volume, 14);
+            var retCCI = talib.CCI(this.highPrice, this.lowPrice, this.closePrice, 14);
+            var retCMO = talib.CMO(this.closePrice, 14);
+            var retAROONOSC = talib.AROONOSC(this.highPrice, this.lowPrice, 14);
+            var retADX = talib.ADX(this.highPrice, this.lowPrice, this.closePrice, 14);
+            var retRSI = talib.RSI(this.closePrice, 14);
+            var mfi = retMFI[retMFI.length - 1];
+            var cci = retCCI[retCCI.length - 1];
+            var cmo = retCMO[retCMO.length - 1];
+            var aroonosc = retAROONOSC[retAROONOSC.length - 1];
+            var adx = retADX[retADX.length - 1];
+            var rsi = retRSI[retRSI.length - 1];
+            this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
+        }
+
         if (global.actionFlag[closedBar.symbol] <= -2 && this.signal <= -2) {
             this.flag = true;
         }
@@ -77,7 +83,9 @@ class AirForceIIStrategy extends BaseStrategy {
             })
         });
     }
-
+    OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
+        this.closedBarList = ClosedBarList;
+    }
     OnQueryTradingAccount(tradingAccountInfo) {
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
@@ -98,6 +106,17 @@ class AirForceIIStrategy extends BaseStrategy {
         if (todayShortPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+        }
+    }
+
+    _profitTodayShortPositions(tick, position, up = 0) {
+        let todayShortPositions = position.GetShortTodayPosition();
+        if (todayShortPositions > 0) {
+            let shortTodayPostionAveragePrice = position.GetShortTodayPostionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+            if(price < shortTodayPostionAveragePrice){
+                this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+            }
         }
     }
 
@@ -130,7 +149,8 @@ class AirForceIIStrategy extends BaseStrategy {
             // time to close
             case -1:
                 if (position) {
-                    this._closeTodayShortPositions(tick, position, 1);
+                    // this._closeTodayShortPositions(tick, position, 1);
+                    this._profitTodayShortPositions(tick, position, 1);
                 }
                 break;
             // trade time
@@ -151,7 +171,7 @@ class AirForceIIStrategy extends BaseStrategy {
                     } else if (this.flag === false) {
                         if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
                             if (position) {
-                                this._closeTodayShortPositions(tick, position);
+                                this._profitTodayShortPositions(tick, position);
                             }
                         }
                     }

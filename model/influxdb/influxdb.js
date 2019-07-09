@@ -18,7 +18,7 @@ class InfluxDB{
         });
 
         this.pointsBuffer=[];
-        this.BufferSize=20;
+        this.BufferSize=50;
         this.BufferInProgress=false;
     }
 
