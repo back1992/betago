@@ -21,7 +21,8 @@ MarketData_DBConfig={
 //配置客户端,NodeQuant启动,会连接已经配置的交易客户端
 ClientConfig={
      CTP: {
-            userID:"27100317",
+            // userID:"27100317",
+            userID:"27100581",
             password:"Joomla8.net",
             brokerID:"0034",
             AppID:"client_nodequant_1.0",
@@ -37,49 +38,7 @@ ClientConfig={
 
 StrategyConfig={
     Strategys:[
-        
-          {
-              name: "sp1909PriceCloseLongStrategy",
-              className: "PriceCloseLongStrategy",
-              symbols: {
-                  "sp1909": {
-                      clientName: SupportClients.CTP
-                  }
-              },
-              BarType: KBarType.Minute,
-              BarInterval: 18,
-              step: 5,
-              total: 4,
-              needCloseYesterday: true,
-              thresholdPrice:4721,
-              PreloadConfig: {
-                  LookBackDays:50,
-                  BarType: KBarType.Minute,
-                  BarInterval: 18,
-                }
-          },
-            
-          {
-              name: "ZC909CavalryIIStrategy",
-              className: "CavalryIIStrategy",
-              symbols: {
-                  "ZC909": {
-                      clientName: SupportClients.CTP
-                  }
-              },
-              BarType: KBarType.Second,
-              BarInterval: 18,
-              step: 5,
-              total: 4,
-              needCloseYesterday: true,
-              thresholdPrice:12000,
-              PreloadConfig: {
-                  LookBackDays:50,
-                  BarType: KBarType.Second,
-                  BarInterval: 18,
-                }
-          },
-            
+
           {
               name: "OI909AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -100,7 +59,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "AP910AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -121,7 +80,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "rb1910AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -142,7 +101,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "au1912AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -163,7 +122,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "bu1912AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -184,7 +143,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "FG909AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -205,7 +164,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "jm1909AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -226,28 +185,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
-          {
-              name: "RM909CavalryIIStrategy",
-              className: "CavalryIIStrategy",
-              symbols: {
-                  "RM909": {
-                      clientName: SupportClients.CTP
-                  }
-              },
-              BarType: KBarType.Second,
-              BarInterval: 18,
-              step: 5,
-              total: 6,
-              needCloseYesterday: true,
-              thresholdPrice:12000,
-              PreloadConfig: {
-                  LookBackDays:50,
-                  BarType: KBarType.Second,
-                  BarInterval: 18,
-                }
-          },
-            
+
           {
               name: "y1909AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -268,7 +206,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "sp1909CavalryIIStrategy",
               className: "CavalryIIStrategy",
@@ -289,7 +227,7 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
+
           {
               name: "i1909AirForceIIStrategy",
               className: "AirForceIIStrategy",
@@ -310,49 +248,6 @@ StrategyConfig={
                   BarInterval: 18,
                 }
           },
-            
-          {
-              name: "ag1912CavalryIIStrategy",
-              className: "CavalryIIStrategy",
-              symbols: {
-                  "ag1912": {
-                      clientName: SupportClients.CTP
-                  }
-              },
-              BarType: KBarType.Second,
-              BarInterval: 18,
-              step: 5,
-              total: 6,
-              needCloseYesterday: true,
-              thresholdPrice:12000,
-              PreloadConfig: {
-                  LookBackDays:50,
-                  BarType: KBarType.Second,
-                  BarInterval: 18,
-                }
-          },
-            
-          {
-              name: "pb1908CavalryIIStrategy",
-              className: "CavalryIIStrategy",
-              symbols: {
-                  "pb1908": {
-                      clientName: SupportClients.CTP
-                  }
-              },
-              BarType: KBarType.Second,
-              BarInterval: 18,
-              step: 5,
-              total: 4,
-              needCloseYesterday: true,
-              thresholdPrice:12000,
-              PreloadConfig: {
-                  LookBackDays:50,
-                  BarType: KBarType.Second,
-                  BarInterval: 18,
-                }
-          },
-            
     ]
 };
 
@@ -363,4 +258,3 @@ NotifyExceptionConfig={
         ErrorType.OperationAfterDisconnected,
     ]
 };
-    
