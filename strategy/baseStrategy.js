@@ -243,6 +243,7 @@ class BaseStrategy {
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
         let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
+        console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime)
         if (isTimeOffset) {
             return 0;
 

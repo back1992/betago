@@ -4,6 +4,6 @@
 # sudo npm install
 # sudo npm install forever -g
 fuser -k -n tcp 3000
-/usr/local/bin/forever stop 0
+/usr/bin/forever stop 0
 rm /home/ubuntu/project/nodequant/nodequant/forever.log
-/usr/local/bin/forever start -l /home/ubuntu/project/nodequant/nodequant/forever.log ./bin/www
+/usr/bin/forever start -l /home/ubuntu/project/nodequant/nodequant/forever.log ./bin/www
