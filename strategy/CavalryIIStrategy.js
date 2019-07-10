@@ -21,6 +21,7 @@ class CavalryIIStrategy extends BaseStrategy {
         this.flag = null;
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
+        this.closedBarList = [];
         global.actionFlag = {};
         global.airForcePrice = {};
         global.stopPrice = {};
@@ -29,28 +30,30 @@ class CavalryIIStrategy extends BaseStrategy {
 
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar) {
-        // let barList = this._loadBarFromDB(this, closedBar.symbol, 50, KBarType.Second, 1);
-        // console.log(barList);
-        this.closedBarList.push(closedBar);
-        this.closedBarList.shift();
-        this.openPrice = this.closedBarList.map(e => e["openPrice"]);
-        this.highPrice = this.closedBarList.map(e => e["highPrice"]);
-        this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
-        this.closeprice = this.closedBarList.map(e => e["closePrice"]);
-        var retMFI = talib.MFI(this.highPrice, this.lowPrice, this.closePrice, this.volume, 14);
-        var retCCI = talib.CCI(this.highPrice, this.lowPrice, this.closePrice, 14);
-        var retCMO = talib.CMO(this.closePrice, 14);
-        var retAROONOSC = talib.AROONOSC(this.highPrice, this.lowPrice, 14);
-        var retADX = talib.ADX(this.highPrice, this.lowPrice, this.closePrice, 14);
-        var retRSI = talib.RSI(this.closePrice, 14);
-        var mfi = retMFI[retMFI.length - 1];
-        var cci = retCCI[retCCI.length - 1];
-        var cmo = retCMO[retCMO.length - 1];
-        var aroonosc = retAROONOSC[retAROONOSC.length - 1];
-        var adx = retADX[retADX.length - 1];
-        var rsi = retRSI[retRSI.length - 1];
-
-        this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
+        if(this.closedBarList) {
+            this.closedBarList.push(closedBar);
+            if(this.closedBarList.length>50) {
+              this.closedBarList.shift();
+            }
+            console.log(this.closedBarList.length);
+            this.openPrice = this.closedBarList.map(e => e["openPrice"]);
+            this.highPrice = this.closedBarList.map(e => e["highPrice"]);
+            this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
+            this.closeprice = this.closedBarList.map(e => e["closePrice"]);
+            var retMFI = talib.MFI(this.highPrice, this.lowPrice, this.closePrice, this.volume, 14);
+            var retCCI = talib.CCI(this.highPrice, this.lowPrice, this.closePrice, 14);
+            var retCMO = talib.CMO(this.closePrice, 14);
+            var retAROONOSC = talib.AROONOSC(this.highPrice, this.lowPrice, 14);
+            var retADX = talib.ADX(this.highPrice, this.lowPrice, this.closePrice, 14);
+            var retRSI = talib.RSI(this.closePrice, 14);
+            var mfi = retMFI[retMFI.length - 1];
+            var cci = retCCI[retCCI.length - 1];
+            var cmo = retCMO[retCMO.length - 1];
+            var aroonosc = retAROONOSC[retAROONOSC.length - 1];
+            var adx = retADX[retADX.length - 1];
+            var rsi = retRSI[retRSI.length - 1];
+            this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
+        }
         if (global.actionFlag[closedBar.symbol] >= 2 && this.signal >= 2) {
             this.flag = true;
         }
@@ -60,7 +63,7 @@ class CavalryIIStrategy extends BaseStrategy {
     }
 
     OnNewBar(newBar) {
-        console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
+        // console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
         mongo.connect(url, {useNewUrlParser: true}, (err, client) => {
             if (err) {
                 console.error(err);
@@ -71,14 +74,21 @@ class CavalryIIStrategy extends BaseStrategy {
             collection.find({
                 "ctpContract": newBar.symbol,
             }).sort({"utime": -1}).limit(1).toArray((err, items) => {
+                // console.log(items[0])
                 if (items.length !== 0 && items[0]['score'] >= 2) {
                     global.airForcePrice[newBar.symbol] = items[0]['price']['low'];
                     global.stopPrice[newBar.symbol] = items[0]['price']['high'];
                     global.actionFlag[newBar.symbol] = items[0]['score'];
+                    console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
                 }
             })
         });
     }
+
+    OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
+        this.closedBarList = ClosedBarList
+    }
+
 
     OnQueryTradingAccount(tradingAccountInfo) {
         global.availableFund = tradingAccountInfo["Available"];
@@ -103,6 +113,17 @@ class CavalryIIStrategy extends BaseStrategy {
         }
     }
 
+    _profitTodayLongPositions(tick, position, up = 0) {
+        let todayLongPositions = position.GetLongTodayPosition();
+        if (todayLongPositions > 0) {
+            let longTodayPostionAveragePrice = position.GetLongTodayPostionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            if(price > longTodayPostionAveragePrice){
+              this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
+            }
+        }
+    }
+
     _closeYesterdayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.GetLongYesterdayPosition();
         if (todayLongPositions > 0) {
@@ -120,7 +141,7 @@ class CavalryIIStrategy extends BaseStrategy {
         let tradeState = this._getOffset(tick, 0, 30);
         let position = this.GetPosition(tick.symbol);
         if (position) {
-            this.position = position.GetLongTodayPosition();
+            // this.position = position.GetLongTodayPosition();
         }
         switch (tradeState) {
             // timeOffset
@@ -133,7 +154,8 @@ class CavalryIIStrategy extends BaseStrategy {
             // time to close
             case -1:
                 if (position) {
-                    this._closeTodayLongPositions(tick, position, 1);
+                    // this._closeTodayLongPositions(tick, position, 1);
+                    this._profitTodayLongPositions(tick, position, 1);
                 }
                 break;
             // trade time
@@ -154,7 +176,8 @@ class CavalryIIStrategy extends BaseStrategy {
                     } else if (this.flag === false) {
                         if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
                             if (position) {
-                                this._closeTodayLongPositions(tick, position);
+                                // this._closeTodayLongPositions(tick, position);
+                                this._profitTodayLongPositions(tick, position);
                             }
                         }
                     }

@@ -2,14 +2,12 @@
  * Created by Administrator on 2017/7/4.
  */
 let talib = require('talib-binding');
-const mongo = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27017';
 var BaseStrategy = require("./baseStrategy");
 require("../util/Position");
 require("../systemConfig");
 
 /////////////////////// Private Method ///////////////////////////////////////////////
-class AirForceIIStrategy extends BaseStrategy {
+class AirForceIIIStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -21,42 +19,55 @@ class AirForceIIStrategy extends BaseStrategy {
         this.flag = null;
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
+        this.signal5m = 0;
         this.closedBarList = [];
         global.actionFlag = {};
         global.airForcePrice = {};
         global.stopPrice = {};
     }
 
+
+    _get_talib_indicator(highPrice, lowPrice, closePrice, volume) {
+      let retMFI = talib.MFI(highPrice, lowPrice, closePrice, volume, 14);
+      let retCCI = talib.CCI(highPrice, lowPrice, closePrice, 14);
+      let retCMO = talib.CMO(closePrice, 14);
+      let retAROONOSC = talib.AROONOSC(highPrice, lowPrice, 14);
+      let retADX = talib.ADX(highPrice, lowPrice, closePrice, 14);
+      let retRSI = talib.RSI(closePrice, 14);
+      let mfi = retMFI[retMFI.length - 1];
+      let cci = retCCI[retCCI.length - 1];
+      let cmo = retCMO[retCMO.length - 1];
+      let aroonosc = retAROONOSC[retAROONOSC.length - 1];
+      let adx = retADX[retADX.length - 1];
+      let rsi = retRSI[retRSI.length - 1];
+      return this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
+    }
+    _myOnFinishLoadBar(strategy,symbol,BarType,BarInterval,ClosedBarList) {
+        return ClosedBarList;
+    }
+
+
+    _loadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval) {
+        global.NodeQuant.StrategyEngine.LoadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval, myOnFinishLoadBar);
+    }
+
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar) {
-        // let barList = this._loadBarFromDB(this, closedBar.symbol, 50, KBarType.Second, 1);
-        if(this.closedBarList) {
-            this.closedBarList.push(closedBar);
-            if(this.closedBarList.length>50) {
-              this.closedBarList.shift();
-            }
-            console.log(this.closedBarList.length);
-            this.openPrice = this.closedBarList.map(e => e["openPrice"]);
-            this.highPrice = this.closedBarList.map(e => e["highPrice"]);
-            this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
-            this.closeprice = this.closedBarList.map(e => e["closePrice"]);
-            var retMFI = talib.MFI(this.highPrice, this.lowPrice, this.closePrice, this.volume, 14);
-            var retCCI = talib.CCI(this.highPrice, this.lowPrice, this.closePrice, 14);
-            var retCMO = talib.CMO(this.closePrice, 14);
-            var retAROONOSC = talib.AROONOSC(this.highPrice, this.lowPrice, 14);
-            var retADX = talib.ADX(this.highPrice, this.lowPrice, this.closePrice, 14);
-            var retRSI = talib.RSI(this.closePrice, 14);
-            var mfi = retMFI[retMFI.length - 1];
-            var cci = retCCI[retCCI.length - 1];
-            var cmo = retCMO[retCMO.length - 1];
-            var aroonosc = retAROONOSC[retAROONOSC.length - 1];
-            var adx = retADX[retADX.length - 1];
-            var rsi = retRSI[retRSI.length - 1];
-            this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
-            console.log(this.signal);
-        }
-
-        if (global.actionFlag[closedBar.symbol] <= -2 && this.signal <= -2) {
+      if(this.closedBarList) {
+          this.closedBarList.push(closedBar);
+          if(this.closedBarList.length>50) {
+            this.closedBarList.shift();
+          }
+          console.log(this.closedBarList.length);
+          this.openPrice = this.closedBarList.map(e => e["openPrice"]);
+          this.highPrice = this.closedBarList.map(e => e["highPrice"]);
+          this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
+          this.closeprice = this.closedBarList.map(e => e["closePrice"]);
+          this.volume = this.closedBarList.map(e => e["volume"]);
+          this.signal = this._get_talib_indicator(this.highPrice, this.lowPrice, this.closePrice, this.volume);
+          console.log(this.signal);
+      }
+        if (this.signal5m <= -2 && this.signal <= -2) {
             this.flag = true;
         }
         if (this.signal >= 2) {
@@ -65,26 +76,24 @@ class AirForceIIStrategy extends BaseStrategy {
     }
 
     OnNewBar(newBar) {
-        console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
-        mongo.connect(url, {useNewUrlParser: true}, (err, client) => {
-            if (err) {
-                console.error(err);
-                return
-            }
-            const db = client.db('destiny');
-            const collection = db.collection('signalFreq');
-            collection.find({
-                "ctpContract": newBar.symbol,
-            }).sort({"utime": -1}).limit(1).toArray((err, items) => {
-                if (items.length !== 0 && items[0]['score'] <= -2) {
-                    global.airForcePrice[newBar.symbol] = items[0]['price']['low'];
-                    global.stopPrice[newBar.symbol] = items[0]['price']['high'];
-                    global.actionFlag[newBar.symbol] = items[0]['score'];
-                }
-            })
-        });
+        console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal + " signal5m: " + this.signal5m);
+        let barList = this._loadBarFromDB(this, newBar.symbol, 50, KBarType.Minute, 5);
+        console.log(barList);
+        // console.log(barList.length);
+        // if(barList) {
+        //     let openPrice = barList.map(e => e["openPrice"]);
+        //     let highPrice = barList.map(e => e["highPrice"]);
+        //     let lowPrice = barList.map(e => e["lowPrice"]);
+        //     let closeprice = barList.map(e => e["closePrice"]);
+        //     let volume = barList.map(e => e["volume"]);
+        //     this.signal5m = this._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+        // }
     }
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
+        this.closedBarList = ClosedBarList;
+    }
+    }
+    OnFinishLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
         this.closedBarList = ClosedBarList;
     }
     OnQueryTradingAccount(tradingAccountInfo) {
@@ -137,8 +146,9 @@ class AirForceIIStrategy extends BaseStrategy {
         let tradeState = this._getOffset(tick, 0, 30);
         let position = this.GetPosition(tick.symbol);
         if (position) {
-            this.position = position.GetShortTodayPosition();
+            this._profitTodayShortPositions(tick, position, 1);
         }
+        console.log(tradeState);
         switch (tradeState) {
             // timeOffset
             case 0:
@@ -186,4 +196,4 @@ class AirForceIIStrategy extends BaseStrategy {
     }
 }
 
-module.exports = AirForceIIStrategy;
+module.exports = AirForceIIIStrategy;

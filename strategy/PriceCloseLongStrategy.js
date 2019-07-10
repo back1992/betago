@@ -16,35 +16,59 @@ class PriceCloseLongStrategy extends BaseStrategy{
         this.lastTick = null;
         this.tick = null;
         this.total = strategyConfig.total;
-        this.threadPrice = strategyConfig.threadPrice;
+        this.thresholdPrice = strategyConfig.thresholdPrice;
         this.sum = 0;
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar)
     {
+      if (this.thresholdPrice) {
+          // if (closedBar.highPrice < this.thresholdPrice && closedBar.closePrice < closedBar.openPrice) {
+          if (closedBar.closePrice > this.thresholdPrice ) {
+              this.flag = true;
+          }
+          // if (closedBar.lowPrice > this.thresholdPrice) {
+          if (closedBar.closePrice < this.thresholdPrice) {
+              this.flag = false;
+          }
+      }
 
     }
 
     OnNewBar(newBar)
     {
+      let position = this.GetPosition(newBar.symbol);
+      if(position!= undefined){
+        let todayLongPositions = position.GetLongTodayPosition();
+        let yesterdayLongPositions = position.GetLongYesterdayPosition();
+        console.log(newBar.symbol, todayLongPositions, yesterdayLongPositions);
+      }
+    }
 
+    _closeShortPositions(tick, shortPositions = 1, up = 0) {
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+        this.SendOrder(tick.clientName, tick.symbol, price, shortPositions, Direction.Buy, OpenCloseFlagType.Close);
+
+    }
+
+    _closeLongPositions(tick, longPositions = 1, up = 0) {
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+        this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close);
     }
 
 
     OnTick(tick)
     {
+      super.OnTick(tick);
       this.lastTick = this.tick;
       this.tick = tick;
-      let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
-      // console.log(this.sum , this.total )
-      // console.log(price , this.threadPrice )
       if( this.sum < this.total ) {
         if (this.lastTick  && this.lastTick.lastPrice > tick.lastPrice ) {
-          // console.log(this.lastTick , this.lastTick.lastPrice , tick.lastPrice )
-          if (price > this.threadPrice ) {
-              this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+          if (this.flag === true) {
+              this._closeLongPositions(tick);
               this.sum += 1;
+              this.flag = null;
           }
         }
       } else {
