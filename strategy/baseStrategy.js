@@ -6,6 +6,7 @@ require("../common");
 let NodeQuantError = require("../util/NodeQuantError");
 let KBar = require("../util/KBar");
 
+
 //////////////////////////////// Private Method ////////////////////////////////////////////
 function _createBar(myStrategy, tick) {
     if (myStrategy.Symbol_KBarId_TickListDic[tick.symbol] === undefined) {
@@ -99,8 +100,17 @@ function _onFinishLoadBar(strategy, symbol, BarType, BarInterval, ClosedBarList)
     strategy.OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList);
 }
 
+//预加载Bar完成
+function _myOnFinishLoadBar(strategy, symbol, BarType, BarInterval, ClosedBarList) {
+    strategy.MyOnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList);
+}
+
 function _loadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval) {
     global.NodeQuant.StrategyEngine.LoadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval, _onFinishLoadBar);
+}
+
+function _myLoadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval) {
+    global.NodeQuant.StrategyEngine.LoadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval, _myOnFinishLoadBar);
 }
 
 class BaseStrategy {
@@ -243,6 +253,7 @@ class BaseStrategy {
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
         let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
+        // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime)
         if (isTimeOffset) {
             return 0;
 

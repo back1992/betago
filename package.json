@@ -31,7 +31,6 @@
     "express": "^4.17.1",
     "fixed-array": "^1.0.0",
     "influx": "^5.2.0",
-    "mongodb": "^3.2.7",
     "morgan": "^1.9.1",
     "redis": "^2.7.1",
     "serve-favicon": "~2.4.2",
