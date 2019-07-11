@@ -41,14 +41,14 @@ StrategyConfig={
 
           {
               name: "i1909",
-              className: "AirForceIIIStrategy",
+              className: "InfluxLongStrategy",
               symbols: {
                   "i1909": {
                       clientName: SupportClients.CTP
                   }
               },
               BarType: KBarType.Second,
-              BarInterval: 18,
+              BarInterval: 8,
               step: 5,
               total: 4,
               needCloseYesterday: true,
@@ -56,7 +56,7 @@ StrategyConfig={
               PreloadConfig: {
                   LookBackDays:50,
                   BarType: KBarType.Second,
-                  BarInterval: 18,
+                  BarInterval: 8,
                 }
           },
     ]
