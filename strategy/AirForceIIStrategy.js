@@ -21,6 +21,7 @@ class AirForceIIStrategy extends BaseStrategy {
         this.flag = null;
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
+        this.lastSignal = 0;
         this.closedBarList = [];
         global.actionFlag = {};
         global.airForcePrice = {};
@@ -29,7 +30,7 @@ class AirForceIIStrategy extends BaseStrategy {
 
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar) {
-        // let barList = this._loadBarFromDB(this, closedBar.symbol, 50, KBarType.Second, 1);
+
         if(this.closedBarList) {
             this.closedBarList.push(closedBar);
             if(this.closedBarList.length>50) {
@@ -40,6 +41,7 @@ class AirForceIIStrategy extends BaseStrategy {
             this.highPrice = this.closedBarList.map(e => e["highPrice"]);
             this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
             this.closeprice = this.closedBarList.map(e => e["closePrice"]);
+            this.volume = this.closedBarList.map(e => e["volume"]);
             var retMFI = talib.MFI(this.highPrice, this.lowPrice, this.closePrice, this.volume, 14);
             var retCCI = talib.CCI(this.highPrice, this.lowPrice, this.closePrice, 14);
             var retCMO = talib.CMO(this.closePrice, 14);
@@ -52,10 +54,11 @@ class AirForceIIStrategy extends BaseStrategy {
             var aroonosc = retAROONOSC[retAROONOSC.length - 1];
             var adx = retADX[retADX.length - 1];
             var rsi = retRSI[retRSI.length - 1];
+            this.lastSignal = this.signal;
             this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
         }
 
-        if (global.actionFlag[closedBar.symbol] <= -2 && this.signal <= -2) {
+        if (global.actionFlag[closedBar.symbol] <= -2 && this.signal <= -2 && this.lastSignal > -2) {
             this.flag = true;
         }
         if (this.signal >= 2) {
@@ -135,9 +138,6 @@ class AirForceIIStrategy extends BaseStrategy {
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
         let position = this.GetPosition(tick.symbol);
-        if (position) {
-            this.position = position.GetShortTodayPosition();
-        }
         switch (tradeState) {
             // timeOffset
             case 0:

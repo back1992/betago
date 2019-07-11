@@ -536,6 +536,8 @@ class BaseStrategy {
         return shortPositionAveragePrice;
     }
 
+
+
 }
 
 module.exports = BaseStrategy;
