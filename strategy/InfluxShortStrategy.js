@@ -85,21 +85,25 @@ class InfluxShortStrategy extends BaseStrategy {
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
-        console.log(this.signal, global.actionFlag[closedBar.symbol]);
-        if (global.actionFlag[closedBar.symbol] <= -2 && this.signal <= -2) {
-            this.flag = true;
+        // console.log(this.signal, global.actionFlag[closedBar.symbol]);
+        if (global.actionFlag[closedBar.symbol] <= -2){
+          if(this.signal <= -2) {
+              this.flag = true;
+          }
+          console.log(this.name + " " + this.signal + " flag: " + this.flag);
         }
         if (this.signal >= 2) {
             this.flag = false;
         }
+        // console.log(closedBar.symbol + "---" + closedBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal + " signal5m: " + global.actionFlag[closedBar.symbol]);
     }
 
     OnNewBar(newBar) {
-        console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal + " signal5m: " + this.signal5m);
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        let BarInterval = 5;
-        global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, 0, LookBackCount, -1], function (err, ClosedBarList) {
+        let intervalArray = [5, 15, 30 ,60];
+        let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
+        global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
             if (err) {
                 console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
                 //没完成收集固定K线个数
@@ -112,8 +116,12 @@ class InfluxShortStrategy extends BaseStrategy {
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
             let volume = ClosedBarList.map(e => e["volume"]);
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            global.actionFlag[newBar.symbol] = score;
-        })
+            if(score >= 2 || score <= -2) {
+              global.actionFlag[newBar.symbol] = score;
+            } else if (score != 0){
+              console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
+            }
+        });
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
@@ -201,6 +209,7 @@ class InfluxShortStrategy extends BaseStrategy {
                             }
                         }
                     } else if (this.flag === false) {
+                        console.log(this.name + " hi his flag is : " + this.flag);
                         if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
                             if (position) {
                                 this._profitTodayShortPositions(tick, position);
@@ -209,13 +218,6 @@ class InfluxShortStrategy extends BaseStrategy {
                     }
                 }
         }
-    }
-    OnTick(tick) {
-        super.OnTick(tick);
-        global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
-        // let barList = this._myLoadBarFromDB(this, tick.symbol,  50, KBarType.Minute, 5);
-        // console.log(barList);
-        // console.log(this.closedBarList );
     }
 
     Stop() {

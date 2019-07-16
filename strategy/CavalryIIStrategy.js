@@ -24,8 +24,8 @@ class CavalryIIStrategy extends BaseStrategy {
         this.lastSignal = 0;
         this.closedBarList = [];
         global.actionFlag = {};
-        global.airForcePrice = {};
-        global.stopPrice = {};
+        // global.airForcePrice = {};
+        // global.stopPrice = {};
     }
 
 
@@ -36,7 +36,6 @@ class CavalryIIStrategy extends BaseStrategy {
             if(this.closedBarList.length>50) {
               this.closedBarList.shift();
             }
-            console.log(this.closedBarList.length);
             this.openPrice = this.closedBarList.map(e => e["openPrice"]);
             this.highPrice = this.closedBarList.map(e => e["highPrice"]);
             this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
@@ -63,10 +62,10 @@ class CavalryIIStrategy extends BaseStrategy {
         if (this.signal <= -2) {
             this.flag = false;
         }
+        console.log(closedBar.symbol + "---" + closedBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal + " last signal: " + this.lastSignal + " global.actionFlag: "+global.actionFlag[closedBar.symbol]);
     }
 
     OnNewBar(newBar) {
-        // console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
         mongo.connect(url, {useNewUrlParser: true}, (err, client) => {
             if (err) {
                 console.error(err);
@@ -77,12 +76,10 @@ class CavalryIIStrategy extends BaseStrategy {
             collection.find({
                 "ctpContract": newBar.symbol,
             }).sort({"utime": -1}).limit(1).toArray((err, items) => {
-                // console.log(items[0])
-                if (items.length !== 0 && items[0]['score'] >= 2) {
-                    global.airForcePrice[newBar.symbol] = items[0]['price']['low'];
-                    global.stopPrice[newBar.symbol] = items[0]['price']['high'];
+                if (items.length !== 0 ) {
+                    // global.airForcePrice[newBar.symbol] = items[0]['price']['low'];
+                    // global.stopPrice[newBar.symbol] = items[0]['price']['high'];
                     global.actionFlag[newBar.symbol] = items[0]['score'];
-                    console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
                 }
             })
         });

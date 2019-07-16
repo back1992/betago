@@ -201,7 +201,7 @@ class InfluxDB {
         let influxClient = this;
         sortDirection = (sortDirection < 0) ? "desc" : "asc";
         let influxQL = `SELECT * FROM ${measurment} ORDER BY time ${sortDirection} LIMIT ${TickLookBackCount}`;
-        console.log(influxQL);
+        // console.log(influxQL);
         influxClient.influx.query(influxQL).then(tickList => {
             callback(null, tickList);
         }).catch(err => {
@@ -210,14 +210,10 @@ class InfluxDB {
         })
     }
 
-    barrange([measurment, ufo, BarLookBackCount, sortDirection], callback) {
+    barrange([measurment, BarInterval, BarLookBackCount, sortDirection], callback) {
         let influxClient = this;
         sortDirection = (sortDirection < 0) ? "desc" : "asc";
-        // let influxQL = `SELECT first(lastPrice) as openPrice, last(lastPrice) as closePrice, max(lastPrice) as highPrice , min(lastPrice) as lowPrice , sum(volume) as volume FROM ${measurment} ORDER BY time ${sortDirection} LIMIT ${BarLookBackCount}`;
-        // let influxQL = `SELECT first(lastPrice) as openPrice, last(lastPrice) as closePrice, max(lastPrice) as highPrice , min(lastPrice) as lowPrice , sum(volume) as volume FROM ${measurment} ORDER BY time ${sortDirection} group by time(5m) fill(none) LIMIT ${BarLookBackCount}`;
-        let influxQL = `SELECT FIRST(lastPrice) AS openPrice, LAST(lastPrice) AS closePrice, MAX(lastPrice) AS highPrice , min(lastPrice) AS lowPrice , sum(volume) AS volume FROM ${measurment} GROUP BY time(5m) FILL(none) ORDER BY time ${sortDirection}  LIMIT ${BarLookBackCount} 
-`;
-        console.log(influxQL);
+        let influxQL = `SELECT FIRST(lastPrice) AS openPrice, LAST(lastPrice) AS closePrice, MAX(lastPrice) AS highPrice , min(lastPrice) AS lowPrice , sum(volume) AS volume FROM ${measurment} GROUP BY time(${BarInterval}m) FILL(none) ORDER BY time ${sortDirection}  LIMIT ${BarLookBackCount}`;
         influxClient.influx.query(influxQL).then(barList => {
             // console.log(barList);
             // console.log(barList.reverse());

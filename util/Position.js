@@ -1,5 +1,6 @@
 //策略仓位管理器
 //一个合约一个仓位对象
+let NodeQuantError = require("./NodeQuantError.js");
 class Position {
     constructor() {
         this.strategyName = "";
