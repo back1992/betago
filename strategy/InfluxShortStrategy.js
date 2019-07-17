@@ -180,7 +180,6 @@ class InfluxShortStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
         this.lastTick = this.tick;
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
