@@ -88,6 +88,8 @@ class InfluxLongStrategy extends BaseStrategy {
         if (global.actionFlag[closedBar.symbol] >= 2){
           if(this.signal >= 2) {
               this.flag = true;
+          } else {
+            this.flag = null;
           }
           console.log(this.name + " " + this.signal + " flag: " + this.flag);
         }
@@ -173,7 +175,6 @@ class InfluxLongStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
         this.lastTick = this.tick;
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
