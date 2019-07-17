@@ -2,7 +2,7 @@
 .idea
 node_modules
 package-lock.json
-model/client/CTP
+/model/
 *.log
 *.sh
 userConfig.js
