@@ -5,7 +5,6 @@ package-lock.json
 model/client/CTP
 *.log
 *.sh
-userConfig.js
 *.out
 /forever.log
 /model/client/CTP/
