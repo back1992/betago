@@ -86,13 +86,18 @@ class InfluxShortStrategy extends BaseStrategy {
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
         // console.log(this.signal, global.actionFlag[closedBar.symbol]);
-        if (global.actionFlag[closedBar.symbol] <= -2){
-          if(this.signal <= -2) {
-              this.flag = true;
-          } else {
-            this.flag = null;
+
+        if(this.flag != true){
+          if (global.actionFlag[closedBar.symbol] <= -2){
+            if(this.signal <= -2) {
+                this.flag = true;
+            } else {
+              this.flag = null;
+            }
+            console.log(this.name + " " + this.signal + " flag: " + this.flag);
           }
-          console.log(this.name + " " + this.signal + " flag: " + this.flag);
+        } else {
+          this.flag = false;
         }
         if (this.signal >= 2) {
             this.flag = false;

@@ -85,13 +85,17 @@ class InfluxLongStrategy extends BaseStrategy {
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
-        if (global.actionFlag[closedBar.symbol] >= 2){
-          if(this.signal >= 2) {
+        if(this.flag != true){
+          if (global.actionFlag[closedBar.symbol] >= 2){
+            if(this.signal >= 2) {
               this.flag = true;
-          } else {
-            this.flag = null;
+            } else {
+              this.flag = null;
+            }
+            console.log(this.name + " " + this.signal + " flag: " + this.flag);
           }
-          console.log(this.name + " " + this.signal + " flag: " + this.flag);
+        } else {
+          this.flag = false;
         }
         if (this.signal <= -2) {
             this.flag = false;
@@ -158,6 +162,7 @@ class InfluxLongStrategy extends BaseStrategy {
         if (todayLongPositions > 0) {
             let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            console.log(price, longTodayPostionAveragePrice);
             if(price > longTodayPostionAveragePrice){
                 this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
             }
