@@ -89,6 +89,8 @@ class InfluxShortStrategy extends BaseStrategy {
         if (global.actionFlag[closedBar.symbol] <= -2){
           if(this.signal <= -2) {
               this.flag = true;
+          } else {
+            this.flag = null;
           }
           console.log(this.name + " " + this.signal + " flag: " + this.flag);
         }
