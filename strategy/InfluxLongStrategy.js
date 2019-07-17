@@ -212,7 +212,6 @@ class InfluxLongStrategy extends BaseStrategy {
                     } else if (this.flag === false) {
                         if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
                           console.log(this.name + " hi his flag is : " + this.flag);
-                          console.log(position);
                             if (position) {
                                 this._profitTodayLongPositions(tick, position);
                             }
