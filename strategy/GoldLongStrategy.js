@@ -10,13 +10,10 @@ class GoldLongStrategy extends BaseStrategy {
         //调用super(strategyConfig)的作用是基类BaseStrategy实例也需要根据strategyConfig来进行初始化
         super(strategyConfig);
         global.BarCount = 0;
-        this.signal = 0;
         this.tick = null;
-        this.flag = null;
         this.lastTick = null;
         this.total = strategyConfig.total;
         this.sum = 0;
-        // this.direction = strategyConfig.direction;
     }
 
 
@@ -25,7 +22,7 @@ class GoldLongStrategy extends BaseStrategy {
     }
 
     OnNewBar(newBar) {
-        console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice, this.signal);
+        console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice);
     }
 
     _closeTodayLongPositions(tick, position, up = 0) {
@@ -33,9 +30,6 @@ class GoldLongStrategy extends BaseStrategy {
         if (todayLongPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
-            this.open = false;
-            this.isOpened = false;
-            // this.thresholdPrice = null;
         }
     }
 
@@ -57,7 +51,7 @@ class GoldLongStrategy extends BaseStrategy {
 
 
     //js Date对象从0开始的月份
-     _getTimeToGold(tick, breakOffsetSec = 588) {
+     _getTimeToGold(tick, breakOffsetSec = 588, closeOffsetSec = 30) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -69,12 +63,10 @@ class GoldLongStrategy extends BaseStrategy {
         let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
         var PMCloseTime = new Date(PMCloseTimeStr);
         var PMStopTime = new Date(PMCloseTime.getTime() - breakOffsetSec * 1000);
-        // let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-        // let AMCloseTimeStr = NowDateStr + " " + tickFutureConfig.AMClose;
-        // var AMCloseTime = new Date(AMCloseTimeStr);
-        // var AMStopTime = new Date(AMCloseTime.getTime() - breakOffsetSec * 1000);
-        // return TickDateTime > AMStopTime && TickDateTime < AMCloseTime;
-        return TickDateTime > PMStopTime && TickDateTime < PMCloseTime;
+        let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
+        var NightCloseTime = new Date(NightCloseTimeStr);
+        var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
+        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime)|| (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
     }
 
 
@@ -84,23 +76,7 @@ class GoldLongStrategy extends BaseStrategy {
         super.OnTick(tick);
         this.lastTick = this.tick;
         this.tick = tick;
-        let position = this.GetPosition(tick.symbol);
-<<<<<<< HEAD
-=======
-        if(position != undefined) {
-          let todayLongPositions = position.GetLongTodayPosition();
-          let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
-          // console.log(position);
-          console.log(todayLongPositions);
-          console.log(longTodayPostionAveragePrice);
-        }
-        console.log(position);
-        console.log(this._getTimeToGold(tick));
-
-
->>>>>>> 0ed579348a9441035d1cede650b50ef1b5a5ebea
         if( ! this._getTimeToGold(tick)){
-          // if(tick.lastPrice < tick.openPrice && tick.lastPrice < tick.preClosePrice) {
           if(this.lastTick && this.lastTick.lastPrice <  tick.lastPrice ) {
             this.QueryTradingAccount(tick.clientName);
             let availablesSum = this._getAvailabelSum(tick);
@@ -108,16 +84,9 @@ class GoldLongStrategy extends BaseStrategy {
               let price = tick.lastPrice;
               this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
             }
-<<<<<<< HEAD
           }
       } else {
-=======
-
-          }
-      } else {
-        // this._cancelOrder();
         let position = this.GetPosition(tick.symbol);
->>>>>>> 0ed579348a9441035d1cede650b50ef1b5a5ebea
         if(position != undefined) {
           let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
           if(tick.lastPrice > longTodayPostionAveragePrice){

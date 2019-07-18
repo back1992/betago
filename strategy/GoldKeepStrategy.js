@@ -78,15 +78,6 @@ class GoldOutStrategy extends BaseStrategy {
                   }
                 }
               }
-              // if (yesterdayLongPositions > 0) {
-              //   this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-              // } else {
-              //   let todayLongPositions = position.GetLongTodayPosition(){
-              //     if(todayLongPositions > 0){
-              //       this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
-              //     }
-              //   }
-              // }
           }
         }
         global.TickCount++;
