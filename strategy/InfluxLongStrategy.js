@@ -92,7 +92,7 @@ class InfluxLongStrategy extends BaseStrategy {
             } else {
               this.flag = null;
             }
-            console.log(this.name + " " + this.signal + " flag: " + this.flag);
+            console.log(this.name + " K线结束,结束时间:"+closedBar.endDatetime.toLocaleString() + " signal: " +  this.signal + " signal5m: " +  global.actionFlag[closedBar.symbol] + " flag: " + this.flag);
           }
         } else {
           this.flag = false;
@@ -105,7 +105,8 @@ class InfluxLongStrategy extends BaseStrategy {
     OnNewBar(newBar) {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        let intervalArray = [5, 15, 30 ,60];
+        // let intervalArray = [5, 15, 30 ,60];
+        let intervalArray = [5, 15];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
             if (err) {
@@ -119,12 +120,14 @@ class InfluxLongStrategy extends BaseStrategy {
             let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
             let volume = ClosedBarList.map(e => e["volume"]);
+            let actionDatetime = ClosedBarList[ClosedBarList.length-1]["ClosedBarList"];
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            if(score >= 2 || score <= -2) {
-              global.actionFlag[newBar.symbol] = score;
-            } else if (score != 0){
-              console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
-            }
+            global.actionFlag[newBar.symbol] = score;
+            // if(score >= 2 || score <= -2) {
+            // }
+            // else if (score != 0){
+            //   console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
+            // }
         });
     }
 
@@ -158,11 +161,9 @@ class InfluxLongStrategy extends BaseStrategy {
 
     _profitTodayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.GetLongTodayPosition();
-        console.log("_profitTodayLongPositions: " + todayLongPositions);
         if (todayLongPositions > 0) {
             let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            console.log(price, longTodayPostionAveragePrice);
             if(price > longTodayPostionAveragePrice){
                 this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
             }
@@ -216,7 +217,6 @@ class InfluxLongStrategy extends BaseStrategy {
                         }
                     } else if (this.flag === false) {
                         if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                          console.log(this.name + " hi his flag is : " + this.flag);
                             if (position) {
                                 this._profitTodayLongPositions(tick, position);
                             }

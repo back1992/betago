@@ -213,7 +213,7 @@ class InfluxDB {
     barrange([measurment, BarInterval, BarLookBackCount, sortDirection], callback) {
         let influxClient = this;
         sortDirection = (sortDirection < 0) ? "desc" : "asc";
-        let influxQL = `SELECT FIRST(lastPrice) AS openPrice, LAST(lastPrice) AS closePrice, MAX(lastPrice) AS highPrice , min(lastPrice) AS lowPrice , sum(volume) AS volume FROM ${measurment} GROUP BY time(${BarInterval}m) FILL(none) ORDER BY time ${sortDirection}  LIMIT ${BarLookBackCount}`;
+        let influxQL = `SELECT FIRST(actionDatetime) AS actionDatetime, FIRST(lastPrice) AS openPrice, LAST(lastPrice) AS closePrice, MAX(lastPrice) AS highPrice , min(lastPrice) AS lowPrice , sum(volume) AS volume FROM ${measurment} GROUP BY time(${BarInterval}m) FILL(none) ORDER BY time ${sortDirection}  LIMIT ${BarLookBackCount}`;
         influxClient.influx.query(influxQL).then(barList => {
             // console.log(barList);
             // console.log(barList.reverse());

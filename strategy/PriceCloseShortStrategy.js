@@ -37,12 +37,6 @@ class PriceCloseShortStrategy extends BaseStrategy{
 
   OnNewBar(newBar)
   {
-    let position = this.GetPosition(newBar.symbol);
-    if(position!= undefined){
-      let todayShortPositions = position.GetShortTodayPosition();
-      let yesterdayShortPositions = position.GetShortYesterdayPosition();
-      console.log(newBar.symbol, todayShortPositions, yesterdayShortPositions);
-    }
   }
 
   _closeShortPositions(tick, shortPositions = 1, up = 0) {
@@ -51,10 +45,6 @@ class PriceCloseShortStrategy extends BaseStrategy{
 
   }
 
-  _closeLongPositions(tick, longPositions = 1, up = 0) {
-      let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-      this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close);
-  }
 
 
   OnTick(tick)
