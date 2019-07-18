@@ -45,7 +45,7 @@ class GoldOutStrategy extends BaseStrategy {
         this.QueryTradingAccount(tick.clientName);
         if (global.TickCount % 168 === 0) {
             console.log(global.TickCount, global.availableFund);
-            if (global.availableFund < 100000) {
+            if (global.availableFund < 0) {
                 let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
                 let position = this.GetPosition(tick.symbol);
                 console.log(position);
