@@ -54,7 +54,7 @@ function _get_talib_indicator(strategy, highPrice, lowPrice, closePrice, volume)
     return _get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
 }
 /////////////////////// Private Method ///////////////////////////////////////////////
-class BackTestLongStrategy extends BaseStrategy {
+class InfluxLongStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
