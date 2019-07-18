@@ -136,88 +136,23 @@ class BackTestStrategy extends BaseStrategy {
         this.closedBarList = ClosedBarList;
     }
 
-    OnQueryTradingAccount(tradingAccountInfo) {
-        global.availableFund = tradingAccountInfo["Available"];
-        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
-        global.Balance = tradingAccountInfo["Balance"];
-    }
-
-    _openLong(tick) {
-        this.QueryTradingAccount(tick.clientName);
-        let sum = this._getAvilableSum(tick);
-        if (sum >= 1) {
-            this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Buy, OpenCloseFlagType.Open);
-            this.flag = null;
-        }
-    }
-
-    _closeTodayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.GetLongTodayPosition();
-        if (todayLongPositions > 0) {
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
-        }
-    }
-
-    _profitTodayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.GetLongTodayPosition();
-        console.log("_profitTodayLongPositions: " + todayLongPositions);
-        if (todayLongPositions > 0) {
-            let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            console.log(price, longTodayPostionAveragePrice);
-            if(price > longTodayPostionAveragePrice){
-                this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
-            }
-        }
-    }
-
-    _closeYesterdayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.GetLongYesterdayPosition();
-        if (todayLongPositions > 0) {
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-        }
-    }
 
 
     OnTick(tick) {
         super.OnTick(tick);
+        global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
         this.lastTick = this.tick;
         this.tick = tick;
-        let tradeState = this._getOffset(tick, 0, 30);
-        let position = this.GetPosition(tick.symbol);
-        switch (tradeState) {
-            // timeOffset
-            case 0:
-                // this.thresholdPrice = null;
-                if (position) {
-                    this._closeYesterdayLongPositions(tick, position, 1);
-                }
-                break;
-            // time to close
-            case -1:
-                if (position) {
-                    // this._closeTodayLongPositions(tick, position, 1);
-                    this._profitTodayLongPositions(tick, position, 1);
-                }
-                break;
-            // trade time
-            default :
-                let unFinishOrderList = this.GetUnFinishOrderList();
-                if (unFinishOrderList.length === 0) {
-                    if (this.flag === true) {
-                        if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                          global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "long");
-                          this.flag = null;
-                        }
-                    } else if (this.flag === false) {
-                        if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                          global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "short");
-                          this.flag = null;
-                        }
-                    }
-                }
+        if (this.flag === true) {
+            if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
+              global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "long");
+              this.flag = null;
+            }
+        } else if (this.flag === false) {
+            if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
+              global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "short");
+              this.flag = null;
+            }
         }
     }
 
