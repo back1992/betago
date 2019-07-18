@@ -37,25 +37,25 @@ class PriceCloseShortStrategy extends BaseStrategy{
 
   OnNewBar(newBar)
   {
-    let position = this.GetPosition(newBar.symbol);
-    if(position!= undefined){
-      let todayShortPositions = position.GetShortTodayPosition();
-      let yesterdayShortPositions = position.GetShortYesterdayPosition();
-      console.log(newBar.symbol, todayShortPositions, yesterdayShortPositions);
-    }
   }
 
   _closeShortPositions(tick, shortPositions = 1, up = 0) {
       let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-      this.SendOrder(tick.clientName, tick.symbol, price, shortPositions, Direction.Buy, OpenCloseFlagType.Close);
+      // this.SendOrder(tick.clientName, tick.symbol, price, shortPositions, Direction.Buy, OpenCloseFlagType.Close);
+
+      let position = this.GetPosition(newBar.symbol);
+      if(position!= undefined){
+        let todayShortPositions = position.GetShortTodayPosition();
+        let yesterdayShortPositions = position.GetShortYesterdayPosition();
+        console.log(newBar.symbol, todayShortPositions, yesterdayShortPositions);
+        if(todayShortPositions > 0){
+          this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+        } else if (yesterdayShortPositions > 0) {
+              this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+        }
+      }
 
   }
-
-  _closeLongPositions(tick, longPositions = 1, up = 0) {
-      let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-      this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close);
-  }
-
 
   OnTick(tick)
   {

@@ -338,6 +338,21 @@ class MainEngine{
 
 
 
+    RecordTrade(tradelog){
+        global.NodeQuant.SystemDBClient.lpush(System_Trade_DB,JSON.stringify(tradelog),function (err,reply) {
+            if(err) {
+
+                let message="记录System_Log失败，原因:"+err;
+                let error=new NodeQuantError("MainEngine",ErrorType.DBError,message);
+                global.AppEventEmitter.emit(EVENT.OnError,error);
+
+                throw new Error(message);
+            }
+        });
+    }
+
+
+
 
     GetClient(clientName) {
         return this.clientDic[clientName];
