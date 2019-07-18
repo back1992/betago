@@ -21,10 +21,11 @@ class CavalryIIStrategy extends BaseStrategy {
         this.flag = null;
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
+        this.lastSignal = 0;
         this.closedBarList = [];
         global.actionFlag = {};
-        global.airForcePrice = {};
-        global.stopPrice = {};
+        // global.airForcePrice = {};
+        // global.stopPrice = {};
     }
 
 
@@ -35,11 +36,11 @@ class CavalryIIStrategy extends BaseStrategy {
             if(this.closedBarList.length>50) {
               this.closedBarList.shift();
             }
-            console.log(this.closedBarList.length);
             this.openPrice = this.closedBarList.map(e => e["openPrice"]);
             this.highPrice = this.closedBarList.map(e => e["highPrice"]);
             this.lowPrice = this.closedBarList.map(e => e["lowPrice"]);
             this.closeprice = this.closedBarList.map(e => e["closePrice"]);
+            this.volume = this.closedBarList.map(e => e["volume"]);
             var retMFI = talib.MFI(this.highPrice, this.lowPrice, this.closePrice, this.volume, 14);
             var retCCI = talib.CCI(this.highPrice, this.lowPrice, this.closePrice, 14);
             var retCMO = talib.CMO(this.closePrice, 14);
@@ -52,18 +53,19 @@ class CavalryIIStrategy extends BaseStrategy {
             var aroonosc = retAROONOSC[retAROONOSC.length - 1];
             var adx = retADX[retADX.length - 1];
             var rsi = retRSI[retRSI.length - 1];
+            this.lastSignal = this.signal;
             this.signal = this._get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
         }
-        if (global.actionFlag[closedBar.symbol] >= 2 && this.signal >= 2) {
+        if (global.actionFlag[closedBar.symbol] >= 2 && this.signal >= 2 && this.lastSignal < 2) {
             this.flag = true;
         }
         if (this.signal <= -2) {
             this.flag = false;
         }
+        console.log(closedBar.symbol + "---" + closedBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal + " last signal: " + this.lastSignal + " global.actionFlag: "+global.actionFlag[closedBar.symbol]);
     }
 
     OnNewBar(newBar) {
-        // console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
         mongo.connect(url, {useNewUrlParser: true}, (err, client) => {
             if (err) {
                 console.error(err);
@@ -74,12 +76,10 @@ class CavalryIIStrategy extends BaseStrategy {
             collection.find({
                 "ctpContract": newBar.symbol,
             }).sort({"utime": -1}).limit(1).toArray((err, items) => {
-                // console.log(items[0])
-                if (items.length !== 0 && items[0]['score'] >= 2) {
-                    global.airForcePrice[newBar.symbol] = items[0]['price']['low'];
-                    global.stopPrice[newBar.symbol] = items[0]['price']['high'];
+                if (items.length !== 0 ) {
+                    // global.airForcePrice[newBar.symbol] = items[0]['price']['low'];
+                    // global.stopPrice[newBar.symbol] = items[0]['price']['high'];
                     global.actionFlag[newBar.symbol] = items[0]['score'];
-                    console.log(newBar.symbol + "---" + newBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal);
                 }
             })
         });
@@ -116,7 +116,7 @@ class CavalryIIStrategy extends BaseStrategy {
     _profitTodayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.GetLongTodayPosition();
         if (todayLongPositions > 0) {
-            let longTodayPostionAveragePrice = position.GetLongTodayPostionAveragePrice();
+            let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if(price > longTodayPostionAveragePrice){
               this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
@@ -140,9 +140,6 @@ class CavalryIIStrategy extends BaseStrategy {
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
         let position = this.GetPosition(tick.symbol);
-        if (position) {
-            // this.position = position.GetLongTodayPosition();
-        }
         switch (tradeState) {
             // timeOffset
             case 0:

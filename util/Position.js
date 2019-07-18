@@ -1,5 +1,6 @@
 //策略仓位管理器
 //一个合约一个仓位对象
+let NodeQuantError = require("./NodeQuantError.js");
 class Position {
     constructor() {
         this.strategyName = "";
@@ -74,7 +75,7 @@ class Position {
     }
 
     //获取 多仓 持仓均价
-    GetLongPostionAveragePrice()
+    GetLongPositionAveragePrice()
     {
         let longPositionSumAmount=0;
         let longPositionSumVolume=0;
@@ -83,6 +84,28 @@ class Position {
             let tradeRecord=this.longPositionTradeRecordList[index];
             longPositionSumVolume += tradeRecord.volume;
             longPositionSumAmount += tradeRecord.price*tradeRecord.volume;
+        }
+        let longPositionAveragePrice=0;
+        if(longPositionSumVolume!==0)
+        {
+            longPositionAveragePrice = longPositionSumAmount/longPositionSumVolume;
+        }
+        return longPositionAveragePrice;
+    }
+
+    //获取 多今仓 持仓均价
+    GetLongTodayPositionAveragePrice()
+    {
+        let longPositionSumAmount=0;
+        let longPositionSumVolume=0;
+        let TodayTradingDay=global.NodeQuant.MainEngine.TradingDay;
+        for(let index in this.longPositionTradeRecordList)
+        {
+            let tradeRecord=this.longPositionTradeRecordList[index];
+            if(tradeRecord.tradingDay===TodayTradingDay){
+              longPositionSumVolume += tradeRecord.volume;
+              longPositionSumAmount += tradeRecord.price*tradeRecord.volume;
+            }
         }
         let longPositionAveragePrice=0;
         if(longPositionSumVolume!==0)
@@ -110,6 +133,75 @@ class Position {
         }
         return shortPositionAveragePrice;
     }
+
+    //获取 空今仓 持仓 均价
+    GetShortTodayPositionAveragePrice()
+    {
+        let shortPositionSumAmount=0;
+        let shortPositionSumVolume=0;
+        let TodayTradingDay=global.NodeQuant.MainEngine.TradingDay;
+        for(let index in this.shortPositionTradeRecordList)
+        {
+            let tradeRecord=this.shortPositionTradeRecordList[index];
+            if(tradeRecord.tradingDay===TodayTradingDay){
+              shortPositionSumVolume += tradeRecord.volume;
+              shortPositionSumAmount += tradeRecord.price*tradeRecord.volume;
+          }
+        }
+        let shortPositionAveragePrice=0;
+        if(shortPositionSumVolume!==0)
+        {
+            shortPositionAveragePrice = shortPositionSumAmount/shortPositionSumVolume;
+        }
+        return shortPositionAveragePrice;
+    }
+
+
+        //获取 多今仓 持仓均价
+        GetLongTodayPositionAveragePrice()
+        {
+            let longPositionSumAmount=0;
+            let longPositionSumVolume=0;
+            let TodayTradingDay=global.NodeQuant.MainEngine.TradingDay;
+            for(let index in this.longPositionTradeRecordList)
+            {
+                let tradeRecord=this.longPositionTradeRecordList[index];
+                if(tradeRecord.tradingDay===TodayTradingDay){
+                  longPositionSumVolume += tradeRecord.volume;
+                  longPositionSumAmount += tradeRecord.price*tradeRecord.volume;
+                }
+            }
+            let longPositionAveragePrice=0;
+            if(longPositionSumVolume!==0)
+            {
+                longPositionAveragePrice = longPositionSumAmount/longPositionSumVolume;
+            }
+            return longPositionAveragePrice;
+        }
+
+
+
+        //获取 空仓 持仓 均价
+        GetShortTodayPositionAveragePrice()
+        {
+            let shortPositionSumAmount=0;
+            let shortPositionSumVolume=0;
+            let TodayTradingDay=global.NodeQuant.MainEngine.TradingDay;
+            for(let index in this.shortPositionTradeRecordList)
+            {
+                let tradeRecord=this.shortPositionTradeRecordList[index];
+                if(tradeRecord.tradingDay===TodayTradingDay){
+                  shortPositionSumVolume += tradeRecord.volume;
+                  shortPositionSumAmount += tradeRecord.price*tradeRecord.volume;
+              }
+            }
+            let shortPositionAveragePrice=0;
+            if(shortPositionSumVolume!==0)
+            {
+                shortPositionAveragePrice = shortPositionSumAmount/shortPositionSumVolume;
+            }
+            return shortPositionAveragePrice;
+        }
 
 
     /// <summary>

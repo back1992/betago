@@ -9,11 +9,11 @@ class DBStorStrategy extends BaseStrategy {
     }
 
     OnClosedBar(closedBar) {
-        console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
+        // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
     }
 
     OnNewBar(newBar) {
-        console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice);
+        // console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice);
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {

@@ -54,7 +54,7 @@ function _get_talib_indicator(strategy, highPrice, lowPrice, closePrice, volume)
     return _get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
 }
 /////////////////////// Private Method ///////////////////////////////////////////////
-class InfluxLongStrategy extends BaseStrategy {
+class BackTestStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -85,18 +85,24 @@ class InfluxLongStrategy extends BaseStrategy {
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
-
+        // if (this.flag != true && global.actionFlag[closedBar.symbol] >= 2){
         if (global.actionFlag[closedBar.symbol] >= 2){
           if(this.signal >= 2) {
             this.flag = true;
-            console.log(this.name + " " + this.signal + " flag: " + this.flag);
           } else {
             this.flag = null;
           }
         }
-        if (this.signal <= -2) {
+
+        // if (this.flag != false && global.actionFlag[closedBar.symbol] <= -2){
+        if ( global.actionFlag[closedBar.symbol] <= -2){
+          if(this.signal <= -2) {
             this.flag = false;
+          } else {
+            this.flag = null;
+          }
         }
+        console.log(this.name + " " + this.signal + " flag: " + this.flag);
     }
 
     OnNewBar(newBar) {
@@ -117,7 +123,11 @@ class InfluxLongStrategy extends BaseStrategy {
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
             let volume = ClosedBarList.map(e => e["volume"]);
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            global.actionFlag[newBar.symbol] = score;
+            if(score >= 2 || score <= -2) {
+              global.actionFlag[newBar.symbol] = score;
+            } else if (score != 0){
+              console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
+            }
         });
     }
 
@@ -151,9 +161,11 @@ class InfluxLongStrategy extends BaseStrategy {
 
     _profitTodayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.GetLongTodayPosition();
+        console.log("_profitTodayLongPositions: " + todayLongPositions);
         if (todayLongPositions > 0) {
             let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            console.log(price, longTodayPostionAveragePrice);
             if(price > longTodayPostionAveragePrice){
                 this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
             }
@@ -196,20 +208,13 @@ class InfluxLongStrategy extends BaseStrategy {
                 if (unFinishOrderList.length === 0) {
                     if (this.flag === true) {
                         if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                            if (position === undefined) {
-                                this._openLong(tick);
-                            } else {
-                                let todayLongPositions = position.GetLongTodayPosition();
-                                if (todayLongPositions < this.total) {
-                                    this._openLong(tick);
-                                }
-                            }
+                          global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "long");
+                          this.flag = null;
                         }
                     } else if (this.flag === false) {
                         if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                            if (position) {
-                                this._profitTodayLongPositions(tick, position);
-                            }
+                          global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "short");
+                          this.flag = null;
                         }
                     }
                 }
@@ -222,4 +227,4 @@ class InfluxLongStrategy extends BaseStrategy {
     }
 }
 
-module.exports = InfluxLongStrategy;
+module.exports = BackTestStrategy;
