@@ -85,17 +85,14 @@ class InfluxLongStrategy extends BaseStrategy {
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
-        if(this.flag != true){
-          if (global.actionFlag[closedBar.symbol] >= 2){
-            if(this.signal >= 2) {
-              this.flag = true;
-            } else {
-              this.flag = null;
-            }
+
+        if (global.actionFlag[closedBar.symbol] >= 2){
+          if(this.signal >= 2) {
+            this.flag = true;
             console.log(this.name + " " + this.signal + " flag: " + this.flag);
+          } else {
+            this.flag = null;
           }
-        } else {
-          this.flag = false;
         }
         if (this.signal <= -2) {
             this.flag = false;
@@ -120,11 +117,7 @@ class InfluxLongStrategy extends BaseStrategy {
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
             let volume = ClosedBarList.map(e => e["volume"]);
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            if(score >= 2 || score <= -2) {
-              global.actionFlag[newBar.symbol] = score;
-            } else if (score != 0){
-              console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
-            }
+            global.actionFlag[newBar.symbol] = score;
         });
     }
 
@@ -158,11 +151,9 @@ class InfluxLongStrategy extends BaseStrategy {
 
     _profitTodayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.GetLongTodayPosition();
-        console.log("_profitTodayLongPositions: " + todayLongPositions);
         if (todayLongPositions > 0) {
             let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            console.log(price, longTodayPostionAveragePrice);
             if(price > longTodayPostionAveragePrice){
                 this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
             }
@@ -216,7 +207,6 @@ class InfluxLongStrategy extends BaseStrategy {
                         }
                     } else if (this.flag === false) {
                         if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                          console.log(this.name + " hi his flag is : " + this.flag);
                             if (position) {
                                 this._profitTodayLongPositions(tick, position);
                             }

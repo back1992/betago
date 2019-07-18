@@ -21,10 +21,11 @@ class GoldOutStrategy extends BaseStrategy {
     }
 
     OnNewBar(newBar) {
-        console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice, this.flag);
+        // console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice, this.flag);
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
+      // console.log(tradingAccountInfo);
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
@@ -40,43 +41,32 @@ class GoldOutStrategy extends BaseStrategy {
     }
 
 
-    //js Date对象从0开始的月份
-     _getTimeToGold(tick, breakOffsetSec = 158) {
-        require("../systemConfig");
-        let NowDateTime = new Date();
-        let NowDateStr = NowDateTime.toLocaleDateString();
-        let TickDateTimeStr = NowDateStr + " " + tick.timeStr;
-        let TickDateTime = new Date(TickDateTimeStr);
-        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
-        let upperFutureName = contract.futureName.toUpperCase();
-        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-        let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
-        var PMCloseTime = new Date(PMCloseTimeStr);
-        var PMStopTime = new Date(PMCloseTime.getTime() - breakOffsetSec * 1000);
-        return TickDateTime > PMStopTime && TickDateTime < PMCloseTime;
-    }
-
 
     OnTick(tick) {
         // super.OnTick(tick);
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         this.QueryTradingAccount(tick.clientName);
-        if (global.TickCount%168 === 0) {
+        if (global.TickCount % 168 === 0) {
           console.log(global.TickCount, global.availableFund);
-          if (global.availableFund < 0 ) {
+          if (global.availableFund < 100000 ) {
               let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
               let position = this.GetPosition(tick.symbol);
+              console.log(position);
               if(position != undefined){
                 let yesterdayLongPositions = position.GetLongYesterdayPosition();
+                let todayLongPositions = position.GetLongTodayPosition();
                 if(yesterdayLongPositions > 0) {
                   this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-                } else {
-                  let todayLongPositions = position.GetLongTodayPosition();
-                  if(todayLongPositions > 0){
-                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+                  } else if(todayLongPositions > 0){
+                      this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+                  }else {
+                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
                   }
                 }
+              else {
+                  console.log(position);
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
               }
           }
         }

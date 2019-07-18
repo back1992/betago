@@ -473,4 +473,4 @@ AppName="NodeQuant";
 Tick_DB_Name=AppName+"_Tick_DB";
 System_Log_DB=AppName+"_System_Log";
 System_Error_DB=AppName+"_System_Error";
-System_Trade_DB=AppName+"_System_Trade";
+System_Trade_DB="trade_record";
