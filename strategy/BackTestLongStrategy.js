@@ -205,21 +205,11 @@ class BackTestLongStrategy extends BaseStrategy {
                 if (unFinishOrderList.length === 0) {
                     if (this.flag === true) {
                         if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                            if (position === undefined) {
-                                this._openLong(tick);
-                            } else {
-                                let todayLongPositions = position.GetLongTodayPosition();
-                                if (todayLongPositions < this.total) {
-                                    this._openLong(tick);
-                                }
-                            }
+                          global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "long");
                         }
                     } else if (this.flag === false) {
                         if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                          console.log(this.name + " hi his flag is : " + this.flag);
-                            if (position) {
-                                this._profitTodayLongPositions(tick, position);
-                            }
+                          global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "short");
                         }
                     }
                 }
@@ -232,4 +222,4 @@ class BackTestLongStrategy extends BaseStrategy {
     }
 }
 
-module.exports = InfluxLongStrategy;
+module.exports = BackTestLongStrategy;

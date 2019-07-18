@@ -132,6 +132,26 @@ class InfluxDB {
         });
     }
 
+    RecordTrade(symbol, tick, direction) {
+        this.influx.writePoints([
+            {
+                measurement: System_Trade_DB,
+                tags: {tradingDay: tick.date},
+                fields: {
+                    symbol: tick.symbol,
+                    exchange: tick.exchange,
+                    lastPrice: tick.lastPrice,          //Tick的最新价
+                    direction: direction,          //Tick的最新价
+                    //自定义数据
+                    datetime: tick.datetime.toLocaleString(),
+                },
+                timestamp: tick.Id,
+            }
+        ]).catch(err => {
+            console.error(`Error saving trade records to InfluxDB! ${err.stack}`)
+        });
+    }
+
     //获取单个合约的交易日列表
     GetTradingDayList(measurment, callback) {
         let influxQL = "select distinct(date) from \"" + measurment + "\"";
