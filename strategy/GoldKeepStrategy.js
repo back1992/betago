@@ -14,10 +14,8 @@ class GoldOutStrategy extends BaseStrategy {
         global.TickCount = 1;
     }
 
-
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-
     }
 
     OnNewBar(newBar) {
@@ -25,7 +23,7 @@ class GoldOutStrategy extends BaseStrategy {
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
-      // console.log(tradingAccountInfo);
+        // console.log(tradingAccountInfo);
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
@@ -40,35 +38,32 @@ class GoldOutStrategy extends BaseStrategy {
         return Math.floor(global.availableFund / (tick.lastPrice * unit * marginRate));
     }
 
-
-
     OnTick(tick) {
         // super.OnTick(tick);
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         this.QueryTradingAccount(tick.clientName);
         if (global.TickCount % 168 === 0) {
-          console.log(global.TickCount, global.availableFund);
-          if (global.availableFund < 100000 ) {
-              let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
-              let position = this.GetPosition(tick.symbol);
-              console.log(position);
-              if(position != undefined){
-                let yesterdayLongPositions = position.GetLongYesterdayPosition();
-                let todayLongPositions = position.GetLongTodayPosition();
-                if(yesterdayLongPositions > 0) {
-                  this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-                  } else if(todayLongPositions > 0){
-                      this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
-                  }else {
+            console.log(global.TickCount, global.availableFund);
+            if (global.availableFund < 100000) {
+                let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
+                let position = this.GetPosition(tick.symbol);
+                console.log(position);
+                if (position != undefined) {
+                    let yesterdayLongPositions = position.GetLongYesterdayPosition();
+                    let todayLongPositions = position.GetLongTodayPosition();
+                    if (yesterdayLongPositions > 0) {
+                        this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
+                    } else if (todayLongPositions > 0) {
+                        this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+                    } else {
+                        this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
+                    }
+                } else {
+                    console.log(position);
                     this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-                  }
                 }
-              else {
-                  console.log(position);
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-              }
-          }
+            }
         }
         global.TickCount++;
     }
