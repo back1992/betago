@@ -102,8 +102,7 @@ class InfluxLongStrategy extends BaseStrategy {
     OnNewBar(newBar) {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        // let intervalArray = [5, 15, 30 ,60];
-        let intervalArray = [5, 15];
+        let intervalArray = [5, 15, 30 ,60];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
             if (err) {
