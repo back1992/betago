@@ -16,9 +16,9 @@ class DBStorStrategy extends BaseStrategy {
         // console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice);
     }
 
-    OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
-        this.closedBarList = ClosedBarList
-    }
+    // OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
+    //     this.closedBarList = ClosedBarList
+    // }
 
     OnTick(tick) {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数

@@ -86,11 +86,18 @@ class InfluxShortStrategy extends BaseStrategy {
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
         // console.log(this.signal, global.actionFlag[closedBar.symbol]);
-        if (global.actionFlag[closedBar.symbol] <= -2){
-          if(this.signal <= -2) {
-              this.flag = true;
+
+        if(this.flag != true){
+          if (global.actionFlag[closedBar.symbol] <= -2){
+            if(this.signal <= -2) {
+                this.flag = true;
+                console.log(this.name + " K线结束,结束时间:"+closedBar.endDatetime.toLocaleString() + " signal: " +  this.signal + " signal5m: " +  global.actionFlag[closedBar.symbol] + " flag: " + this.flag);
+            } else {
+              this.flag = null;
+            }
           }
-          console.log(this.name + " " + this.signal + " flag: " + this.flag);
+        } else {
+          this.flag = false;
         }
         if (this.signal >= 2) {
             this.flag = false;
@@ -101,7 +108,7 @@ class InfluxShortStrategy extends BaseStrategy {
     OnNewBar(newBar) {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        let intervalArray = [5, 15, 30 ,60];
+        let intervalArray = [5, 15, 30, 60];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
             if (err) {
@@ -114,13 +121,16 @@ class InfluxShortStrategy extends BaseStrategy {
             let highPrice = ClosedBarList.map(e => e["highPrice"]);
             let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
+            let actionDatetime = ClosedBarList.map(e => e["actionDatetime"]);
             let volume = ClosedBarList.map(e => e["volume"]);
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            if(score >= 2 || score <= -2) {
-              global.actionFlag[newBar.symbol] = score;
-            } else if (score != 0){
-              console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
-            }
+            // let actionDatetime = ClosedBarList[ClosedBarList.length-1]["ClosedBarList"];
+            global.actionFlag[newBar.symbol] = score;
+            // if(score >= 2 || score <= -2) {
+            // }
+            // else if (score != 0){
+            //   console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score + " actionDatetime: " + actionDatetime[actionDatetime.length-1]);
+            // }
         });
     }
 
@@ -173,7 +183,6 @@ class InfluxShortStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
         this.lastTick = this.tick;
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
@@ -209,7 +218,6 @@ class InfluxShortStrategy extends BaseStrategy {
                             }
                         }
                     } else if (this.flag === false) {
-                        console.log(this.name + " hi his flag is : " + this.flag);
                         if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
                             if (position) {
                                 this._profitTodayShortPositions(tick, position);

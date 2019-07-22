@@ -18,17 +18,17 @@ class PriceCloseLongStrategy extends BaseStrategy{
         this.total = strategyConfig.total;
         this.thresholdPrice = strategyConfig.thresholdPrice;
         this.sum = 0;
+        this.flag = false;
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar)
     {
+      console.log(closedBar.symbol + " flag: " + this.flag + "closePrice" + closedBar.closePrice+ "thresholdPrice: " + this.thresholdPrice );
       if (this.thresholdPrice) {
-          // if (closedBar.highPrice < this.thresholdPrice && closedBar.closePrice < closedBar.openPrice) {
           if (closedBar.closePrice > this.thresholdPrice ) {
               this.flag = true;
           }
-          // if (closedBar.lowPrice > this.thresholdPrice) {
           if (closedBar.closePrice < this.thresholdPrice) {
               this.flag = false;
           }
@@ -38,23 +38,25 @@ class PriceCloseLongStrategy extends BaseStrategy{
 
     OnNewBar(newBar)
     {
-      let position = this.GetPosition(newBar.symbol);
-      if(position!= undefined){
-        let todayLongPositions = position.GetLongTodayPosition();
-        let yesterdayLongPositions = position.GetLongYesterdayPosition();
-        console.log(newBar.symbol, todayLongPositions, yesterdayLongPositions);
-      }
-    }
-
-    _closeShortPositions(tick, shortPositions = 1, up = 0) {
-        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-        this.SendOrder(tick.clientName, tick.symbol, price, shortPositions, Direction.Buy, OpenCloseFlagType.Close);
 
     }
+
+
 
     _closeLongPositions(tick, longPositions = 1, up = 0) {
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-        this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close);
+        let position = this.GetPosition(tick.symbol);
+        if(position!= undefined){
+          let todayLongPositions = position.GetLongTodayPosition();
+          let yesterdayLongPositions = position.GetLongYesterdayPosition();
+          if(todayLongPositions > 0){
+            this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
+          } else if (yesterdayLongPositions > 0) {
+                this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
+          }
+        } else {
+            this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close);
+        }
     }
 
 
