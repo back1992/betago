@@ -102,7 +102,7 @@ class BackTestStrategy extends BaseStrategy {
             this.flag = null;
           }
         }
-        console.log(this.name + " " + this.signal + " flag: " + this.flag);
+
     }
 
     OnNewBar(newBar) {
@@ -125,8 +125,7 @@ class BackTestStrategy extends BaseStrategy {
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
             if(score >= 2 || score <= -2) {
               global.actionFlag[newBar.symbol] = score;
-            } else if (score != 0){
-              console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
+              // console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score);
             }
         });
     }
@@ -146,11 +145,13 @@ class BackTestStrategy extends BaseStrategy {
         if (this.flag === true) {
             if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
               global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "long");
+              console.log(this.name + " " + this.signal + " flag: " + this.flag);
               this.flag = null;
             }
         } else if (this.flag === false) {
             if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
               global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "short");
+              console.log(this.name + " " + this.signal + " flag: " + this.flag);
               this.flag = null;
             }
         }

@@ -140,7 +140,7 @@ class InfluxDB{
         });
     }
 
-    RecordTrade(symbol, tick, direction) {
+    RecordTrade(symbol, tick, direction, volume = 1) {
         this.influx.writePoints([
             {
                 measurement: System_Trade_DB,
@@ -150,6 +150,7 @@ class InfluxDB{
                     exchange: tick.exchange,
                     lastPrice: tick.lastPrice,          //Tick的最新价
                     direction: direction,          //Tick的最新价
+                    volume: volume,
                     //自定义数据
                     datetime: tick.datetime.toLocaleString(),
                 },
@@ -242,7 +243,6 @@ class InfluxDB{
       let influxClient = this;
       sortDirection = (sortDirection<0)?"desc":"asc";
       let influxQL = `SELECT * FROM ${measurment} ORDER BY time ${sortDirection} LIMIT ${TickLookBackCount}`;
-      console.log(influxQL);
       influxClient.influx.query(influxQL).then(tickList => {
         callback(null, tickList);
       }).catch( err => {
