@@ -54,7 +54,9 @@ class PriceCloseLongStrategy extends BaseStrategy{
           } else if (yesterdayLongPositions > 0) {
                 this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
           }
-        }
+        } else {
+              this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close;
+            }
     }
 
 
