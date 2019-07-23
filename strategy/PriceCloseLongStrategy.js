@@ -24,13 +24,16 @@ class PriceCloseLongStrategy extends BaseStrategy{
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar)
     {
-      console.log(closedBar.symbol + " flag: " + this.flag + "closePrice" + closedBar.closePrice+ "thresholdPrice: " + this.thresholdPrice );
+      console.log(closedBar.symbol + " flag: " + this.flag + " closePrice " + closedBar.closePrice+ " thresholdPrice: " + this.thresholdPrice , closedBar.closePrice > this.thresholdPrice , closedBar.closePrice < this.thresholdPrice);
       if (this.thresholdPrice) {
           if (closedBar.closePrice > this.thresholdPrice ) {
+            console.log("this.flag = true");
               this.flag = true;
-          }
-          if (closedBar.closePrice < this.thresholdPrice) {
+          } else if (closedBar.closePrice < this.thresholdPrice) {
+            console.log("this.flag = false");
               this.flag = false;
+          } else {
+            this.flag = null;
           }
       }
 
@@ -53,6 +56,8 @@ class PriceCloseLongStrategy extends BaseStrategy{
             this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
           } else if (yesterdayLongPositions > 0) {
                 this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
+          } else {
+              this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close);
           }
         } else {
             this.SendOrder(tick.clientName, tick.symbol, price, longPositions, Direction.Sell, OpenCloseFlagType.Close);
@@ -70,7 +75,7 @@ class PriceCloseLongStrategy extends BaseStrategy{
           if (this.flag === true) {
               this._closeLongPositions(tick);
               this.sum += 1;
-              this.flag = null;
+              // this.flag = null;
           }
         }
       } else {
