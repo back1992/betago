@@ -53,6 +53,7 @@ function _get_talib_indicator(strategy, highPrice, lowPrice, closePrice, volume)
     let rsi = retRSI[retRSI.length - 1];
     return _get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
 }
+
 /////////////////////// Private Method ///////////////////////////////////////////////
 class InfluxLongStrategy extends BaseStrategy {
     //初始化
@@ -68,6 +69,10 @@ class InfluxLongStrategy extends BaseStrategy {
         this.signal = 0;
         this.closedBarList = [];
         global.actionFlag = {};
+        global.actionScore = {};
+        global.actionDatetime = {};
+        global.actionBarInterval = {};
+        // global.actionFlag[Object.keys(strategyConfig.symbols)[0].toString()] = {};
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
@@ -85,24 +90,23 @@ class InfluxLongStrategy extends BaseStrategy {
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
-
-        if (global.actionFlag[closedBar.symbol] >= 2){
-          if(this.signal >= 2) {
-            this.flag = true;
-            console.log(this.name + " " + this.signal + " flag: " + this.flag);
-          } else {
-            this.flag = null;
-          }
-        }
-        if (this.signal <= -2) {
+        if (this.signal >= 2) {
+            if (global.actionScore[closedBar.symbol] >= 2) {
+                this.flag = true;
+                console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
+            } else {
+                this.flag = null;
+            }
+        } else if (this.signal <= -2) {
             this.flag = false;
+            // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
         }
     }
 
     OnNewBar(newBar) {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        let intervalArray = [5, 15, 30 ,60];
+        let intervalArray = [5, 15, 30, 60];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
             if (err) {
@@ -116,9 +120,11 @@ class InfluxLongStrategy extends BaseStrategy {
             let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
             let volume = ClosedBarList.map(e => e["volume"]);
-            let actionDatetime = ClosedBarList[ClosedBarList.length-1]["ClosedBarList"];
+            let actionDatetime = ClosedBarList.map(e => e["actionDatetime"]);
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            global.actionFlag[newBar.symbol] = score;
+            global.actionScore[newBar.symbol] = score;
+            global.actionDatetime[newBar.symbol] = actionDatetime[actionDatetime.length - 1];
+            global.actionBarInterval[newBar.symbol] = BarInterval;
         });
     }
 
@@ -155,7 +161,7 @@ class InfluxLongStrategy extends BaseStrategy {
         if (todayLongPositions > 0) {
             let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            if(price > longTodayPostionAveragePrice){
+            if (price > longTodayPostionAveragePrice) {
                 this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
             }
         }

@@ -145,13 +145,13 @@ class BackTestStrategy extends BaseStrategy {
         if (this.flag === true) {
             if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
               global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "long");
-              console.log(this.name + " " + this.signal + " flag: " + this.flag);
+              console.log(this.name + " " + this.signal + " flag: " + this.flag + "时间:" + tick.date + tick.timeStr);
               this.flag = null;
             }
         } else if (this.flag === false) {
             if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
               global.NodeQuant.MarketDataDBClient.RecordTrade(tick.symbol, tick, "short");
-              console.log(this.name + " " + this.signal + " flag: " + this.flag);
+              console.log(this.name + " " + this.signal + " flag: " + this.flag + "时间:" + tick.date + tick.timeStr);
               this.flag = null;
             }
         }
