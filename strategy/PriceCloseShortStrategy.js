@@ -27,9 +27,7 @@ class PriceCloseShortStrategy extends BaseStrategy{
         // if (closedBar.highPrice < this.thresholdPrice && closedBar.closePrice < closedBar.openPrice) {
         if (closedBar.closePrice < this.thresholdPrice ) {
             this.flag = true;
-        }
-        // if (closedBar.lowPrice > this.thresholdPrice) {
-        if (closedBar.closePrice > this.thresholdPrice) {
+        }else if (closedBar.closePrice > this.thresholdPrice) {
             this.flag = false;
         }
     }

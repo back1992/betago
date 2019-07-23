@@ -23,7 +23,7 @@ class DBStorStrategy extends BaseStrategy {
     OnTick(tick) {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
-        super.OnTick(tick);
+        // super.OnTick(tick);
         // this.OnFinishPreLoadBar(tick.symbol, KBarType.Second, 10, this.closedBarList)
         global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
         // console.log(this.name+"策略的"+tick.symbol+"的Tick,时间:"+tick.date+" "+tick.timeStr+",价格:"+tick.lastPrice);

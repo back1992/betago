@@ -24,17 +24,13 @@ class PriceCloseLongStrategy extends BaseStrategy{
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar)
     {
-      console.log(closedBar.symbol + " flag: " + this.flag + " closePrice " + closedBar.closePrice+ " thresholdPrice: " + this.thresholdPrice , closedBar.closePrice > this.thresholdPrice , closedBar.closePrice < this.thresholdPrice);
+      // console.log(closedBar.symbol + " flag: " + this.flag + " closePrice " + closedBar.closePrice+ " thresholdPrice: " + this.thresholdPrice , closedBar.closePrice > this.thresholdPrice , closedBar.closePrice < this.thresholdPrice);
       if (this.thresholdPrice) {
           if (closedBar.closePrice > this.thresholdPrice ) {
-            console.log("this.flag = true");
               this.flag = true;
           } else if (closedBar.closePrice < this.thresholdPrice) {
-            console.log("this.flag = false");
               this.flag = false;
-          } else {
-            this.flag = null;
-          }
+          } 
       }
 
     }
@@ -75,7 +71,7 @@ class PriceCloseLongStrategy extends BaseStrategy{
           if (this.flag === true) {
               this._closeLongPositions(tick);
               this.sum += 1;
-              // this.flag = null;
+              this.flag = null;
           }
         }
       } else {
