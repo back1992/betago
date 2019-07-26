@@ -92,7 +92,7 @@ class InfluxLongStrategy extends BaseStrategy {
         }
         if (this.signal >= 2) {
             if (global.actionScore[closedBar.symbol] >= 2) {
-                this.flag = true;
+                this.flag = (this.flag != true) ? true : null;
                 console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
             } else {
                 this.flag = null;
