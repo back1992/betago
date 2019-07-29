@@ -14,11 +14,17 @@ class GoldLongStrategy extends BaseStrategy {
         this.lastTick = null;
         this.total = strategyConfig.total;
         this.sum = 0;
+        this.flag = null;
     }
 
 
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
+        if (closedBar.closePrice < closedBar.openPrice) {
+            this.flag = true;
+        } else {
+            this.flag = false;
+        }
     }
 
     OnNewBar(newBar) {
@@ -51,7 +57,7 @@ class GoldLongStrategy extends BaseStrategy {
 
 
     //js Date对象从0开始的月份
-     _getTimeToGold(tick, breakOffsetSec = 588, closeOffsetSec = 30) {
+    _getTimeToGold(tick, breakOffsetSec = 588, closeOffsetSec = 30) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -66,8 +72,13 @@ class GoldLongStrategy extends BaseStrategy {
         let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
+<<<<<<< HEAD
         // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime);
         return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime)|| (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
+=======
+        console.log("NowDateTime: " + NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime + "TickDateTime: " + TickDateTime + "NightCloseTime: " + NightCloseTime);
+        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
+>>>>>>> d2c557af24e4c198dd6fd03648e31741d4923198
     }
 
 
@@ -77,24 +88,26 @@ class GoldLongStrategy extends BaseStrategy {
         super.OnTick(tick);
         this.lastTick = this.tick;
         this.tick = tick;
-        if( ! this._getTimeToGold(tick)){
-          if(this.lastTick && this.lastTick.lastPrice <  tick.lastPrice ) {
-            this.QueryTradingAccount(tick.clientName);
-            let availablesSum = this._getAvailabelSum(tick);
-            if (availablesSum >= 1) {
-              let price = tick.lastPrice;
-              this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
+        if (!this._getTimeToGold(tick)) {
+            if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
+                this.QueryTradingAccount(tick.clientName);
+                let availablesSum = this._getAvailabelSum(tick);
+                if (availablesSum >= 1) {
+                    let price = tick.lastPrice;
+                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
+                }
             }
-          }
-      } else {
-        let position = this.GetPosition(tick.symbol);
-        if(position != undefined) {
-          let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
-          if(tick.lastPrice > longTodayPostionAveragePrice){
-              this._closeTodayLongPositions(tick, position);
-          }
+        } else {
+            if (this.flag) {
+                let position = this.GetPosition(tick.symbol);
+                if (position != undefined) {
+                    let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
+                    if (tick.lastPrice > longTodayPostionAveragePrice) {
+                        this._closeTodayLongPositions(tick, position);
+                    }
+                }
+            }
         }
-      }
     }
 
     Stop() {
