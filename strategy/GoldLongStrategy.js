@@ -72,13 +72,8 @@ class GoldLongStrategy extends BaseStrategy {
         let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
-<<<<<<< HEAD
         // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime);
         return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime)|| (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
-=======
-        console.log("NowDateTime: " + NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime + "TickDateTime: " + TickDateTime + "NightCloseTime: " + NightCloseTime);
-        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
->>>>>>> d2c557af24e4c198dd6fd03648e31741d4923198
     }
 
 
