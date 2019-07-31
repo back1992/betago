@@ -44,11 +44,9 @@ class GoldOutStrategy extends BaseStrategy {
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         this.QueryTradingAccount(tick.clientName);
         if (global.TickCount % 168 === 0) {
-            console.log(global.TickCount, global.availableFund);
             if (global.availableFund < 0) {
                 let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
                 let position = this.GetPosition(tick.symbol);
-                console.log(position);
                 if (position != undefined) {
                     let yesterdayLongPositions = position.GetLongYesterdayPosition();
                     let todayLongPositions = position.GetLongTodayPosition();
@@ -60,7 +58,6 @@ class GoldOutStrategy extends BaseStrategy {
                         this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
                     }
                 } else {
-                    console.log(position);
                     this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
                 }
             }
