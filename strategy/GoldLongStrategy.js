@@ -18,6 +18,7 @@ class GoldLongStrategy extends BaseStrategy {
         this.leftFund = 20000;
     }
 
+
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
         if (closedBar.closePrice < closedBar.openPrice) {
@@ -40,7 +41,7 @@ class GoldLongStrategy extends BaseStrategy {
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
-        console.log(tradingAccountInfo);
+        // console.log(tradingAccountInfo);
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
@@ -55,8 +56,9 @@ class GoldLongStrategy extends BaseStrategy {
         return Math.floor((global.availableFund - this.leftFund) / (tick.lastPrice * unit * marginRate));
     }
 
+
     //js Date对象从0开始的月份
-    _getTimeToGold(tick, breakOffsetSec = 588, closeOffsetSec = 30) {
+    _getTimeToGold(tick, breakOffsetSec = 588) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -70,10 +72,10 @@ class GoldLongStrategy extends BaseStrategy {
         var PMStopTime = new Date(PMCloseTime.getTime() - breakOffsetSec * 1000);
         let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
         var NightCloseTime = new Date(NightCloseTimeStr);
-        var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
-        // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime);
+        var NightStopTime = new Date(NightCloseTime.getTime() - breakOffsetSec * 1000);
         return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
     }
+
 
     OnTick(tick) {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数

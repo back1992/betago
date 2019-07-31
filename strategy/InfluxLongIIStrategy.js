@@ -12,7 +12,7 @@ dotenv.config();
 var BaseStrategy = require("./baseStrategy");
 
 /////////////////////// Private Method ///////////////////////////////////////////////
-class InfluxShortStrategy extends BaseStrategy {
+class InfluxLongIIStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -25,9 +25,11 @@ class InfluxShortStrategy extends BaseStrategy {
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
         this.closedBarList = [];
+        global.actionFlag = {};
         global.actionScore = {};
         global.actionDatetime = {};
         global.actionBarInterval = {};
+        // global.actionFlag[Object.keys(strategyConfig.symbols)[0].toString()] = {};
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
@@ -37,6 +39,7 @@ class InfluxShortStrategy extends BaseStrategy {
             if (this.closedBarList.length > 50) {
                 this.closedBarList.shift();
             }
+            // console.log(this.closedBarList);
             let openPrice = this.closedBarList.map(e => e["openPrice"]);
             let highPrice = this.closedBarList.map(e => e["highPrice"]);
             let lowPrice = this.closedBarList.map(e => e["lowPrice"]);
@@ -44,15 +47,13 @@ class InfluxShortStrategy extends BaseStrategy {
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
-
         if (this.signal >= 2) {
-            this.flag = false;
-        } else if (this.signal <= -2) {
-            if (global.actionScore[closedBar.symbol] <= -2) {
+            if (global.actionScore[closedBar.symbol] >= 2) {
                 this.flag = (this.flag != true) ? true : null;
                 let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
                 console.log(message);
                 if (this.flag) {
+                    // 设置邮件内容（谁发送什么给谁）
                     // 设置邮件内容（谁发送什么给谁）
                     let mailOptions = {
                         from: process.env.SEND_FROM, // 发件人
@@ -70,8 +71,9 @@ class InfluxShortStrategy extends BaseStrategy {
             } else {
                 this.flag = null;
             }
+        } else if (this.signal <= -2) {
+            this.flag = false;
         }
-        // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
     }
 
     OnNewBar(newBar) {
@@ -90,8 +92,8 @@ class InfluxShortStrategy extends BaseStrategy {
             let highPrice = ClosedBarList.map(e => e["highPrice"]);
             let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
-            let actionDatetime = ClosedBarList.map(e => e["actionDatetime"]);
             let volume = ClosedBarList.map(e => e["volume"]);
+            let actionDatetime = ClosedBarList.map(e => e["actionDatetime"]);
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
             global.actionScore[newBar.symbol] = score;
             global.actionDatetime[newBar.symbol] = actionDatetime[actionDatetime.length - 1];
@@ -110,39 +112,39 @@ class InfluxShortStrategy extends BaseStrategy {
         global.Balance = tradingAccountInfo["Balance"];
     }
 
-    _openShort(tick) {
+    _openLong(tick) {
         this.QueryTradingAccount(tick.clientName);
         let sum = this._getAvilableSum(tick);
         if (sum >= 1) {
-            this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.Open);
+            this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Buy, OpenCloseFlagType.Open);
             this.flag = null;
         }
     }
 
-    _closeTodayShortPositions(tick, position, up = 0) {
-        let todayShortPositions = position.GetShortTodayPosition();
-        if (todayShortPositions > 0) {
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-            this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+    _closeTodayLongPositions(tick, position, up = 0) {
+        let todayLongPositions = position.GetLongTodayPosition();
+        if (todayLongPositions > 0) {
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
         }
     }
 
-    _profitTodayShortPositions(tick, position, up = 0) {
-        let todayShortPositions = position.GetShortTodayPosition();
-        if (todayShortPositions > 0) {
-            let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-            if (price < shortTodayPostionAveragePrice) {
-                this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+    _profitTodayLongPositions(tick, position, up = 0) {
+        let todayLongPositions = position.GetLongTodayPosition();
+        if (todayLongPositions > 0) {
+            let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            if (price > longTodayPostionAveragePrice) {
+                this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
             }
         }
     }
 
-    _closeYesterdayShortPositions(tick, position, up = 0) {
-        let todayShortPositions = position.GetShortYesterdayPosition();
-        if (todayShortPositions > 0) {
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-            this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+    _closeYesterdayLongPositions(tick, position, up = 0) {
+        let todayLongPositions = position.GetLongYesterdayPosition();
+        if (todayLongPositions > 0) {
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
         }
     }
 
@@ -158,14 +160,14 @@ class InfluxShortStrategy extends BaseStrategy {
             case 0:
                 // this.thresholdPrice = null;
                 if (position) {
-                    this._closeYesterdayShortPositions(tick, position, 1);
+                    this._closeYesterdayLongPositions(tick, position, 1);
                 }
                 break;
             // time to close
             case -1:
                 if (position) {
-                    // this._closeTodayShortPositions(tick, position, 1);
-                    this._profitTodayShortPositions(tick, position, 1);
+                    // this._closeTodayLongPositions(tick, position, 1);
+                    this._profitTodayLongPositions(tick, position, 1);
                 }
                 break;
             // trade time
@@ -173,20 +175,22 @@ class InfluxShortStrategy extends BaseStrategy {
                 let unFinishOrderList = this.GetUnFinishOrderList();
                 if (unFinishOrderList.length === 0) {
                     if (this.flag === true) {
-                        if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
+                        if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
                             if (position === undefined) {
-                                this._openShort(tick);
+                                this._openLong(tick);
                             } else {
-                                let todayShortPositions = position.GetShortTodayPosition();
-                                if (todayShortPositions < this.total) {
-                                    this._openShort(tick);
+                                let todayLongPositions = position.GetLongTodayPosition();
+                                if (todayLongPositions < this.total) {
+                                    this._openLong(tick);
                                 }
                             }
                         }
                     } else if (this.flag === false) {
-                        if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
+                        if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
                             if (position) {
-                                this._profitTodayShortPositions(tick, position);
+                                this._profitTodayLongPositions(tick, position);
+                                let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
+                                console.log(message);
                                 // 设置邮件内容（谁发送什么给谁）
                                 let mailOptions = {
                                     from: process.env.SEND_FROM, // 发件人
@@ -213,4 +217,4 @@ class InfluxShortStrategy extends BaseStrategy {
     }
 }
 
-module.exports = InfluxShortStrategy;
+module.exports = InfluxLongIIStrategy;

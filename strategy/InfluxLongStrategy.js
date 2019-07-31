@@ -1,59 +1,18 @@
 /**
  * Created by Administrator on 2017/7/4.
  */
-let talib = require('talib-binding');
+
+require("../systemConfig");
+require("../util/Position");
+require("../util/Indicator");
+require("../util/MyPostMan");
+const dotenv = require('dotenv');
+dotenv.config();
 // import _get_talib_indicator from "../util/Indicator";
 // import { _get_talib_indicator } from "../util/Indicator";
 var BaseStrategy = require("./baseStrategy");
-require("../util/Position");
-require("../systemConfig");
-require("../util/MyPostMan");
 
-function _get_signal(mfi, cci, cmo, aroonosc, adx, rsi) {
-    let score = 0;
-    if (cci > 100) {
-        score -= 1
-    } else if (cci < -100) {
-        score += 1
-    }
-    if (mfi > 80) {
-        score -= 1
-    } else if (mfi < 20) {
-        score += 1
-    }
-    if (cmo > 50) {
-        score -= 1
-    } else if (cmo < -50) {
-        score += 1
-    }
-    if (aroonosc < -50) {
-        score -= 1
-    } else if (aroonosc > 50) {
-        score += 1
-    }
-    if (rsi > 70) {
-        score -= 1
-    } else if (rsi < 30) {
-        score += 1
-    }
-    return score
-}
 
-function _get_talib_indicator(strategy, highPrice, lowPrice, closePrice, volume) {
-    let retMFI = talib.MFI(highPrice, lowPrice, closePrice, volume, 14);
-    let retCCI = talib.CCI(highPrice, lowPrice, closePrice, 14);
-    let retCMO = talib.CMO(closePrice, 14);
-    let retAROONOSC = talib.AROONOSC(highPrice, lowPrice, 14);
-    let retADX = talib.ADX(highPrice, lowPrice, closePrice, 14);
-    let retRSI = talib.RSI(closePrice, 14);
-    let mfi = retMFI[retMFI.length - 1];
-    let cci = retCCI[retCCI.length - 1];
-    let cmo = retCMO[retCMO.length - 1];
-    let aroonosc = retAROONOSC[retAROONOSC.length - 1];
-    let adx = retADX[retADX.length - 1];
-    let rsi = retRSI[retRSI.length - 1];
-    return _get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
-}
 
 /////////////////////// Private Method ///////////////////////////////////////////////
 class InfluxLongStrategy extends BaseStrategy {
@@ -100,8 +59,8 @@ class InfluxLongStrategy extends BaseStrategy {
                 if (this.flag) {
                     // 设置邮件内容（谁发送什么给谁）
                     let mailOptions = {
-                        from: '"林慕空 👻" <465613067@qq.com>', // 发件人
-                        to: '465613067@qq.com, 13261871395@163.com', // 收件人
+                        from: process.env.SEND_FROM, // 发件人
+                        to: process.env.SEND_TO, // 收件人
                         subject: this.name + " signal: " + this.signal, // 主题
                         text: message, // plain text body
                         html: `<b>${message}</b>`, // html body
@@ -238,8 +197,8 @@ class InfluxLongStrategy extends BaseStrategy {
                                 console.log(message);
                                 // 设置邮件内容（谁发送什么给谁）
                                 let mailOptions = {
-                                    from: '"林慕空 👻" <465613067@qq.com>', // 发件人
-                                    to: '465613067@qq.com, 13261871395@163.com', // 收件人
+                                    from: process.env.SEND_FROM, // 发件人
+                                    to: process.env.SEND_TO, // 收件人
                                     subject: this.name + " signal: " + this.signal, // 主题
                                     text: message, // plain text body
                                     html: `<b>${message}</b>`, // html body

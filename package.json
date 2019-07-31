@@ -27,6 +27,7 @@
     "cookie-parser": "^1.4.4",
     "dateformat": "^3.0.3",
     "debug": "~2.6.3",
+    "dotenv": "^8.0.0",
     "ejs": "~2.5.6",
     "express": "^4.17.1",
     "fixed-array": "^1.0.0",
