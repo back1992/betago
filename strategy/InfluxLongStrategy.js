@@ -8,6 +8,20 @@ var BaseStrategy = require("./baseStrategy");
 require("../util/Position");
 require("../systemConfig");
 
+const nodemailer = require('nodemailer');
+
+// 开启一个 SMTP 连接池
+let transporter = nodemailer.createTransport({
+    host: 'smtp.qq.com',
+    secureConnection: true, // use SSL
+    port: 465,
+    secure: true, // secure:true for port 465, secure:false for port 587
+    auth: {
+        user: '465613067@qq.com',
+        pass: 'xohrhfwhaodlbieb' // QQ邮箱需要使用授权码
+    }
+});
+
 function _get_signal(mfi, cci, cmo, aroonosc, adx, rsi) {
     let score = 0;
     if (cci > 100) {
@@ -93,7 +107,24 @@ class InfluxLongStrategy extends BaseStrategy {
         if (this.signal >= 2) {
             if (global.actionScore[closedBar.symbol] >= 2) {
                 this.flag = (this.flag != true) ? true : null;
-                console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
+                // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
+                let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
+                console.log(message);
+                // 设置邮件内容（谁发送什么给谁）
+                let mailOptions = {
+                    from: '"林慕空 👻" <465613067@qq.com>', // 发件人
+                    to: '465613067@qq.com, 13261871395@163.com', // 收件人
+                    subject: this.name + " signal: " + this.signal, // 主题
+                    text: '这是一封来自 Node.js 的测试邮件', // plain text body
+                    html: `<b>${message}</b>`, // html body
+                };
+                if (this.flag) {
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            return console.log(error);
+                        }
+                    });
+                }
             } else {
                 this.flag = null;
             }

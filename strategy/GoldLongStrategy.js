@@ -15,6 +15,7 @@ class GoldLongStrategy extends BaseStrategy {
         this.total = strategyConfig.total;
         this.sum = 0;
         this.flag = null;
+        this.leftFund = 20000;
     }
 
 
@@ -52,7 +53,7 @@ class GoldLongStrategy extends BaseStrategy {
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
-        return Math.floor(global.availableFund / (tick.lastPrice * unit * marginRate));
+        return Math.floor((global.availableFund - this.leftFund) / (tick.lastPrice * unit * marginRate));
     }
 
 
