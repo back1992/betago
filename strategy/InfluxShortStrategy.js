@@ -8,6 +8,20 @@ var BaseStrategy = require("./baseStrategy");
 require("../util/Position");
 require("../systemConfig");
 
+const nodemailer = require('nodemailer');
+
+// 开启一个 SMTP 连接池
+let transporter = nodemailer.createTransport({
+    host: 'smtp.qq.com',
+    secureConnection: true, // use SSL
+    port: 465,
+    secure: true, // secure:true for port 465, secure:false for port 587
+    auth: {
+        user: '465613067@qq.com',
+        pass: 'xohrhfwhaodlbieb' // QQ邮箱需要使用授权码
+    }
+});
+
 function _get_signal(mfi, cci, cmo, aroonosc, adx, rsi) {
     let score = 0;
     if (cci > 100) {
@@ -53,6 +67,7 @@ function _get_talib_indicator(strategy, highPrice, lowPrice, closePrice, volume)
     let rsi = retRSI[retRSI.length - 1];
     return _get_signal(mfi, cci, cmo, aroonosc, adx, rsi);
 }
+
 /////////////////////// Private Method ///////////////////////////////////////////////
 class InfluxShortStrategy extends BaseStrategy {
     //初始化
@@ -67,7 +82,9 @@ class InfluxShortStrategy extends BaseStrategy {
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
         this.closedBarList = [];
-        global.actionFlag = {};
+        global.actionScore = {};
+        global.actionDatetime = {};
+        global.actionBarInterval = {};
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
@@ -77,7 +94,6 @@ class InfluxShortStrategy extends BaseStrategy {
             if (this.closedBarList.length > 50) {
                 this.closedBarList.shift();
             }
-            // console.log(this.closedBarList);
             let openPrice = this.closedBarList.map(e => e["openPrice"]);
             let highPrice = this.closedBarList.map(e => e["highPrice"]);
             let lowPrice = this.closedBarList.map(e => e["lowPrice"]);
@@ -85,24 +101,34 @@ class InfluxShortStrategy extends BaseStrategy {
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
-        // console.log(this.signal, global.actionFlag[closedBar.symbol]);
 
-        if(this.flag != true){
-          if (global.actionFlag[closedBar.symbol] <= -2){
-            if(this.signal <= -2) {
-                this.flag = true;
-                console.log(this.name + " K线结束,结束时间:"+closedBar.endDatetime.toLocaleString() + " signal: " +  this.signal + " signal5m: " +  global.actionFlag[closedBar.symbol] + " flag: " + this.flag);
-            } else {
-              this.flag = null;
-            }
-          }
-        } else {
-          this.flag = false;
-        }
         if (this.signal >= 2) {
             this.flag = false;
+        } else if (this.signal <= -2) {
+            if (global.actionScore[closedBar.symbol] <= -2) {
+                this.flag = (this.flag != true) ? true : null;
+                let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
+                console.log(message);
+                // 设置邮件内容（谁发送什么给谁）
+                let mailOptions = {
+                    from: '"林慕空 👻" <465613067@qq.com>', // 发件人
+                    to: '465613067@qq.com, 13261871395@163.com', // 收件人
+                    subject: this.name + " signal: " + this.signal, // 主题
+                    text: '这是一封来自 Node.js 的测试邮件', // plain text body
+                    html: `<b>${message}</b>`, // html body
+                };
+                if (this.flag) {
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            return console.log(error);
+                        }
+                    });
+                }
+            } else {
+                this.flag = null;
+            }
         }
-        // console.log(closedBar.symbol + "---" + closedBar.startDatetime.toLocaleString() + " flag: " + this.flag + " signal: " + this.signal + " signal5m: " + global.actionFlag[closedBar.symbol]);
+        // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
     }
 
     OnNewBar(newBar) {
@@ -124,13 +150,9 @@ class InfluxShortStrategy extends BaseStrategy {
             let actionDatetime = ClosedBarList.map(e => e["actionDatetime"]);
             let volume = ClosedBarList.map(e => e["volume"]);
             let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            // let actionDatetime = ClosedBarList[ClosedBarList.length-1]["ClosedBarList"];
-            global.actionFlag[newBar.symbol] = score;
-            // if(score >= 2 || score <= -2) {
-            // }
-            // else if (score != 0){
-            //   console.log(newBar.symbol + " BarInterval: " + BarInterval + " score : " + score + " actionDatetime: " + actionDatetime[actionDatetime.length-1]);
-            // }
+            global.actionScore[newBar.symbol] = score;
+            global.actionDatetime[newBar.symbol] = actionDatetime[actionDatetime.length - 1];
+            global.actionBarInterval[newBar.symbol] = BarInterval;
         });
     }
 
@@ -172,6 +194,7 @@ class InfluxShortStrategy extends BaseStrategy {
             }
         }
     }
+
     _closeYesterdayShortPositions(tick, position, up = 0) {
         let todayShortPositions = position.GetShortYesterdayPosition();
         if (todayShortPositions > 0) {
