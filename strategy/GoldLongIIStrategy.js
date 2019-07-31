@@ -3,7 +3,7 @@ let talib = require('talib-binding');
 let BaseStrategy = require("./baseStrategy");
 
 // let Position = require("../util/Position");
-class GoldLongStrategy extends BaseStrategy {
+class GoldLongIIStrategy extends BaseStrategy {
     constructor(strategyConfig) {
         //一定要使用super(strategyConfig)进行基类实例初始化
         //strategyConfig为 userConfig.js 中的DemoStrategy类的策略配置对象
@@ -44,6 +44,8 @@ class GoldLongStrategy extends BaseStrategy {
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
+        global.PreMargin = tradingAccountInfo["PreMargin"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
     }
 
     _getAvailabelSum(tick) {
@@ -79,11 +81,9 @@ class GoldLongStrategy extends BaseStrategy {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         super.OnTick(tick);
-        this.lastTick = this.tick;
-        this.tick = tick;
         if (!this._getTimeToGold(tick)) {
-            if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                this.QueryTradingAccount(tick.clientName);
+            this.QueryTradingAccount(tick.clientName);
+            if (global.CurrMargin > global.PreMargin) {
                 let availablesSum = this._getAvailabelSum(tick);
                 if (availablesSum >= 1) {
                     let price = tick.lastPrice;
@@ -108,4 +108,4 @@ class GoldLongStrategy extends BaseStrategy {
     }
 }
 
-module.exports = GoldLongStrategy;
+module.exports = GoldLongIIStrategy;
