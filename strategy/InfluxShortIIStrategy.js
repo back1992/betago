@@ -164,6 +164,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let sum = this._getAvilableSum(tick);
         if (sum >= 1) {
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.Open);
+            this._sendMessage(tick);
             this.flag = null;
         }
     }
@@ -214,7 +215,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let mailOptions = {
             from: process.env.SEND_FROM, // 发件人
             to: process.env.SEND_TO, // 收件人
-            subject: this.name + " signal: " + this.signal, // 主题
+            subject: "Action "+ this.name + " signal: " + this.signal, // 主题
             text: message, // plain text body
             html: `<b>${message}</b>`, // html body
         };
