@@ -4,7 +4,7 @@
 // let talib = require('talib-binding');
 require("../systemConfig");
 require("../util/Position");
-const Indicator = require("../util/Indicator")
+const Indicator = require("../util/Indicator");
 require("../util/MyPostMan");
 const dotenv = require('dotenv');
 dotenv.config();
