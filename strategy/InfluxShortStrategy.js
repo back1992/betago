@@ -110,7 +110,7 @@ class InfluxShortStrategy extends BaseStrategy {
 
     _openShort(tick) {
         this.QueryTradingAccount(tick.clientName);
-        let sum = this._getAvilableSum(tick);
+        let sum = this._getAvailabelSum(tick);
         if (sum >= 1) {
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.Open);
             this.flag = null;

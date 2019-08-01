@@ -35,7 +35,7 @@ class GoldOutStrategy extends BaseStrategy {
         global.Balance = tradingAccountInfo["Balance"];
     }
 
-    _getAvilableSum(tick) {
+    _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
         let upperFutureName = contract.futureName.toUpperCase();
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];

@@ -213,13 +213,16 @@ class BaseStrategy {
     }
 
 
-    _getAvilableSum(tick) {
+    _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
         let upperFutureName = contract.futureName.toUpperCase();
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
-        return Math.floor(global.availableFund / (tick.lastPrice * unit * marginRate));
+        let priceUnit = (tick.lastPrice * unit * marginRate) * global.CurrMargin / global.ExchangeMargin;
+        let availabelSum = Math.floor((global.availableFund - this.leftFund) / priceUnit);
+        console.log(`availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        return availabelSum;
     }
 
 

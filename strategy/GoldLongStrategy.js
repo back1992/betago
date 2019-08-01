@@ -44,19 +44,22 @@ class GoldLongStrategy extends BaseStrategy {
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
+        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
     }
 
-    _getAvailabelSum(tick) {
-        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
-        let upperFutureName = contract.futureName.toUpperCase();
-        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-        let unit = tickFutureConfig.Unit;
-        let marginRate = tickFutureConfig.MarginRate;
-        let availabelSum = Math.floor((global.availableFund - this.leftFund) / (tick.lastPrice * unit * marginRate));
-        console.log(`availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}`);
-        return availabelSum;
-    }
-
+    // _getAvailabelSum(tick) {
+    //     let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
+    //     let upperFutureName = contract.futureName.toUpperCase();
+    //     let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
+    //     let unit = tickFutureConfig.Unit;
+    //     let marginRate = tickFutureConfig.MarginRate;
+    //     let priceUnit = (tick.lastPrice * unit * marginRate) * global.CurrMargin / global.ExchangeMargin;
+    //     let availabelSum = Math.floor((global.availableFund - this.leftFund) / priceUnit);
+    //     console.log(`availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+    //     return availabelSum;
+    // }
+    //
 
     //js Date对象从0开始的月份
     _getTimeToGold(tick, breakOffsetSec = 588) {
