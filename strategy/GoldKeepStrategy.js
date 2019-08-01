@@ -15,7 +15,6 @@ class GoldOutStrategy extends BaseStrategy {
 
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-        console.log(global.availableFund, this.flag);
         if (global.availableFund < 0) {
             this.flag = true;
         } else {

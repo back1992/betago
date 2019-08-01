@@ -13,12 +13,13 @@ class GoldLongStrategy extends BaseStrategy {
         this.total = strategyConfig.total;
         this.sum = 0;
         this.flag = null;
-        this.leftFund = 20000;
+        this.leftFund = 0;
     }
 
 
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
+        console.log((closedBar.closePrice > closedBar.openPrice), closedBar.closePrice, closedBar.openPrice);
         if (closedBar.closePrice > closedBar.openPrice) {
             this.flag = true;
         } else {
@@ -51,7 +52,9 @@ class GoldLongStrategy extends BaseStrategy {
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
-        return Math.floor((global.availableFund - this.leftFund) / (tick.lastPrice * unit * marginRate));
+        let availabelSum = Math.floor((global.availableFund - this.leftFund) / (tick.lastPrice * unit * marginRate));
+        console.log(`availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}`);
+        return availabelSum;
     }
 
 
@@ -81,10 +84,10 @@ class GoldLongStrategy extends BaseStrategy {
         super.OnTick(tick);
         this.lastTick = this.tick;
         this.tick = tick;
+        this.QueryTradingAccount(tick.clientName);
+        let availablesSum = this._getAvailabelSum(tick);
         if (!this._getTimeToGold(tick)) {
-            if (this.flag == false) {
-                this.QueryTradingAccount(tick.clientName);
-                let availablesSum = this._getAvailabelSum(tick);
+            if (this.flag) {
                 if (availablesSum >= 1) {
                     let price = tick.lastPrice;
                     this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
@@ -92,7 +95,7 @@ class GoldLongStrategy extends BaseStrategy {
                 }
             }
         } else {
-            if (this.flag) {
+            if (this.flag == false) {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
                     let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
