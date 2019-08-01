@@ -19,7 +19,7 @@ class GoldLongStrategy extends BaseStrategy {
 
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-        if (closedBar.closePrice < closedBar.openPrice) {
+        if (closedBar.closePrice > closedBar.openPrice) {
             this.flag = true;
         } else {
             this.flag = false;
