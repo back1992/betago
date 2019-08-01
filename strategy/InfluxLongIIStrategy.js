@@ -5,7 +5,7 @@
 require("../systemConfig");
 require("../util/Position");
 require("../util/MyPostMan");
-const Indicator = require("../util/Indicator")
+const Indicator = require("../util/Indicator");
 const dotenv = require('dotenv');
 dotenv.config();
 var BaseStrategy = require("./baseStrategy");
