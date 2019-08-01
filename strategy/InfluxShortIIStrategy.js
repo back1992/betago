@@ -1,14 +1,12 @@
 /**
  * Created by Administrator on 2017/7/4.
  */
-// let talib = require('talib-binding');
 require("../systemConfig");
 require("../util/Position");
-const Indicator = require("../util/Indicator");
 require("../util/MyPostMan");
+const Indicator = require("../util/Indicator");
 const dotenv = require('dotenv');
 dotenv.config();
-
 var BaseStrategy = require("./baseStrategy");
 
 /////////////////////// Private Method ///////////////////////////////////////////////
@@ -78,27 +76,35 @@ class InfluxShortIIStrategy extends BaseStrategy {
     OnNewBar(newBar) {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        let intervalArray = [5, 15, 30, 60];
+        let intervalArray = [5, 15, 30, 60, 0, 0, 0, 0];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
-        global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
-            if (err) {
-                console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
-                //没完成收集固定K线个数
-                MyOnFinishLoadBar(strategy, newBar.symbol, BarType, BarInterval, undefined);
-                return;
-            }
-            let openPrice = ClosedBarList.map(e => e["openPrice"]);
-            let highPrice = ClosedBarList.map(e => e["highPrice"]);
-            let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
-            let closePrice = ClosedBarList.map(e => e["closePrice"]);
-            let actionDate = ClosedBarList.map(e => e["actionDate"]);
-            let timeStr = ClosedBarList.map(e => e["timeStr"]);
-            let volume = ClosedBarList.map(e => e["volume"]);
-            let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            global.actionScore[newBar.symbol] = score;
-            global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-            global.actionBarInterval[newBar.symbol] = BarInterval;
-        });
+        if (BarInterval != 0) {
+            global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
+                if (err) {
+                    console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
+                    //没完成收集固定K线个数
+                    MyOnFinishLoadBar(strategy, newBar.symbol, BarType, BarInterval, undefined);
+                    return;
+                }
+                let openPrice = ClosedBarList.map(e => e["openPrice"]);
+                let highPrice = ClosedBarList.map(e => e["highPrice"]);
+                let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
+                let closePrice = ClosedBarList.map(e => e["closePrice"]);
+                let actionDate = ClosedBarList.map(e => e["actionDate"]);
+                let timeStr = ClosedBarList.map(e => e["timeStr"]);
+                let volume = ClosedBarList.map(e => e["volume"]);
+                let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+                // global.actionScore[newBar.symbol] = score;
+                // global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
+                // global.actionBarInterval[newBar.symbol] = BarInterval;
+                if (score >= 2 || score <= -2) {
+                    global.actionScore[newBar.symbol] = score;
+                    global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
+                    global.actionBarInterval[newBar.symbol] = BarInterval;
+                }
+            });
+
+        }
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
