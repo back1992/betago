@@ -232,10 +232,20 @@ class InfluxShortIIStrategy extends BaseStrategy {
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
         let position = this.GetPosition(tick.symbol);
+        if (this.flag === false) {
+            if (this.signal >= 2) {
+                if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
+                    if (position) {
+                        this._profitTodayShortPositions(tick, position);
+                        this._profitYesterdayShortPositions(tick, position);
+                        this.flag = null;
+                    }
+                }
+            }
+        }
         switch (tradeState) {
             // timeOffset
             case 0:
-                // this.thresholdPrice = null;
                 if (position) {
                     this._closeYesterdayShortPositions(tick, position, 1);
                 }
@@ -265,17 +275,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
                     }
                 }
         }
-        if (this.flag === false) {
-            if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                if (position) {
-                    this._profitTodayShortPositions(tick, position);
-                    this._profitYesterdayShortPositions(tick, position);
-                    this.flag = null;
-                    // 设置邮件内容（谁发送什么给谁）
 
-                }
-            }
-        }
     }
 
     Stop() {

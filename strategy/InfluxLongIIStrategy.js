@@ -118,7 +118,7 @@ class InfluxLongIIStrategy extends BaseStrategy {
             } else {
                 this.flag = null;
             }
-        } else if (this.signal <= -2) {
+        } else if (this.flag <= -2) {
             this.flag = false;
         }
     }
@@ -235,10 +235,20 @@ class InfluxLongIIStrategy extends BaseStrategy {
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 300);
         let position = this.GetPosition(tick.symbol);
+        if (this.flag === false) {
+            if (this.signal <= -2) {
+                if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
+                    if (position) {
+                        this._profitTodayLongPositions(tick, position);
+                        this._profitYestedayLongPositions(tick, position);
+                        this.flag = null;
+                    }
+                }
+            }
+        }
         switch (tradeState) {
             // timeOffset
             case 0:
-                // this.thresholdPrice = null;
                 if (position) {
                     this._closeYesterdayLongPositions(tick, position, 1);
                 }
@@ -268,30 +278,7 @@ class InfluxLongIIStrategy extends BaseStrategy {
                     }
                 }
         }
-        if (this.flag === false) {
-            if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                if (position) {
-                    this._profitTodayLongPositions(tick, position);
-                    this._profitYestedayLongPositions(tick, position);
-                    this.flag = null;
-                    // let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
-                    // console.log(message);
-                    // // 设置邮件内容（谁发送什么给谁）
-                    // let mailOptions = {
-                    //     from: process.env.SEND_FROM, // 发件人
-                    //     to: process.env.SEND_TO, // 收件人
-                    //     subject: this.name + " signal: " + this.signal, // 主题
-                    //     text: message, // plain text body
-                    //     html: `<b>${message}</b>`, // html body
-                    // };
-                    // transporter.sendMail(mailOptions, (error, info) => {
-                    //     if (error) {
-                    //         return console.log(error);
-                    //     }
-                    // });
-                }
-            }
-        }
+
     }
 
     Stop() {
