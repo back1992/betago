@@ -2,8 +2,6 @@
  * Created by Administrator on 2017/7/4.
  */
 let talib = require('talib-binding');
-// import _get_talib_indicator from "../util/Indicator";
-// import { _get_talib_indicator } from "../util/Indicator";
 var BaseStrategy = require("./baseStrategy");
 require("../util/Position");
 require("../systemConfig");

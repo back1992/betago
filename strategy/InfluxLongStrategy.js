@@ -8,8 +8,6 @@ require("../util/Indicator");
 require("../util/MyPostMan");
 const dotenv = require('dotenv');
 dotenv.config();
-// import _get_talib_indicator from "../util/Indicator";
-// import { _get_talib_indicator } from "../util/Indicator";
 var BaseStrategy = require("./baseStrategy");
 
 
