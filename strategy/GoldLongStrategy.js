@@ -73,7 +73,7 @@ class GoldLongStrategy extends BaseStrategy {
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
         // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime);
-        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime)|| (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
+        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
     }
 
 
@@ -84,12 +84,13 @@ class GoldLongStrategy extends BaseStrategy {
         this.lastTick = this.tick;
         this.tick = tick;
         if (!this._getTimeToGold(tick)) {
-            if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
+            if (this.flag == false) {
                 this.QueryTradingAccount(tick.clientName);
                 let availablesSum = this._getAvailabelSum(tick);
                 if (availablesSum >= 1) {
                     let price = tick.lastPrice;
                     this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
+                    this.flag = null;
                 }
             }
         } else {
