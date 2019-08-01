@@ -1,19 +1,18 @@
 /**
  * Created by Administrator on 2017/7/4.
  */
-
+// let talib = require('talib-binding');
 require("../systemConfig");
 require("../util/Position");
-require("../util/Indicator");
 require("../util/MyPostMan");
+const Indicator = require("../util/Indicator")
 const dotenv = require('dotenv');
 dotenv.config();
 var BaseStrategy = require("./baseStrategy");
 
 
-
 /////////////////////// Private Method ///////////////////////////////////////////////
-class InfluxLongStrategy extends BaseStrategy {
+class InfluxLongIIStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -46,15 +45,16 @@ class InfluxLongStrategy extends BaseStrategy {
             let lowPrice = this.closedBarList.map(e => e["lowPrice"]);
             let closePrice = this.closedBarList.map(e => e["closePrice"]);
             let volume = this.closedBarList.map(e => e["volume"]);
-            this.signal = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+            this.signal = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
         }
         if (this.signal >= 2) {
             if (global.actionScore[closedBar.symbol] >= 2) {
                 this.flag = (this.flag != true) ? true : null;
-                // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
-                let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
+                this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
+                let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
                 console.log(message);
                 if (this.flag) {
+                    // 设置邮件内容（谁发送什么给谁）
                     // 设置邮件内容（谁发送什么给谁）
                     let mailOptions = {
                         from: process.env.SEND_FROM, // 发件人
@@ -72,9 +72,8 @@ class InfluxLongStrategy extends BaseStrategy {
             } else {
                 this.flag = null;
             }
-        } else if (this.signal <= -2) {
+        } else if (this.flag <= -2) {
             this.flag = false;
-            // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
         }
     }
 
@@ -95,10 +94,12 @@ class InfluxLongStrategy extends BaseStrategy {
             let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
             let closePrice = ClosedBarList.map(e => e["closePrice"]);
             let volume = ClosedBarList.map(e => e["volume"]);
-            let actionDatetime = ClosedBarList.map(e => e["actionDatetime"]);
-            let score = _get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+            // let actionDatetime = ClosedBarList.map(e => e["actionDatetime"]);
+            let actionDate = ClosedBarList.map(e => e["actionDate"]);
+            let timeStr = ClosedBarList.map(e => e["timeStr"]);
+            let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
             global.actionScore[newBar.symbol] = score;
-            global.actionDatetime[newBar.symbol] = actionDatetime[actionDatetime.length - 1];
+            global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
             global.actionBarInterval[newBar.symbol] = BarInterval;
         });
     }
@@ -119,6 +120,7 @@ class InfluxLongStrategy extends BaseStrategy {
         let sum = this._getAvilableSum(tick);
         if (sum >= 1) {
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Buy, OpenCloseFlagType.Open);
+            this._sendMessage(tick);
             this.flag = null;
         }
     }
@@ -138,9 +140,40 @@ class InfluxLongStrategy extends BaseStrategy {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longTodayPostionAveragePrice) {
                 this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
+                this._sendMessage(tick);
             }
         }
     }
+
+    _profitYestedayLongPositions(tick, position, up = 0) {
+        let yesterdayLongPositions = position.GetLongYesterdayPosition();
+        if (yesterdayLongPositions > 0) {
+            let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            if (price > longYesterdayPostionAveragePrice) {
+                this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
+                this._sendMessage(tick);
+            }
+        }
+    }
+
+    _sendMessage(tick) {
+        let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
+        console.log(message);
+        let mailOptions = {
+            from: process.env.SEND_FROM, // 发件人
+            to: process.env.SEND_TO, // 收件人
+            subject: "Action " + this.name + " signal: " + this.signal, // 主题
+            text: message, // plain text body
+            html: `<b>${message}</b>`, // html body
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+        });
+    }
+
 
     _closeYesterdayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.GetLongYesterdayPosition();
@@ -155,12 +188,22 @@ class InfluxLongStrategy extends BaseStrategy {
         super.OnTick(tick);
         this.lastTick = this.tick;
         this.tick = tick;
-        let tradeState = this._getOffset(tick, 0, 30);
+        let tradeState = this._getOffset(tick, 0, 300);
         let position = this.GetPosition(tick.symbol);
+        if (this.flag === false) {
+            if (this.signal <= -2) {
+                if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
+                    if (position) {
+                        this._profitTodayLongPositions(tick, position);
+                        this._profitYestedayLongPositions(tick, position);
+                        this.flag = null;
+                    }
+                }
+            }
+        }
         switch (tradeState) {
             // timeOffset
             case 0:
-                // this.thresholdPrice = null;
                 if (position) {
                     this._closeYesterdayLongPositions(tick, position, 1);
                 }
@@ -187,30 +230,10 @@ class InfluxLongStrategy extends BaseStrategy {
                                 }
                             }
                         }
-                    } else if (this.flag === false) {
-                        if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                            if (position) {
-                                this._profitTodayLongPositions(tick, position);
-                                let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
-                                console.log(message);
-                                // 设置邮件内容（谁发送什么给谁）
-                                let mailOptions = {
-                                    from: process.env.SEND_FROM, // 发件人
-                                    to: process.env.SEND_TO, // 收件人
-                                    subject: this.name + " signal: " + this.signal, // 主题
-                                    text: message, // plain text body
-                                    html: `<b>${message}</b>`, // html body
-                                };
-                                transporter.sendMail(mailOptions, (error, info) => {
-                                    if (error) {
-                                        return console.log(error);
-                                    }
-                                });
-                            }
-                        }
                     }
                 }
         }
+
     }
 
     Stop() {
@@ -219,4 +242,4 @@ class InfluxLongStrategy extends BaseStrategy {
     }
 }
 
-module.exports = InfluxLongStrategy;
+module.exports = InfluxLongIIStrategy;

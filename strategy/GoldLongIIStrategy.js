@@ -1,7 +1,9 @@
+let FixedArray = require("fixed-array");
+let talib = require('talib-binding');
 let BaseStrategy = require("./baseStrategy");
 
 // let Position = require("../util/Position");
-class GoldLongStrategy extends BaseStrategy {
+class GoldLongIIStrategy extends BaseStrategy {
     constructor(strategyConfig) {
         //一定要使用super(strategyConfig)进行基类实例初始化
         //strategyConfig为 userConfig.js 中的DemoStrategy类的策略配置对象
@@ -15,7 +17,6 @@ class GoldLongStrategy extends BaseStrategy {
         this.flag = null;
         this.leftFund = 20000;
     }
-
 
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
@@ -39,10 +40,12 @@ class GoldLongStrategy extends BaseStrategy {
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
-        // console.log(tradingAccountInfo);
+        console.log(tradingAccountInfo);
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
+        global.PreMargin = tradingAccountInfo["PreMargin"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
     }
 
     _getAvailabelSum(tick) {
@@ -54,9 +57,8 @@ class GoldLongStrategy extends BaseStrategy {
         return Math.floor((global.availableFund - this.leftFund) / (tick.lastPrice * unit * marginRate));
     }
 
-
     //js Date对象从0开始的月份
-    _getTimeToGold(tick, breakOffsetSec = 588) {
+    _getTimeToGold(tick, breakOffsetSec = 588, closeOffsetSec = 30) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -70,25 +72,22 @@ class GoldLongStrategy extends BaseStrategy {
         var PMStopTime = new Date(PMCloseTime.getTime() - breakOffsetSec * 1000);
         let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
         var NightCloseTime = new Date(NightCloseTimeStr);
-        var NightStopTime = new Date(NightCloseTime.getTime() - breakOffsetSec * 1000);
+        var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
+        // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime);
         return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
     }
-
 
     OnTick(tick) {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         super.OnTick(tick);
-        this.lastTick = this.tick;
-        this.tick = tick;
         if (!this._getTimeToGold(tick)) {
-            if (this.flag == false) {
-                this.QueryTradingAccount(tick.clientName);
+            this.QueryTradingAccount(tick.clientName);
+            if (global.CurrMargin > global.PreMargin) {
                 let availablesSum = this._getAvailabelSum(tick);
                 if (availablesSum >= 1) {
                     let price = tick.lastPrice;
                     this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
-                    this.flag = null;
                 }
             }
         } else {
@@ -109,4 +108,4 @@ class GoldLongStrategy extends BaseStrategy {
     }
 }
 
-module.exports = GoldLongStrategy;
+module.exports = GoldLongIIStrategy;
