@@ -11,7 +11,6 @@ dotenv.config();
 var BaseStrategy = require("./baseStrategy");
 
 
-
 /////////////////////// Private Method ///////////////////////////////////////////////
 class InfluxLongStrategy extends BaseStrategy {
     //初始化
@@ -25,6 +24,7 @@ class InfluxLongStrategy extends BaseStrategy {
         this.flag = null;
         this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
+        this.lastSignal = 0;
         this.closedBarList = [];
         global.actionFlag = {};
         global.actionScore = {};
@@ -35,6 +35,7 @@ class InfluxLongStrategy extends BaseStrategy {
 
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar) {
+        this.lastSignal = this.signal;
         if (this.closedBarList) {
             this.closedBarList.push(closedBar);
             if (this.closedBarList.length > 50) {
@@ -50,7 +51,7 @@ class InfluxLongStrategy extends BaseStrategy {
         }
         if (this.signal >= 2) {
             if (global.actionScore[closedBar.symbol] >= 2) {
-                this.flag = (this.flag != true) ? true : null;
+                this.flag = (this.lastSignal < 2) ? true : null;
                 // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
                 let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
                 console.log(message);
