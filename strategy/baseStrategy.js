@@ -222,7 +222,6 @@ class BaseStrategy {
     }
 
 
-
     _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
         let upperFutureName = contract.futureName.toUpperCase();
@@ -231,9 +230,12 @@ class BaseStrategy {
         let marginRate = tickFutureConfig.MarginRate;
         let priceUnit = tick.lastPrice * unit * marginRate * global.CurrMargin / global.ExchangeMargin;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
+        console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin, global.ExchangeMargin);
         console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
+
+
 
 
     //js Date对象从0开始的月份
