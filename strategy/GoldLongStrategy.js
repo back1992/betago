@@ -39,27 +39,6 @@ class GoldLongStrategy extends BaseStrategy {
         }
     }
 
-    OnQueryTradingAccount(tradingAccountInfo) {
-        // console.log(tradingAccountInfo);
-        global.availableFund = tradingAccountInfo["Available"];
-        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
-        global.Balance = tradingAccountInfo["Balance"];
-        global.CurrMargin = tradingAccountInfo["CurrMargin"];
-        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
-    }
-
-    // _getAvailabelSum(tick) {
-    //     let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
-    //     let upperFutureName = contract.futureName.toUpperCase();
-    //     let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-    //     let unit = tickFutureConfig.Unit;
-    //     let marginRate = tickFutureConfig.MarginRate;
-    //     let priceUnit = (tick.lastPrice * unit * marginRate) * global.CurrMargin / global.ExchangeMargin;
-    //     let availabelSum = Math.floor((global.availableFund - this.leftFund) / priceUnit);
-    //     console.log(`availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
-    //     return availabelSum;
-    // }
-    //
 
     //js Date对象从0开始的月份
     _getTimeToGold(tick, breakOffsetSec = 588) {
@@ -87,10 +66,10 @@ class GoldLongStrategy extends BaseStrategy {
         super.OnTick(tick);
         this.lastTick = this.tick;
         this.tick = tick;
-        this.QueryTradingAccount(tick.clientName);
-        let availablesSum = this._getAvailabelSum(tick);
         if (!this._getTimeToGold(tick)) {
             if (this.flag) {
+                this.QueryTradingAccount(tick.clientName);
+                let availablesSum = this._getAvailabelSum(tick);
                 if (availablesSum >= 1) {
                     let price = tick.lastPrice;
                     this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);

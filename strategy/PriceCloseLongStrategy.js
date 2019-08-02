@@ -12,8 +12,6 @@ class PriceCloseLongStrategy extends BaseStrategy {
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
         super(strategyConfig);
-        this.lastTick = null;
-        this.tick = null;
         this.total = strategyConfig.total;
         this.thresholdPrice = strategyConfig.thresholdPrice;
         this.sum = 0;
@@ -61,15 +59,11 @@ class PriceCloseLongStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        this.lastTick = this.tick;
-        this.tick = tick;
         if (this.sum < this.total) {
-            if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                if (this.flag === true) {
-                    this._closeLongPositions(tick);
-                    this.sum += 1;
-                    this.flag = null;
-                }
+            if (this.flag === true) {
+                this._closeLongPositions(tick);
+                this.sum += 1;
+                this.flag = null;
             }
         } else {
             // this.Stop();

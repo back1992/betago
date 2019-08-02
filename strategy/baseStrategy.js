@@ -212,14 +212,15 @@ class BaseStrategy {
         return score
     }
 
-
     OnQueryTradingAccount(tradingAccountInfo) {
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
         global.PreMargin = tradingAccountInfo["PreMargin"];
         global.CurrMargin = tradingAccountInfo["CurrMargin"];
+        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
     }
+
 
 
     _getAvailabelSum(tick) {
@@ -228,8 +229,9 @@ class BaseStrategy {
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
-        let priceUnit = (tick.lastPrice * unit * marginRate) * global.CurrMargin / global.ExchangeMargin;
+        let priceUnit = tick.lastPrice * unit * marginRate * global.CurrMargin / global.ExchangeMargin;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
+        console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin , global.ExchangeMargin);
         console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
@@ -313,8 +315,18 @@ class BaseStrategy {
         global.NodeQuant.StrategyEngine.QueryTradingAccount(clientName, this);
     }
 
-    OnQueryTradingAccount(tradingAccountInfo) {
-    }
+
+    // OnQueryTradingAccount(tradingAccountInfo) {
+    //     global.availableFund = tradingAccountInfo["Available"];
+    //     global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
+    //     global.Balance = tradingAccountInfo["Balance"];
+    //     global.PreMargin = tradingAccountInfo["PreMargin"];
+    //     global.CurrMargin = tradingAccountInfo["CurrMargin"];
+    // }
+
+    //
+    // OnQueryTradingAccount(tradingAccountInfo) {
+    // }
 
     //通过合约名字获得合约最新Tick
     GetLastTick(symbol) {
