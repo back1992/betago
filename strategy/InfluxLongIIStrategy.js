@@ -22,14 +22,12 @@ class InfluxLongIIStrategy extends BaseStrategy {
         this.total = strategyConfig.total;
         this.sum = 0;
         this.flag = null;
-        this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
         this.closedBarList = [];
         global.actionFlag = {};
         global.actionScore = {};
         global.actionDatetime = {};
         global.actionBarInterval = {};
-        // global.actionFlag[Object.keys(strategyConfig.symbols)[0].toString()] = {};
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
@@ -54,7 +52,6 @@ class InfluxLongIIStrategy extends BaseStrategy {
                 let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
                 console.log(message);
                 if (this.flag) {
-                    // 设置邮件内容（谁发送什么给谁）
                     // 设置邮件内容（谁发送什么给谁）
                     let mailOptions = {
                         from: process.env.SEND_FROM, // 发件人
@@ -110,7 +107,6 @@ class InfluxLongIIStrategy extends BaseStrategy {
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
-        // console.log(ClosedBarList);
         this.closedBarList = ClosedBarList;
     }
 
