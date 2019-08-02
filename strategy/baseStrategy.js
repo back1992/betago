@@ -167,7 +167,7 @@ class BaseStrategy {
 
     //加载Bar完成
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
-      // console.log(symbol, BarType, BarInterval, ClosedBarList);
+        // console.log(symbol, BarType, BarInterval, ClosedBarList);
     }
 
     /// <summary>
@@ -213,6 +213,15 @@ class BaseStrategy {
     }
 
 
+    OnQueryTradingAccount(tradingAccountInfo) {
+        global.availableFund = tradingAccountInfo["Available"];
+        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
+        global.Balance = tradingAccountInfo["Balance"];
+        global.PreMargin = tradingAccountInfo["PreMargin"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
+    }
+
+
     _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
         let upperFutureName = contract.futureName.toUpperCase();
@@ -220,8 +229,8 @@ class BaseStrategy {
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
         let priceUnit = (tick.lastPrice * unit * marginRate) * global.CurrMargin / global.ExchangeMargin;
-        let availabelSum = Math.floor((global.availableFund - this.leftFund) / priceUnit);
-        console.log(`availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        let availabelSum = Math.floor(global.availableFund / priceUnit);
+        console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
 
@@ -248,7 +257,7 @@ class BaseStrategy {
         let NightOpenTimeStr = NowDateStr + " " + tickFutureConfig.NightOpen;
         var NightOpenTime = new Date(NightOpenTimeStr);
         var NightOpenTimeOffset = new Date(NightOpenTime.getTime() + breakOffsetSec * 1000);
-        let isTimeOffset = (NowDateTime > AMOpenTime && NowDateTime < AMOpenTimeOffset) || (NowDateTime > AMResumeTime && NowDateTime < AMResumeTimeOffset) || (NowDateTime > PMOpenTime && NowDateTime < PMOpenTimeOffset) || (NowDateTime > NightOpenTime && NowDateTime < NightOpenTimeOffset) ;
+        let isTimeOffset = (NowDateTime > AMOpenTime && NowDateTime < AMOpenTimeOffset) || (NowDateTime > AMResumeTime && NowDateTime < AMResumeTimeOffset) || (NowDateTime > PMOpenTime && NowDateTime < PMOpenTimeOffset) || (NowDateTime > NightOpenTime && NowDateTime < NightOpenTimeOffset);
         let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
         var PMCloseTime = new Date(PMCloseTimeStr);
         var PMStopTime = new Date(PMCloseTime.getTime() - closeOffsetSec * 1000);
@@ -260,7 +269,7 @@ class BaseStrategy {
         if (isTimeOffset) {
             return 0;
 
-        } else if (isTimeToClose){
+        } else if (isTimeToClose) {
             return -1;
         } else {
             return 1;
@@ -500,11 +509,10 @@ class BaseStrategy {
             betterPrice = orderPrice + tickCount * priceTick;
         return betterPrice;
     }
+
     // _loadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval){
     //   _loadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval)
     // }
-
-
 
 
 }

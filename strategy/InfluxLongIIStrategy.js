@@ -115,9 +115,12 @@ class InfluxLongIIStrategy extends BaseStrategy {
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
+        // console.log(tradingAccountInfo);
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
+        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
     }
 
     _openLong(tick) {
@@ -126,8 +129,8 @@ class InfluxLongIIStrategy extends BaseStrategy {
         if (sum >= 1) {
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Buy, OpenCloseFlagType.Open);
             this._sendMessage(tick);
-            this.flag = null;
         }
+        this.flag = null;
     }
 
     _closeTodayLongPositions(tick, position, up = 0) {

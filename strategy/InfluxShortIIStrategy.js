@@ -72,7 +72,6 @@ class InfluxShortIIStrategy extends BaseStrategy {
                 this.flag = null;
             }
         }
-        // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
     }
 
     OnNewBar(newBar) {
@@ -96,9 +95,6 @@ class InfluxShortIIStrategy extends BaseStrategy {
                 let timeStr = ClosedBarList.map(e => e["timeStr"]);
                 let volume = ClosedBarList.map(e => e["volume"]);
                 let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                // global.actionScore[newBar.symbol] = score;
-                // global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-                // global.actionBarInterval[newBar.symbol] = BarInterval;
                 if (score >= 2 || score <= -2) {
                     global.actionScore[newBar.symbol] = score;
                     global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
@@ -110,14 +106,16 @@ class InfluxShortIIStrategy extends BaseStrategy {
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
-        // console.log(ClosedBarList);
         this.closedBarList = ClosedBarList;
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
+        // console.log(tradingAccountInfo);
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
+        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
     }
 
     _openShort(tick) {
@@ -126,8 +124,8 @@ class InfluxShortIIStrategy extends BaseStrategy {
         if (sum >= 1) {
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.Open);
             this._sendMessage(tick);
-            this.flag = null;
         }
+        this.flag = null;
     }
 
     _closeTodayShortPositions(tick, position, up = 0) {

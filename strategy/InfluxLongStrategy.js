@@ -52,7 +52,6 @@ class InfluxLongStrategy extends BaseStrategy {
         if (this.signal >= 2) {
             if (global.actionScore[closedBar.symbol] >= 2) {
                 this.flag = (this.lastSignal < 2) ? true : null;
-                // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
                 let message = this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
                 console.log(message);
                 if (this.flag) {
@@ -75,7 +74,6 @@ class InfluxLongStrategy extends BaseStrategy {
             }
         } else if (this.signal <= -2) {
             this.flag = false;
-            // console.log(this.name + " signal: " + this.signal + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString());
         }
     }
 
@@ -105,7 +103,6 @@ class InfluxLongStrategy extends BaseStrategy {
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
-        // console.log(ClosedBarList);
         this.closedBarList = ClosedBarList;
     }
 
