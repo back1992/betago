@@ -229,7 +229,8 @@ class BaseStrategy {
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
-        let priceUnit = tick.lastPrice * unit * marginRate * global.CurrMargin / global.ExchangeMargin;
+        // let priceUnit = tick.lastPrice * unit * marginRate * global.CurrMargin / global.ExchangeMargin;
+        let priceUnit = tick.lastPrice * unit * marginRate;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
         console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin , global.ExchangeMargin);
         console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);

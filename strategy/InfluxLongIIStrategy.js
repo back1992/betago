@@ -99,12 +99,9 @@ class InfluxLongIIStrategy extends BaseStrategy {
                 let actionDate = ClosedBarList.map(e => e["actionDate"]);
                 let timeStr = ClosedBarList.map(e => e["timeStr"]);
                 let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                if (score >= 2 || score <= -2) {
-                    global.actionScore[newBar.symbol] = score;
-                    global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-                    global.actionBarInterval[newBar.symbol] = BarInterval;
-                    console.log(global.actionScore);
-                }
+                global.actionScore[newBar.symbol] = score;
+                global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
+                global.actionBarInterval[newBar.symbol] = BarInterval;
             });
         }
     }
