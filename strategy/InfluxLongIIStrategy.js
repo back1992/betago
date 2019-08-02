@@ -114,14 +114,14 @@ class InfluxLongIIStrategy extends BaseStrategy {
         this.closedBarList = ClosedBarList;
     }
 
-    OnQueryTradingAccount(tradingAccountInfo) {
-        // console.log(tradingAccountInfo);
-        global.availableFund = tradingAccountInfo["Available"];
-        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
-        global.Balance = tradingAccountInfo["Balance"];
-        global.CurrMargin = tradingAccountInfo["CurrMargin"];
-        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
-    }
+    // OnQueryTradingAccount(tradingAccountInfo) {
+    //     // console.log(tradingAccountInfo);
+    //     global.availableFund = tradingAccountInfo["Available"];
+    //     global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
+    //     global.Balance = tradingAccountInfo["Balance"];
+    //     global.CurrMargin = tradingAccountInfo["CurrMargin"];
+    //     global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
+    // }
 
     _openLong(tick) {
         this.QueryTradingAccount(tick.clientName);

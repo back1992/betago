@@ -213,14 +213,6 @@ class BaseStrategy {
     }
 
 
-    OnQueryTradingAccount(tradingAccountInfo) {
-        global.availableFund = tradingAccountInfo["Available"];
-        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
-        global.Balance = tradingAccountInfo["Balance"];
-        global.PreMargin = tradingAccountInfo["PreMargin"];
-        global.CurrMargin = tradingAccountInfo["CurrMargin"];
-    }
-
 
     _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
@@ -313,8 +305,18 @@ class BaseStrategy {
         global.NodeQuant.StrategyEngine.QueryTradingAccount(clientName, this);
     }
 
+    // OnQueryTradingAccount(tradingAccountInfo) {
+    // }
+
+
     OnQueryTradingAccount(tradingAccountInfo) {
+        global.availableFund = tradingAccountInfo["Available"];
+        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
+        global.Balance = tradingAccountInfo["Balance"];
+        global.PreMargin = tradingAccountInfo["PreMargin"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
     }
+
 
     //通过合约名字获得合约最新Tick
     GetLastTick(symbol) {

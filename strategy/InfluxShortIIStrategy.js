@@ -51,10 +51,10 @@ class InfluxShortIIStrategy extends BaseStrategy {
             if (global.actionScore[closedBar.symbol] <= -2) {
                 this.flag = (this.lastSignal > -2) ? true : null;
                 this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
-                let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
-                console.log(message);
                 if (this.flag) {
                     // 设置邮件内容（谁发送什么给谁）
+                    let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
+                    console.log(message);
                     let mailOptions = {
                         from: process.env.SEND_FROM, // 发件人
                         to: process.env.SEND_TO, // 收件人
@@ -109,14 +109,14 @@ class InfluxShortIIStrategy extends BaseStrategy {
         this.closedBarList = ClosedBarList;
     }
 
-    OnQueryTradingAccount(tradingAccountInfo) {
-        // console.log(tradingAccountInfo);
-        global.availableFund = tradingAccountInfo["Available"];
-        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
-        global.Balance = tradingAccountInfo["Balance"];
-        global.CurrMargin = tradingAccountInfo["CurrMargin"];
-        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
-    }
+    // OnQueryTradingAccount(tradingAccountInfo) {
+    //     // console.log(tradingAccountInfo);
+    //     global.availableFund = tradingAccountInfo["Available"];
+    //     global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
+    //     global.Balance = tradingAccountInfo["Balance"];
+    //     global.CurrMargin = tradingAccountInfo["CurrMargin"];
+    //     global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
+    // }
 
     _openShort(tick) {
         this.QueryTradingAccount(tick.clientName);
