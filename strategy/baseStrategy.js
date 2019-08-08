@@ -232,8 +232,8 @@ class BaseStrategy {
         // let priceUnit = tick.lastPrice * unit * marginRate * global.CurrMargin / global.ExchangeMargin;
         let priceUnit = tick.lastPrice * unit * marginRate;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
-        console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin , global.ExchangeMargin);
-        console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        // console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin , global.ExchangeMargin);
+        // console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
 

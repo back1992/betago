@@ -31,6 +31,21 @@ class GoldLongStrategy extends BaseStrategy {
         console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice);
     }
 
+    _getAvailabelSum(tick) {
+        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
+        let upperFutureName = contract.futureName.toUpperCase();
+        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
+        let unit = tickFutureConfig.Unit;
+        let marginRate = tickFutureConfig.MarginRate;
+        let priceUnit = tick.lastPrice * unit * marginRate;
+        // let priceUnit = tick.lastPrice * unit * marginRate * global.ExchangeMargin / global.CurrMargin;
+        let availabelSum = Math.floor(global.availableFund / priceUnit);
+        console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin, global.ExchangeMargin);
+        console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        return availabelSum;
+    }
+
+
     _closeTodayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.GetLongTodayPosition();
         if (todayLongPositions > 0) {
