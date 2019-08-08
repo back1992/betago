@@ -51,23 +51,6 @@ class InfluxShortIIStrategy extends BaseStrategy {
             if (global.actionScore[closedBar.symbol] <= -2) {
                 this.flag = (this.lastSignal > -2) ? true : null;
                 this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
-                let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
-                console.log(message);
-                if (this.flag) {
-                    // 设置邮件内容（谁发送什么给谁）
-                    let mailOptions = {
-                        from: process.env.SEND_FROM, // 发件人
-                        to: process.env.SEND_TO, // 收件人
-                        subject: this.name + " signal: " + this.signal, // 主题
-                        text: message, // plain text body
-                        html: `<b>${message}</b>`, // html body
-                    };
-                    transporter.sendMail(mailOptions, (error, info) => {
-                        if (error) {
-                            return console.log(error);
-                        }
-                    });
-                }
             } else {
                 this.flag = null;
             }
@@ -95,9 +78,11 @@ class InfluxShortIIStrategy extends BaseStrategy {
                 let timeStr = ClosedBarList.map(e => e["timeStr"]);
                 let volume = ClosedBarList.map(e => e["volume"]);
                 let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                global.actionScore[newBar.symbol] = score;
-                global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-                global.actionBarInterval[newBar.symbol] = BarInterval;
+                if (score >= 2 || score <= -2) {
+                    global.actionScore[newBar.symbol] = score;
+                    global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
+                    global.actionBarInterval[newBar.symbol] = BarInterval;
+                }
             });
 
         }
@@ -105,15 +90,6 @@ class InfluxShortIIStrategy extends BaseStrategy {
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
         this.closedBarList = ClosedBarList;
-    }
-
-    OnQueryTradingAccount(tradingAccountInfo) {
-        // console.log(tradingAccountInfo);
-        global.availableFund = tradingAccountInfo["Available"];
-        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
-        global.Balance = tradingAccountInfo["Balance"];
-        global.CurrMargin = tradingAccountInfo["CurrMargin"];
-        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
     }
 
     _openShort(tick) {
@@ -211,8 +187,8 @@ class InfluxShortIIStrategy extends BaseStrategy {
             // time to close
             case -1:
                 if (position) {
-                    // this._closeTodayShortPositions(tick, position, 1);
                     this._profitTodayShortPositions(tick, position, 1);
+                    this._profitYesterdayShortPositions(tick, position, 1);
                 }
                 break;
             // trade time

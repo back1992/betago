@@ -222,7 +222,6 @@ class BaseStrategy {
     }
 
 
-
     _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
         let upperFutureName = contract.futureName.toUpperCase();
@@ -232,10 +231,12 @@ class BaseStrategy {
         // let priceUnit = tick.lastPrice * unit * marginRate * global.CurrMargin / global.ExchangeMargin;
         let priceUnit = tick.lastPrice * unit * marginRate;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
-        // console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin , global.ExchangeMargin);
-        // console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin, global.ExchangeMargin);
+        console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
+
+
 
 
     //js Date对象从0开始的月份
@@ -268,7 +269,6 @@ class BaseStrategy {
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
         let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
-        // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime)
         if (isTimeOffset) {
             return 0;
 
@@ -277,7 +277,6 @@ class BaseStrategy {
         } else {
             return 1;
         }
-        // return {'isTimeOffset': isTimeOffset, 'isTimeToClose': isTimeToClose}
     }
 
 
@@ -316,18 +315,6 @@ class BaseStrategy {
         global.NodeQuant.StrategyEngine.QueryTradingAccount(clientName, this);
     }
 
-
-    // OnQueryTradingAccount(tradingAccountInfo) {
-    //     global.availableFund = tradingAccountInfo["Available"];
-    //     global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
-    //     global.Balance = tradingAccountInfo["Balance"];
-    //     global.PreMargin = tradingAccountInfo["PreMargin"];
-    //     global.CurrMargin = tradingAccountInfo["CurrMargin"];
-    // }
-
-    //
-    // OnQueryTradingAccount(tradingAccountInfo) {
-    // }
 
     //通过合约名字获得合约最新Tick
     GetLastTick(symbol) {
