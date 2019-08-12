@@ -1,7 +1,8 @@
 /**
  * Created by Administrator on 2017/6/12.
  */
-
+const dotenv = require('dotenv');
+dotenv.config();
 require("../common");
 let NodeQuantError = require("../util/NodeQuantError");
 let KBar = require("../util/KBar");
@@ -238,6 +239,24 @@ class BaseStrategy {
 
 
 
+    _sendMessage(subject, message) {
+        let mailOptions = {
+            from: process.env.SEND_FROM, // 发件人
+            to: process.env.SEND_TO, // 收件人
+            // subject: "Action " + this.name + " signal: " + this.signal, // 主题
+            subject: subject, // 主题
+            text: message, // plain text body
+            html: `<b>${message}</b>`, // html body
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+        });
+    }
+
+
+
 
     //js Date对象从0开始的月份
     _getOffset(tick, breakOffsetSec = 180, closeOffsetSec = 30) {
@@ -309,6 +328,7 @@ class BaseStrategy {
     }
 
     OnTrade(trade) {
+
     }
 
     QueryTradingAccount(clientName) {
