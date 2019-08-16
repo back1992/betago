@@ -60,16 +60,10 @@ class PriceCloseShortStrategy extends BaseStrategy {
         super.OnTick(tick);
         this.lastTick = this.tick;
         this.tick = tick;
-        if (this.sum < this.total) {
-            if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                if (this.flag === true) {
-                    this._closeShortPositions(tick);
-                    this.sum += 1;
-                    this.flag = null;
-                }
-            }
-        } else {
-            // this.Stop();
+        if (this.flag === true) {
+            this._closeShortPositions(tick);
+            this.sum += 1;
+            this.flag = null;
         }
     }
 

@@ -8,8 +8,6 @@ class GoldLongStrategy extends BaseStrategy {
         //调用super(strategyConfig)的作用是基类BaseStrategy实例也需要根据strategyConfig来进行初始化
         super(strategyConfig);
         global.BarCount = 0;
-        this.tick = null;
-        this.lastTick = null;
         this.total = strategyConfig.total;
         this.sum = 0;
         this.flag = null;
@@ -18,8 +16,6 @@ class GoldLongStrategy extends BaseStrategy {
 
 
     OnClosedBar(closedBar) {
-        // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-        console.log((closedBar.closePrice > closedBar.openPrice), closedBar.closePrice, closedBar.openPrice);
         if (closedBar.closePrice > closedBar.openPrice) {
             this.flag = true;
         } else {
@@ -51,12 +47,13 @@ class GoldLongStrategy extends BaseStrategy {
         if (todayLongPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
+            // this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
         }
     }
 
 
     //js Date对象从0开始的月份
-    _getTimeToGold(tick, breakOffsetSec = 588) {
+    _getTimeToGold(tick, breakOffsetSec = 288) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -92,7 +89,7 @@ class GoldLongStrategy extends BaseStrategy {
                 }
             }
         } else {
-            if (this.flag == false) {
+            if (this.flag === false) {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
                     let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();

@@ -51,21 +51,6 @@ class InfluxLongIIStrategy extends BaseStrategy {
                 this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
                 let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[closedBar.symbol] + "M: " + global.actionScore[closedBar.symbol] + " " + global.actionDatetime[closedBar.symbol] + " flag: " + this.flag + " 时间: " + closedBar.endDatetime.toLocaleString();
                 console.log(message);
-                // if (this.flag) {
-                //     // 设置邮件内容（谁发送什么给谁）
-                //     let mailOptions = {
-                //         from: process.env.SEND_FROM, // 发件人
-                //         to: process.env.SEND_TO, // 收件人
-                //         subject: this.name + " signal: " + this.signal, // 主题
-                //         text: message, // plain text body
-                //         html: `<b>${message}</b>`, // html body
-                //     };
-                //     transporter.sendMail(mailOptions, (error, info) => {
-                //         if (error) {
-                //             return console.log(error);
-                //         }
-                //     });
-                // }
             } else {
                 this.flag = null;
             }
