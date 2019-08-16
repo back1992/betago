@@ -47,7 +47,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             this.flag = false;
         } else if (this.signal <= -2) {
             if (global.actionScore[closedBar.symbol] <= -2) {
-                this.flag = (this.flag != true)  ? true : null;
+                this.flag = true;
                 this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
             } else {
                 this.flag = null;
@@ -77,11 +77,11 @@ class InfluxShortIIStrategy extends BaseStrategy {
                 let timeStr = ClosedBarList.map(e => e["timeStr"]);
                 let volume = ClosedBarList.map(e => e["volume"]);
                 let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                global.actionScore[newBar.symbol] = score;
-                global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-                global.actionBarInterval[newBar.symbol] = BarInterval;
-                // if (score >= 2 || score <= -2) {
-                // }
+                if (score >= 2 || score <= -2) {
+                    global.actionScore[newBar.symbol] = score;
+                    global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
+                    global.actionBarInterval[newBar.symbol] = BarInterval;
+                }
             });
 
         }
@@ -99,6 +99,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let subject = "Today Action Open Short " + this.name + " signal: " + this.signal;
             let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
             this._sendMessage(subject, message);
+            this.flag = null;
         }
     }
 
@@ -131,15 +132,14 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (price < shortYesterdayPostionAveragePrice) {
-                // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
-                this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+                // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
                 let subject = "Yesterday Action Profit Short  " + this.name + " signal: " + this.signal;
                 let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice price ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}}`;
                 this._sendMessage(subject, message);
             }
         }
     }
-
 
 
     _closeYesterdayShortPositions(tick, position, up = 0) {
@@ -156,39 +156,41 @@ class InfluxShortIIStrategy extends BaseStrategy {
     // }
 
 
-
     OnTick(tick) {
         super.OnTick(tick);
         this.lastTick = this.tick;
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
-        let position = this.GetPosition(tick.symbol);
-        this.tradePosition = position;
         if (this.flag === false) {
-            if (this.signal >= 2) {
-                if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                    if (position) {
-                        this._profitTodayShortPositions(tick, position);
-                        this._profitYesterdayShortPositions(tick, position);
-                        this.flag = null;
-                    }
+            let position = this.GetPosition(tick.symbol);
+            if (position) {
+                let yesterdayShortPositions = position.GetShortYesterdayPosition();
+                let todayShortPositions = position.GetShortTodayPosition();
+                if (yesterdayShortPositions) {
+                    this._profitYesterdayShortPositions(tick, position, 0);
                 }
+                if (todayShortPositions) {
+                    this._profitTodayShortPositions(tick, position, 0);
+                }
+                this.flag = null;
             }
         }
         switch (tradeState) {
             // timeOffset
             case 0:
-                if (position) {
-                    this._closeYesterdayShortPositions(tick, position, 1);
-                    // // this._profitTodayShortPositions(tick, position, 1);
-                    // this._profitYesterdayShortPositions(tick, position, 1);
-                }
                 break;
             // time to close
             case -1:
+                let position = this.GetPosition(tick.symbol);
                 if (position) {
-                    this._profitTodayShortPositions(tick, position, 1);
-                    this._profitYesterdayShortPositions(tick, position, 1);
+                    let yesterdayShortPositions = position.GetShortYesterdayPosition();
+                    let todayShortPositions = position.GetShortTodayPosition();
+                    if (yesterdayShortPositions) {
+                        this._profitYesterdayShortPositions(tick, position, 0);
+                    }
+                    if (todayShortPositions) {
+                        this._profitTodayShortPositions(tick, position, 0);
+                    }
                 }
                 break;
             // trade time
@@ -196,14 +198,13 @@ class InfluxShortIIStrategy extends BaseStrategy {
                 let unFinishOrderList = this.GetUnFinishOrderList();
                 if (unFinishOrderList.length === 0) {
                     if (this.flag === true) {
-                        if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                            if (position === undefined) {
+                        let position = this.GetPosition(tick.symbol);
+                        if (position === undefined) {
+                            this._openShort(tick);
+                        } else {
+                            let todayShortPositions = position.GetShortTodayPosition();
+                            if (todayShortPositions < this.total) {
                                 this._openShort(tick);
-                            } else {
-                                let todayShortPositions = position.GetShortTodayPosition();
-                                if (todayShortPositions < this.total) {
-                                    this._openShort(tick);
-                                }
                             }
                         }
                     }
