@@ -4,26 +4,26 @@
 require("../../common");
 require("../../userConfig");
 const Influx = require('influx');
-class InfluxDB{
-    constructor()
-    {
-        this.influx=new Influx.InfluxDB({
+const MyPostMan = require("../../util/MyPostMan.js");
+
+class InfluxDB {
+    constructor() {
+        this.influx = new Influx.InfluxDB({
             host: MarketData_DBConfig.Host,
-            port:MarketData_DBConfig.Port,
-            username:MarketData_DBConfig.Username,
-            password:MarketData_DBConfig.Password,
+            port: MarketData_DBConfig.Port,
+            username: MarketData_DBConfig.Username,
+            password: MarketData_DBConfig.Password,
             // database: "NodeQuant_Recorder_Tick_DB",
             database: MarketData_DBConfig.Database,
-            pool:{maxRetries:10,requestTimeout:3*60*1000}  //1个连接失败,重试10次,每次timeout,3分钟
+            pool: {maxRetries: 10, requestTimeout: 3 * 60 * 1000}  //1个连接失败,重试10次,每次timeout,3分钟
         });
 
-        this.pointsBuffer=[];
-        this.BufferSize=100;
-        this.BufferInProgress=false;
+        this.pointsBuffer = [];
+        this.BufferSize = 200;
+        this.BufferInProgress = false;
     }
 
-    Start(callback)
-    {
+    Start(callback) {
         this.influx.getDatabaseNames().then(names => {
             if (!names.includes(Tick_DB_Name)) {
                 return global.NodeQuant.MarketDataDBClient.influx.createDatabase(Tick_DB_Name);
@@ -35,9 +35,8 @@ class InfluxDB{
         });
     }
 
-    RecordTick(symbol,tick)
-    {
-        let point={
+    RecordTick(symbol, tick) {
+        let point = {
             measurement: symbol,
             tags: {tradingDay: tick.date},
             fields: {
@@ -90,33 +89,32 @@ class InfluxDB{
 
         this.pointsBuffer.push(point);
 
-        if(this.BufferInProgress)
+        if (this.BufferInProgress)
             return;
 
-        if(this.pointsBuffer.length>=this.BufferSize) {
-            this.BufferInProgress=true;
-            this.influx.writePoints(this.pointsBuffer.slice(0,this.BufferSize), {
+        if (this.pointsBuffer.length >= this.BufferSize) {
+            this.BufferInProgress = true;
+            this.influx.writePoints(this.pointsBuffer.slice(0, this.BufferSize), {
                 precision: 'ms'
             }).then(() => {
-                this.BufferInProgress=false;
+                this.BufferInProgress = false;
                 this.pointsBuffer.splice(0, this.BufferSize);
             }).catch(err => {
-                this.BufferInProgress=false;
+                this.BufferInProgress = false;
                 console.error(`Error saving ticks to InfluxDB! ${err.stack}`)
             });
         }
     }
 
-    RecordLog(log)
-    {
+    RecordLog(log) {
         this.influx.writePoints([
             {
-                measurement:System_Log_DB,
+                measurement: System_Log_DB,
                 fields: {
-                    Source:log.Source,
-                    Type:log.Type,
-                    Message:log.Message,
-                    Datetime:log.Datetime
+                    Source: log.Source,
+                    Type: log.Type,
+                    Message: log.Message,
+                    Datetime: log.Datetime
                 }
             }
         ]).catch(err => {
@@ -124,15 +122,14 @@ class InfluxDB{
         });
     }
 
-    RecordError(error)
-    {
+    RecordError(error) {
         this.influx.writePoints([
             {
-                measurement:System_Error_DB,
+                measurement: System_Error_DB,
                 fields: {
-                    Source:error.Source,
-                    Type:error.Type,
-                    Message:error.Message
+                    Source: error.Source,
+                    Type: error.Type,
+                    Message: error.Message
                 }
             }
         ]).catch(err => {
@@ -162,40 +159,36 @@ class InfluxDB{
     }
 
     //获取单个合约的交易日列表
-    GetTradingDayList(measurment,callback)
-    {
-        let influxQL="select distinct(date) from \""+measurment+"\"";
+    GetTradingDayList(measurment, callback) {
+        let influxQL = "select distinct(date) from \"" + measurment + "\"";
         this.influx.query(influxQL).then(dateResult => {
             let allDayCount = dateResult.length;
 
-            let TradingDayList=[];
-            for(let i=0;i<allDayCount;i++) {
+            let TradingDayList = [];
+            for (let i = 0; i < allDayCount; i++) {
                 let dateStr = dateResult[i].distinct;
                 TradingDayList.push(dateStr);
             }
             callback(TradingDayList);
         }).catch(err => {
-            console.log("Error: get Trading Days in "+measurment);
+            console.log("Error: get Trading Days in " + measurment);
             console.log(err);
             callback(undefined);
         });
     }
 
     //获取最新交易日
-    GetLastTradingDay(measurment,callback)
-    {
-        let influxQL="select last(date) from \""+measurment+"\"";
+    GetLastTradingDay(measurment, callback) {
+        let influxQL = "select last(date) from \"" + measurment + "\"";
         this.influx.query(influxQL).then(lastTradingDayResult => {
 
-            if(lastTradingDayResult.length>0)
-            {
+            if (lastTradingDayResult.length > 0) {
                 callback(lastTradingDayResult[0].last);
-            }else
-            {
+            } else {
                 callback("");
             }
         }).catch(err => {
-            console.log("Error: get Trading Days in "+measurment);
+            console.log("Error: get Trading Days in " + measurment);
             console.log(err);
 
             callback("");
@@ -205,20 +198,18 @@ class InfluxDB{
     //回溯前x天的tick
     //当天:LookBackDays=0
     //前1天:LookBackDays=1
-    LoadTick(measurment,LookBackDays,callback)
-    {
-        let influxClient=this;
-        this.GetTradingDayList(measurment,function (tradingDayList) {
-            if(tradingDayList===undefined)
-            {
+    LoadTick(measurment, LookBackDays, callback) {
+        let influxClient = this;
+        this.GetTradingDayList(measurment, function (tradingDayList) {
+            if (tradingDayList === undefined) {
                 callback(undefined);
                 return;
             }
 
-            let allDayCount=tradingDayList.length;
+            let allDayCount = tradingDayList.length;
 
-            let influxQL="select *::field from \""+measurment+"\" where";
-            if(allDayCount>=LookBackDays) {
+            let influxQL = "select *::field from \"" + measurment + "\" where";
+            if (allDayCount >= LookBackDays) {
                 for (let i = allDayCount - LookBackDays - 1; i < allDayCount; i++) {
                     let dateStr = tradingDayList[i];
                     influxQL += " tradingDay='" + dateStr + "'";
@@ -239,22 +230,24 @@ class InfluxDB{
         });
     }
 
-    nrrange([measurment, ufo, TickLookBackCount, sortDirection], callback){
-      let influxClient = this;
-      sortDirection = (sortDirection<0)?"desc":"asc";
-      let influxQL = `SELECT * FROM ${measurment} ORDER BY time ${sortDirection} LIMIT ${TickLookBackCount}`;
-      influxClient.influx.query(influxQL).then(tickList => {
-        callback(null, tickList);
-      }).catch( err => {
-        console.log(err);
-        callback(undefined);
-      })
+    nrrange([measurment, ufo, TickLookBackCount, sortDirection], callback) {
+        let influxClient = this;
+        sortDirection = (sortDirection < 0) ? "desc" : "asc";
+        let influxQL = `SELECT * FROM ${measurment} ORDER BY time ${sortDirection} LIMIT ${TickLookBackCount}`;
+        influxClient.influx.query(influxQL).then(tickList => {
+            callback(null, tickList);
+        }).catch(err => {
+            console.log(err);
+            callback(undefined);
+        })
     }
 
     barrange([measurment, BarInterval, BarLookBackCount, sortDirection], callback) {
         let influxClient = this;
         sortDirection = (sortDirection < 0) ? "desc" : "asc";
-        let influxQL = `SELECT FIRST(actionDatetime) AS actionDatetime, FIRST(lastPrice) AS openPrice, LAST(lastPrice) AS closePrice, MAX(lastPrice) AS highPrice , min(lastPrice) AS lowPrice , sum(volume) AS volume FROM ${measurment} GROUP BY time(${BarInterval}m) FILL(none) ORDER BY time ${sortDirection}  LIMIT ${BarLookBackCount}`;
+        // let influxQL = `SELECT FIRST(actionDate) + FIRST(timeStr) AS actionDatetime, FIRST(lastPrice) AS openPrice, LAST(lastPrice) AS closePrice, MAX(lastPrice) AS highPrice , min(lastPrice) AS lowPrice , sum(volume) AS volume FROM ${measurment} GROUP BY time(${BarInterval}m) FILL(none) ORDER BY time ${sortDirection}  LIMIT ${BarLookBackCount}`;
+        let influxQL = `SELECT FIRST(actionDate) AS actionDate, FIRST(timeStr) AS timeStr, FIRST(lastPrice) AS openPrice, LAST(lastPrice) AS closePrice, MAX(lastPrice) AS highPrice , min(lastPrice) AS lowPrice , sum(volume) AS volume FROM ${measurment} GROUP BY time(${BarInterval}m) FILL(none) ORDER BY time ${sortDirection}  LIMIT ${BarLookBackCount}`;
+        // console.log(influxQL)
         influxClient.influx.query(influxQL).then(barList => {
             // console.log(barList);
             // console.log(barList.reverse());
@@ -266,4 +259,4 @@ class InfluxDB{
     }
 }
 
-module.exports=InfluxDB;
+module.exports = InfluxDB;

@@ -1,7 +1,8 @@
 /**
  * Created by Administrator on 2017/6/12.
  */
-
+const dotenv = require('dotenv');
+dotenv.config();
 require("../common");
 let NodeQuantError = require("../util/NodeQuantError");
 let KBar = require("../util/KBar");
@@ -167,7 +168,7 @@ class BaseStrategy {
 
     //加载Bar完成
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
-      // console.log(symbol, BarType, BarInterval, ClosedBarList);
+        // console.log(symbol, BarType, BarInterval, ClosedBarList);
     }
 
     /// <summary>
@@ -212,15 +213,49 @@ class BaseStrategy {
         return score
     }
 
+    OnQueryTradingAccount(tradingAccountInfo) {
+        global.availableFund = tradingAccountInfo["Available"];
+        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
+        global.Balance = tradingAccountInfo["Balance"];
+        global.PreMargin = tradingAccountInfo["PreMargin"];
+        global.CurrMargin = tradingAccountInfo["CurrMargin"];
+        global.ExchangeMargin = tradingAccountInfo["ExchangeMargin"];
+    }
 
-    _getAvilableSum(tick) {
+
+    _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
         let upperFutureName = contract.futureName.toUpperCase();
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
-        return Math.floor(global.availableFund / (tick.lastPrice * unit * marginRate));
+        // let priceUnit = tick.lastPrice * unit * marginRate * global.CurrMargin / global.ExchangeMargin;
+        let priceUnit = tick.lastPrice * unit * marginRate;
+        let availabelSum = Math.floor(global.availableFund / priceUnit);
+        // console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin, global.ExchangeMargin);
+        // console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        return availabelSum;
     }
+
+
+
+    _sendMessage(subject, message) {
+        let mailOptions = {
+            from: process.env.SEND_FROM, // 发件人
+            to: process.env.SEND_TO, // 收件人
+            // subject: "Action " + this.name + " signal: " + this.signal, // 主题
+            subject: subject, // 主题
+            text: message, // plain text body
+            html: `<b>${message}</b>`, // html body
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+        });
+    }
+
+
 
 
     //js Date对象从0开始的月份
@@ -245,7 +280,7 @@ class BaseStrategy {
         let NightOpenTimeStr = NowDateStr + " " + tickFutureConfig.NightOpen;
         var NightOpenTime = new Date(NightOpenTimeStr);
         var NightOpenTimeOffset = new Date(NightOpenTime.getTime() + breakOffsetSec * 1000);
-        let isTimeOffset = (NowDateTime > AMOpenTime && NowDateTime < AMOpenTimeOffset) || (NowDateTime > AMResumeTime && NowDateTime < AMResumeTimeOffset) || (NowDateTime > PMOpenTime && NowDateTime < PMOpenTimeOffset) || (NowDateTime > NightOpenTime && NowDateTime < NightOpenTimeOffset) ;
+        let isTimeOffset = (NowDateTime > AMOpenTime && NowDateTime < AMOpenTimeOffset) || (NowDateTime > AMResumeTime && NowDateTime < AMResumeTimeOffset) || (NowDateTime > PMOpenTime && NowDateTime < PMOpenTimeOffset) || (NowDateTime > NightOpenTime && NowDateTime < NightOpenTimeOffset);
         let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
         var PMCloseTime = new Date(PMCloseTimeStr);
         var PMStopTime = new Date(PMCloseTime.getTime() - closeOffsetSec * 1000);
@@ -253,16 +288,14 @@ class BaseStrategy {
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
         let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
-        // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime)
         if (isTimeOffset) {
             return 0;
 
-        } else if (isTimeToClose){
+        } else if (isTimeToClose) {
             return -1;
         } else {
             return 1;
         }
-        // return {'isTimeOffset': isTimeOffset, 'isTimeToClose': isTimeToClose}
     }
 
 
@@ -295,14 +328,13 @@ class BaseStrategy {
     }
 
     OnTrade(trade) {
+
     }
 
     QueryTradingAccount(clientName) {
         global.NodeQuant.StrategyEngine.QueryTradingAccount(clientName, this);
     }
 
-    OnQueryTradingAccount(tradingAccountInfo) {
-    }
 
     //通过合约名字获得合约最新Tick
     GetLastTick(symbol) {
@@ -497,11 +529,10 @@ class BaseStrategy {
             betterPrice = orderPrice + tickCount * priceTick;
         return betterPrice;
     }
+
     // _loadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval){
     //   _loadBarFromDB(myStrategy, symbol, LookBackCount, BarType, BarInterval)
     // }
-
-
 
 
 }

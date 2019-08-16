@@ -2,7 +2,7 @@ let FixedArray = require("fixed-array");
 let BaseStrategy = require("./baseStrategy");
 
 // let Position = require("../util/Position");
-class GoldOutStrategy extends BaseStrategy {
+class GoldClearStrategy extends BaseStrategy {
     constructor(strategyConfig) {
         //一定要使用super(strategyConfig)进行基类实例初始化
         //strategyConfig为 userConfig.js 中的DemoStrategy类的策略配置对象
@@ -13,16 +13,14 @@ class GoldOutStrategy extends BaseStrategy {
         this.sum = 0;
     }
 
-
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-        if (global.availableFund < 0) {
-            this.flag = true;
-        }
+        // this.QueryTradingAccount(tick.clientName);
     }
 
     OnNewBar(newBar) {
         console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice, this.flag);
+        this.QueryTradingAccount('CTP');
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
@@ -40,9 +38,8 @@ class GoldOutStrategy extends BaseStrategy {
         return Math.floor(global.availableFund / (tick.lastPrice * unit * marginRate));
     }
 
-
     //js Date对象从0开始的月份
-     _getTimeToGold(tick, breakOffsetSec = 158) {
+    _getTimeToGold(tick, breakOffsetSec = 158) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -57,32 +54,25 @@ class GoldOutStrategy extends BaseStrategy {
         return TickDateTime > PMStopTime && TickDateTime < PMCloseTime;
     }
 
-
     OnTick(tick) {
         super.OnTick(tick);
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
-        this.QueryTradingAccount(tick.clientName);
-        let threadBalance = global.Balance - 111000;
-        let meatBalance = global.Balance - 100000;
 
-        if( this._getTimeToGold(tick)){
-          if( this.sum < this.total ) {
-            if (threadBalance > 0) {
-            // if (global.withdrawQuota < 500) {
-              if (global.withdrawQuota < threadBalance) {
+        if (this._getTimeToGold(tick)) {
+            if (this.sum < this.total) {
+                if (global.availableFund < global.Balance) {
+                    let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
+                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+                    this.sum += 1;
+                }
+            }
+        } else {
+            if (this.flag === true) {
                 let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
                 this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
-                this.sum += 1;
-              }
+                this.flag = null;
             }
-          }
-        } else {
-          if (this.flag === true) {
-              let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, 1);
-              this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
-              this.flag = null;
-          }
         }
     }
 
@@ -91,4 +81,4 @@ class GoldOutStrategy extends BaseStrategy {
     }
 }
 
-module.exports = GoldOutStrategy;
+module.exports = GoldClearStrategy;
