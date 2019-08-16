@@ -14,18 +14,11 @@ class GoldLongStrategy extends BaseStrategy {
         this.lastTick = null;
         this.total = strategyConfig.total;
         this.sum = 0;
-        this.flag = null;
-        this.leftFund = 20000;
     }
 
 
     OnClosedBar(closedBar) {
         // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-        if (closedBar.closePrice < closedBar.openPrice) {
-            this.flag = true;
-        } else {
-            this.flag = false;
-        }
     }
 
     OnNewBar(newBar) {
@@ -41,7 +34,7 @@ class GoldLongStrategy extends BaseStrategy {
     }
 
     OnQueryTradingAccount(tradingAccountInfo) {
-        // console.log(tradingAccountInfo);
+        console.log(tradingAccountInfo);
         global.availableFund = tradingAccountInfo["Available"];
         global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
         global.Balance = tradingAccountInfo["Balance"];
@@ -53,7 +46,7 @@ class GoldLongStrategy extends BaseStrategy {
         let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
-        return Math.floor((global.availableFund - this.leftFund) / (tick.lastPrice * unit * marginRate));
+        return Math.floor(global.availableFund / (tick.lastPrice * unit * marginRate));
     }
 
 
@@ -73,8 +66,8 @@ class GoldLongStrategy extends BaseStrategy {
         let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
         var NightCloseTime = new Date(NightCloseTimeStr);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
-        // console.log("NowDateTime: "+ NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime  + "TickDateTime: " + TickDateTime  + "NightCloseTime: " + NightCloseTime);
-        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime)|| (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
+        console.log("NowDateTime: " + NowDateTime + "PMStopTime: " + PMStopTime + "PMCloseTime : " + PMCloseTime + "TickDateTime: " + TickDateTime + "NightCloseTime: " + NightCloseTime);
+        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
     }
 
 
@@ -82,25 +75,24 @@ class GoldLongStrategy extends BaseStrategy {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         super.OnTick(tick);
+        this.QueryTradingAccount(tick.clientName);
         this.lastTick = this.tick;
         this.tick = tick;
         if (!this._getTimeToGold(tick)) {
-            if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                this.QueryTradingAccount(tick.clientName);
-                let availablesSum = this._getAvailabelSum(tick);
-                if (availablesSum >= 1) {
-                    let price = tick.lastPrice;
-                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
-                }
+            //   console.log()
+            // if(this.lastTick && this.lastTick.lastPrice <  tick.lastPrice ) {
+            let availablesSum = this._getAvailabelSum(tick);
+            if (availablesSum >= 1) {
+                let price = tick.lastPrice;
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
             }
+            // }
         } else {
-            if (this.flag) {
-                let position = this.GetPosition(tick.symbol);
-                if (position != undefined) {
-                    let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
-                    if (tick.lastPrice > longTodayPostionAveragePrice) {
-                        this._closeTodayLongPositions(tick, position);
-                    }
+            let position = this.GetPosition(tick.symbol);
+            if (position != undefined) {
+                let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
+                if (tick.lastPrice > longTodayPostionAveragePrice) {
+                    this._closeTodayLongPositions(tick, position);
                 }
             }
         }
