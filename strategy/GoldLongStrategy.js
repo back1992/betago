@@ -34,10 +34,8 @@ class GoldLongStrategy extends BaseStrategy {
         let unit = tickFutureConfig.Unit;
         let marginRate = tickFutureConfig.MarginRate;
         let priceUnit = tick.lastPrice * unit * marginRate;
-        // let priceUnit = tick.lastPrice * unit * marginRate * global.ExchangeMargin / global.CurrMargin;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
-        console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin, global.ExchangeMargin);
-        console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        console.log(`${tick.symbol}  的Tick,时间: ${tick.date}  ${tick.timeStr} availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
 
@@ -93,7 +91,7 @@ class GoldLongStrategy extends BaseStrategy {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
                     let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
-                    if (tick.lastPrice > longTodayPostionAveragePrice) {
+                    if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                         this._closeTodayLongPositions(tick, position);
                     }
                 }
