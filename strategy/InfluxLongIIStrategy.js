@@ -147,7 +147,7 @@ class InfluxLongStrategy extends BaseStrategy {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longYesterdayPostionAveragePrice) {
                 // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
                 let subject = "Yesterday Action Profit Long " + this.name + " signal: " + this.signal;
                 let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
                 this._sendMessage(subject, message);
