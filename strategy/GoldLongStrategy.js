@@ -8,8 +8,6 @@ class GoldLongStrategy extends BaseStrategy {
         //调用super(strategyConfig)的作用是基类BaseStrategy实例也需要根据strategyConfig来进行初始化
         super(strategyConfig);
         global.BarCount = 0;
-        this.tick = null;
-        this.lastTick = null;
         this.total = strategyConfig.total;
         this.sum = 0;
         this.flag = null;
@@ -18,8 +16,6 @@ class GoldLongStrategy extends BaseStrategy {
 
 
     OnClosedBar(closedBar) {
-        // console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-        console.log((closedBar.closePrice > closedBar.openPrice), closedBar.closePrice, closedBar.openPrice);
         if (closedBar.closePrice > closedBar.openPrice) {
             this.flag = true;
         } else {
@@ -31,17 +27,33 @@ class GoldLongStrategy extends BaseStrategy {
         console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice);
     }
 
+    _getAvailabelSum(tick) {
+        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
+        let upperFutureName = contract.futureName.toUpperCase();
+        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
+        let unit = tickFutureConfig.Unit;
+        let marginRate = tickFutureConfig.MarginRate;
+        let priceUnit = tick.lastPrice * unit * marginRate;
+        // let priceUnit = tick.lastPrice * unit * marginRate * global.ExchangeMargin / global.CurrMargin;
+        let availabelSum = Math.floor(global.availableFund / priceUnit);
+        console.log(global.CurrMargin / global.ExchangeMargin, priceUnit, global.CurrMargin, global.ExchangeMargin);
+        console.log(`${tick.symbol}  availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        return availabelSum;
+    }
+
+
     _closeTodayLongPositions(tick, position, up = 0) {
         let todayLongPositions = position.MyGetLongTodayPosition();
         if (todayLongPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
+            // this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
         }
     }
 
 
     //js Date对象从0开始的月份
-    _getTimeToGold(tick, breakOffsetSec = 588) {
+    _getTimeToGold(tick, breakOffsetSec = 288) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -77,7 +89,7 @@ class GoldLongStrategy extends BaseStrategy {
                 }
             }
         } else {
-            if (this.flag == false) {
+            if (this.flag === false) {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
                     let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();

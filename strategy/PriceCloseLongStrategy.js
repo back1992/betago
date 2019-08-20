@@ -20,18 +20,17 @@ class PriceCloseLongStrategy extends BaseStrategy {
 
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar) {
-        if (this.thresholdPrice) {
-            if (closedBar.closePrice > this.thresholdPrice) {
-                if (closedBar.closePrice < closedBar.openPrice) {
-                    this.flag = true;
-                } else {
-                    this.flag = null;
-                }
-            } else if (closedBar.closePrice < this.thresholdPrice) {
-                this.flag = false;
+        let position = this.GetPosition(closedBar.symbol);
+        let longPostionAveragePrice = position.GetLongPositionAveragePrice();
+        if (closedBar.closePrice > longPostionAveragePrice ) {
+            if (closedBar.closePrice < closedBar.openPrice) {
+                this.flag = true;
+            } else {
+                this.flag = null;
             }
+        } else if (closedBar.closePrice < longPostionAveragePrice ) {
+            this.flag = false;
         }
-
     }
 
     OnNewBar(newBar) {
