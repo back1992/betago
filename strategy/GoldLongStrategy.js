@@ -43,7 +43,7 @@ class GoldLongStrategy extends BaseStrategy {
 
 
     _closeTodayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.GetLongTodayPosition();
+        let todayLongPositions = position.MyGetLongTodayPosition();
         if (todayLongPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
@@ -95,7 +95,7 @@ class GoldLongStrategy extends BaseStrategy {
             if (this.flag === false) {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
-                    let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
+                    let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
                     if (tick.lastPrice > longTodayPostionAveragePrice) {
                         this._closeTodayLongPositions(tick, position);
                     }
