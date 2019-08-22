@@ -103,6 +103,29 @@ class Position {
         return longPositionAveragePrice;
     }
 
+    //获取 多今仓 持仓均价
+    MyGetLongTodayPositionAveragePrice() {
+        var date = new Date();
+        var current_hour = date.getHours();
+        let longPositionSumAmount = 0;
+        let longPositionSumVolume = 0;
+        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+        for (let index in this.longPositionTradeRecordList) {
+            let tradeRecord = this.longPositionTradeRecordList[index];
+            if (tradeRecord.tradingDay === TodayTradingDay) {
+                if (current_hour < 16 || tradeRecord.tradeTime > "16:00:00") {
+                    longPositionSumVolume += tradeRecord.volume;
+                    longPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+                }
+            }
+        }
+        let longPositionAveragePrice = 0;
+        if (longPositionSumVolume !== 0) {
+            longPositionAveragePrice = Math.ceil(longPositionSumAmount / longPositionSumVolume);
+        }
+        return longPositionAveragePrice;
+    }
+
     //获取 空仓 持仓 均价
     GetShortPositionAveragePrice() {
         let shortPositionSumAmount = 0;
@@ -139,44 +162,68 @@ class Position {
     }
 
 
-    //获取 多今仓 持仓均价
-    GetLongTodayPositionAveragePrice() {
-        let longPositionSumAmount = 0;
-        let longPositionSumVolume = 0;
-        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
-        for (let index in this.longPositionTradeRecordList) {
-            let tradeRecord = this.longPositionTradeRecordList[index];
-            if (tradeRecord.tradingDay === TodayTradingDay) {
-                longPositionSumVolume += tradeRecord.volume;
-                longPositionSumAmount += tradeRecord.price * tradeRecord.volume;
-            }
-        }
-        let longPositionAveragePrice = 0;
-        if (longPositionSumVolume !== 0) {
-            longPositionAveragePrice = longPositionSumAmount / longPositionSumVolume;
-        }
-        return longPositionAveragePrice;
-    }
-
-
-    //获取 空仓 持仓 均价
-    GetShortTodayPositionAveragePrice() {
+    //获取 空今仓 持仓 均价
+    MyGetShortTodayPositionAveragePrice() {
+        var date = new Date();
+        var current_hour = date.getHours();
         let shortPositionSumAmount = 0;
         let shortPositionSumVolume = 0;
         let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
         for (let index in this.shortPositionTradeRecordList) {
             let tradeRecord = this.shortPositionTradeRecordList[index];
             if (tradeRecord.tradingDay === TodayTradingDay) {
-                shortPositionSumVolume += tradeRecord.volume;
-                shortPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+                if (current_hour < 16 || tradeRecord.tradeTime > "16:00:00") {
+                    shortPositionSumVolume += tradeRecord.volume;
+                    shortPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+                }
             }
         }
         let shortPositionAveragePrice = 0;
         if (shortPositionSumVolume !== 0) {
-            shortPositionAveragePrice = shortPositionSumAmount / shortPositionSumVolume;
+            shortPositionAveragePrice = Math.floor(shortPositionSumAmount / shortPositionSumVolume);
         }
         return shortPositionAveragePrice;
     }
+
+
+    // //获取 多今仓 持仓均价
+    // GetLongTodayPositionAveragePrice() {
+    //     let longPositionSumAmount = 0;
+    //     let longPositionSumVolume = 0;
+    //     let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+    //     for (let index in this.longPositionTradeRecordList) {
+    //         let tradeRecord = this.longPositionTradeRecordList[index];
+    //         if (tradeRecord.tradingDay === TodayTradingDay) {
+    //             longPositionSumVolume += tradeRecord.volume;
+    //             longPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+    //         }
+    //     }
+    //     let longPositionAveragePrice = 0;
+    //     if (longPositionSumVolume !== 0) {
+    //         longPositionAveragePrice = longPositionSumAmount / longPositionSumVolume;
+    //     }
+    //     return longPositionAveragePrice;
+    // }
+    //
+    //
+    // //获取 空仓 持仓 均价
+    // GetShortTodayPositionAveragePrice() {
+    //     let shortPositionSumAmount = 0;
+    //     let shortPositionSumVolume = 0;
+    //     let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+    //     for (let index in this.shortPositionTradeRecordList) {
+    //         let tradeRecord = this.shortPositionTradeRecordList[index];
+    //         if (tradeRecord.tradingDay === TodayTradingDay) {
+    //             shortPositionSumVolume += tradeRecord.volume;
+    //             shortPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+    //         }
+    //     }
+    //     let shortPositionAveragePrice = 0;
+    //     if (shortPositionSumVolume !== 0) {
+    //         shortPositionAveragePrice = shortPositionSumAmount / shortPositionSumVolume;
+    //     }
+    //     return shortPositionAveragePrice;
+    // }
 
 
     /// <summary>
@@ -244,6 +291,27 @@ class Position {
     }
 
     /// <summary>
+    /// 获取多仓,今仓
+    /// </summary>
+    /// <returns> 获取多仓,今仓 数量</returns>
+    MyGetLongTodayPosition() {
+        var date = new Date();
+        var current_hour = date.getHours();
+        let longTdPosition = 0;
+        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+        for (let index in this.longPositionTradeRecordList) {
+            let tradeRecord = this.longPositionTradeRecordList[index];
+            if (tradeRecord.tradingDay === TodayTradingDay) {
+                if (current_hour < 16 || tradeRecord.tradeTime > "16:00:00") {
+                    longTdPosition += tradeRecord.volume;
+                }
+            }
+        }
+
+        return longTdPosition;
+    }
+
+    /// <summary>
     /// 获取空仓,今仓
     /// </summary>
     /// <returns> 获取空仓,今仓 数量</returns>
@@ -254,6 +322,26 @@ class Position {
             let tradeRecord = this.shortPositionTradeRecordList[index];
             if (tradeRecord.tradingDay === TodayTradingDay) {
                 shortTdPosition += tradeRecord.volume;
+            }
+        }
+        return shortTdPosition;
+    }
+
+    /// <summary>
+    /// 获取空仓,今仓
+    /// </summary>
+    /// <returns> 获取空仓,今仓 数量</returns>
+    MyGetShortTodayPosition() {
+        var date = new Date();
+        var current_hour = date.getHours();
+        let shortTdPosition = 0;
+        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+        for (let index in this.shortPositionTradeRecordList) {
+            let tradeRecord = this.shortPositionTradeRecordList[index];
+            if (tradeRecord.tradingDay === TodayTradingDay) {
+                if (current_hour < 16 || tradeRecord.tradeTime > "16:00:00") {
+                    shortTdPosition += tradeRecord.volume;
+                }
             }
         }
         return shortTdPosition;
@@ -323,6 +411,29 @@ class Position {
         return longYdPosition;
     }
 
+    /// <summary>
+    /// 获取多仓,昨仓
+    /// </summary>
+    /// <returns> 获取多仓,昨仓 数量</returns>
+    MyGetLongYesterdayPosition() {
+        var date = new Date();
+        var current_hour = date.getHours();
+        let longYdPosition = 0;
+        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+        for (let index in this.longPositionTradeRecordList) {
+            let tradeRecord = this.longPositionTradeRecordList[index];
+
+            if (tradeRecord.tradingDay !== TodayTradingDay) {
+                longYdPosition += tradeRecord.volume;
+            } else {
+                if (current_hour > 16 && tradeRecord.tradeTime < "16:00:00") {
+                    longYdPosition += tradeRecord.volume;
+                }
+            }
+        }
+        return longYdPosition;
+    }
+
     //获取 多昨仓 持仓均价
     GetLongYesterdayPositionAveragePrice() {
         let longPositionSumAmount = 0;
@@ -333,6 +444,32 @@ class Position {
             if (tradeRecord.tradingDay != TodayTradingDay) {
                 longPositionSumVolume += tradeRecord.volume;
                 longPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+            }
+        }
+        let longPositionAveragePrice = 0;
+        if (longPositionSumVolume !== 0) {
+            longPositionAveragePrice = longPositionSumAmount / longPositionSumVolume;
+        }
+        return longPositionAveragePrice;
+    }
+
+    //获取 多昨仓 持仓均价
+    MyGetLongYesterdayPositionAveragePrice() {
+        let longPositionSumAmount = 0;
+        let longPositionSumVolume = 0;
+        var date = new Date();
+        var current_hour = date.getHours();
+        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+        for (let index in this.longPositionTradeRecordList) {
+            let tradeRecord = this.longPositionTradeRecordList[index];
+            if (tradeRecord.tradingDay != TodayTradingDay) {
+                longPositionSumVolume += tradeRecord.volume;
+                longPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+            } else {
+                if (current_hour > 16 && tradeRecord.tradeTime < "16:00:00") {
+                    longPositionSumVolume += tradeRecord.volume;
+                    longPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+                }
             }
         }
         let longPositionAveragePrice = 0;
@@ -358,6 +495,28 @@ class Position {
         return shortYdPosition;
     }
 
+    /// <summary>
+    /// 获取空仓,昨仓
+    /// </summary>
+    /// <returns> 获取空仓,昨仓 数量</returns>
+    MyGetShortYesterdayPosition() {
+        var date = new Date();
+        var current_hour = date.getHours();
+        let shortYdPosition = 0;
+        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+        for (let index in this.shortPositionTradeRecordList) {
+            let tradeRecord = this.shortPositionTradeRecordList[index];
+            if (tradeRecord.tradingDay !== TodayTradingDay) {
+                shortYdPosition += tradeRecord.volume;
+            } else {
+                if (current_hour > 16 && tradeRecord.tradeTime < "16:00:00") {
+                    shortYdPosition += tradeRecord.volume;
+                }
+            }
+        }
+        return shortYdPosition;
+    }
+
     //获取 空仓 持仓 均价
     GetShortYesterdayPositionAveragePrice() {
         let shortPositionSumAmount = 0;
@@ -368,6 +527,32 @@ class Position {
             if (tradeRecord.tradingDay != TodayTradingDay) {
                 shortPositionSumVolume += tradeRecord.volume;
                 shortPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+            }
+        }
+        let shortPositionAveragePrice = 0;
+        if (shortPositionSumVolume !== 0) {
+            shortPositionAveragePrice = shortPositionSumAmount / shortPositionSumVolume;
+        }
+        return shortPositionAveragePrice;
+    }
+
+    //获取 空仓 持仓 均价
+    MyGetShortYesterdayPositionAveragePrice() {
+        var date = new Date();
+        var current_hour = date.getHours();
+        let shortPositionSumAmount = 0;
+        let shortPositionSumVolume = 0;
+        let TodayTradingDay = global.NodeQuant.MainEngine.TradingDay;
+        for (let index in this.shortPositionTradeRecordList) {
+            let tradeRecord = this.shortPositionTradeRecordList[index];
+            if (tradeRecord.tradingDay != TodayTradingDay) {
+                shortPositionSumVolume += tradeRecord.volume;
+                shortPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+            } else {
+                if (current_hour > 16 && tradeRecord.tradeTime < "16:00:00") {
+                    shortPositionSumVolume += tradeRecord.volume;
+                    shortPositionSumAmount += tradeRecord.price * tradeRecord.volume;
+                }
             }
         }
         let shortPositionAveragePrice = 0;

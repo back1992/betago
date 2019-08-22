@@ -641,7 +641,7 @@ FuturesConfig={
             name:"橡胶",
             exchange:"SHF",
             Unit:10,
-            MarginRate:0.10,
+            MarginRate:0.09,
             AMOpen:"9:00:00",
             AMBreak:"10:15:00",
             AMResume:"10:30:00",
