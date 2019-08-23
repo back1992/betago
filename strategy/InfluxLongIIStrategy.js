@@ -95,6 +95,7 @@ class InfluxLongStrategy extends BaseStrategy {
                     return score > 1 || score < -1;
                 });
                 if (score >= 2 || score <= -2) {
+                    console.log(actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1]);
                     console.log(filtered);
                 }
             });
