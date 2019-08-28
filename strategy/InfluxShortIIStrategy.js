@@ -120,7 +120,12 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (price < shortTodayPostionAveragePrice) {
-                this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+                let exchangeName = this._getExchange(tick);
+                if (exchangeName === "SHF") {
+                    this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+                } else {
+                    this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+                }
                 let subject = "Today Action Profit Short  " + this.name + " signal: " + this.signal;
                 let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
                 message += `price ${price}  shortTodayPostionAveragePrice  ${shortTodayPostionAveragePrice} todayShortPositions  ${todayShortPositions}`
@@ -136,8 +141,12 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (price < shortYesterdayPostionAveragePrice) {
-                this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
-                // this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
+                let exchangeName = this._getExchange(tick);
+                if (exchangeName === "SHF") {
+                    this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+                } else {
+                    this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+                }
                 let subject = "Yesterday Action Profit Short  " + this.name + " signal: " + this.signal;
                 let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice price ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}}`;
                 this._sendMessage(subject, message);
