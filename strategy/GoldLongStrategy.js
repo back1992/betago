@@ -14,13 +14,23 @@ class GoldLongStrategy extends BaseStrategy {
         this.leftFund = 0;
     }
 
+    //
+    // OnClosedBar(closedBar) {
+    //     if (closedBar.closePrice > closedBar.openPrice) {
+    //         this.flag = true;
+    //     } else {
+    //         this.flag = false;
+    //     }
+    // }
 
     OnClosedBar(closedBar) {
-        if (closedBar.closePrice > closedBar.openPrice) {
-            this.flag = true;
-        } else {
-            this.flag = false;
-        }
+        let lowerLeader = (closedBar.closePrice > closedBar.openPrice) ? closedBar.openPrice : closedBar.closePrice;
+        let upperLeader = (closedBar.closePrice > closedBar.openPrice) ? closedBar.closePrice : closedBar.openPrice;
+        let flagIndex = (lowerLeader - closedBar.lowPrice) - (closedBar.highPrice - upperLeader)
+        this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
+        console.log(this.flag, closedBar.lowPrice, lowerLeader, closedBar.highPrice, upperLeader);
+        console.log(closedBar.openPrice, closedBar.highPrice, closedBar.lowPrice, closedBar.closePrice);
+        console.log((lowerLeader - closedBar.lowPrice), (closedBar.highPrice - upperLeader), flagIndex);
     }
 
     OnNewBar(newBar) {
@@ -35,7 +45,7 @@ class GoldLongStrategy extends BaseStrategy {
         let marginRate = tickFutureConfig.MarginRate;
         let priceUnit = tick.lastPrice * unit * marginRate;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
-        console.log(`${tick.symbol}  的Tick,时间: ${tick.date}  ${tick.timeStr} availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
+        // console.log(`${tick.symbol}  的Tick,时间: ${tick.date}  ${tick.timeStr} availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
 
@@ -74,8 +84,15 @@ class GoldLongStrategy extends BaseStrategy {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         super.OnTick(tick);
-        this.lastTick = this.tick;
-        this.tick = tick;
+        if (this.flag === false) {
+            let position = this.GetPosition(tick.symbol);
+            if (position != undefined) {
+                let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
+                if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                    this._closeTodayLongPositions(tick, position);
+                }
+            }
+        }
         if (!this._getTimeToGold(tick)) {
             if (this.flag) {
                 this.QueryTradingAccount(tick.clientName);
@@ -87,6 +104,7 @@ class GoldLongStrategy extends BaseStrategy {
                 }
             }
         } else {
+            this._cancelOrder();
             if (this.flag === false) {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
