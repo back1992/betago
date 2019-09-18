@@ -24,10 +24,17 @@ class GoldLongStrategy extends BaseStrategy {
     // }
 
     OnClosedBar(closedBar) {
-        let lowerLeader = (closedBar.closePrice > closedBar.openPrice) ? closedBar.openPrice : closedBar.closePrice;
-        let upperLeader = (closedBar.closePrice > closedBar.openPrice) ? closedBar.closePrice : closedBar.openPrice;
-        let flagIndex = (lowerLeader - closedBar.lowPrice) - (closedBar.highPrice - upperLeader)
-        this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
+        let cylinder = Math.abs(closedBar.closePrice - closedBar.openPrice);
+        let bottom = (closedBar.closePrice > closedBar.openPrice) ? closedBar.openPrice : closedBar.closePrice;
+        let top = (closedBar.closePrice > closedBar.openPrice) ? closedBar.closePrice : closedBar.openPrice;
+        let lowerLeader = bottom - closedBar.lowPrice;
+        let upperLeader = closedBar.highPrice - top;
+        let flagIndex = lowerLeader - upperLeader;
+        if (lowerLeader > cylinder || upperLeader > cylinder) {
+            this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
+        } else {
+            this.flag = null;
+        }
         console.log(this.flag, closedBar.lowPrice, lowerLeader, closedBar.highPrice, upperLeader);
         console.log(closedBar.openPrice, closedBar.highPrice, closedBar.lowPrice, closedBar.closePrice);
         console.log((lowerLeader - closedBar.lowPrice), (closedBar.highPrice - upperLeader), flagIndex);
