@@ -30,19 +30,28 @@ class GoldLongStrategy extends BaseStrategy {
         let lowerLeader = bottom - closedBar.lowPrice;
         let upperLeader = closedBar.highPrice - top;
         let flagIndex = lowerLeader - upperLeader;
-        if (lowerLeader > cylinder || upperLeader > cylinder) {
-            this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
-        } else {
-            this.flag = null;
-        }
-        console.log(this.flag, closedBar.lowPrice, lowerLeader, closedBar.highPrice, upperLeader);
-        console.log(closedBar.openPrice, closedBar.highPrice, closedBar.lowPrice, closedBar.closePrice);
-        console.log((lowerLeader - closedBar.lowPrice), (closedBar.highPrice - upperLeader), flagIndex);
+        // if (lowerLeader > cylinder || upperLeader > cylinder) {
+        //     this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
+        // } else {
+        //     this.flag = null;
+        // }
+        this.flag = flagIndex > cylinder ? true : flagIndex < -1 * cylinder ? false : null;
+        console.log(`this.flag: ${this.flag}, closedBar.openPrice: ${closedBar.openPrice}, closedBar.highPrice: ${closedBar.highPrice}, closedBar.lowPrice: ${closedBar.lowPrice}, closedBar.closePrice: ${closedBar.closePrice}, lowerLeader: ${lowerLeader}, cylinder: ${cylinder}, upperLeader: ${upperLeader}`);
     }
 
     OnNewBar(newBar) {
         console.log(this.name + "策略的" + newBar.symbol + "K线开始,开始时间" + newBar.startDatetime.toLocaleString() + ",Open价:" + newBar.openPrice);
+        this.QueryTradingAccount('CTP');
     }
+
+
+    OnQueryTradingAccount(tradingAccountInfo) {
+        // console.log(tradingAccountInfo);
+        global.availableFund = tradingAccountInfo["Available"];
+        global.withdrawQuota = tradingAccountInfo["WithdrawQuota"];
+        global.Balance = tradingAccountInfo["Balance"];
+    }
+
 
     _getAvailabelSum(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
@@ -97,6 +106,10 @@ class GoldLongStrategy extends BaseStrategy {
                 let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
                 if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                     this._closeTodayLongPositions(tick, position);
+                } else {
+                    if (global.Balance > 110000 && global.withdrawQuota < 90000) {
+                        this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+                    }
                 }
             }
         }
