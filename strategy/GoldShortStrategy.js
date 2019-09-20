@@ -1,7 +1,7 @@
 let BaseStrategy = require("./baseStrategy");
 
 // let Position = require("../util/Position");
-class GoldLongStrategy extends BaseStrategy {
+class GoldShortStrategy extends BaseStrategy {
     constructor(strategyConfig) {
         //一定要使用super(strategyConfig)进行基类实例初始化
         //strategyConfig为 userConfig.js 中的DemoStrategy类的策略配置对象
@@ -30,12 +30,7 @@ class GoldLongStrategy extends BaseStrategy {
         let lowerLeader = bottom - closedBar.lowPrice;
         let upperLeader = closedBar.highPrice - top;
         let flagIndex = lowerLeader - upperLeader;
-        // if (lowerLeader > cylinder || upperLeader > cylinder) {
-        //     this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
-        // } else {
-        //     this.flag = null;
-        // }
-        this.flag = flagIndex > cylinder ? true : flagIndex < -1 * cylinder ? false : null;
+        this.flag = flagIndex > cylinder ? false : flagIndex < -1 * cylinder ? true : null;
         console.log(`this.flag: ${this.flag}  openPrice: ${closedBar.openPrice}  highPrice: ${closedBar.highPrice}  lowPrice: ${closedBar.lowPrice}  closePrice: ${closedBar.closePrice}, lowerLeader: ${lowerLeader}, cylinder: ${cylinder}, upperLeader: ${upperLeader}`);
     }
 
@@ -66,12 +61,12 @@ class GoldLongStrategy extends BaseStrategy {
     }
 
 
-    _closeTodayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.MyGetLongTodayPosition();
-        if (todayLongPositions > 0) {
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            // this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
-            this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+    _closeTodayShortPositions(tick, position, up = 0) {
+        let todayShortPositions = position.MyGetShortTodayPosition();
+        if (todayShortPositions > 0) {
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+            // this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+            this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseToday);
         }
     }
 
@@ -104,13 +99,13 @@ class GoldLongStrategy extends BaseStrategy {
             this._cancelOrder();
             let position = this.GetPosition(tick.symbol);
             if (position != undefined) {
-                let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
-                if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
-                    this._closeTodayLongPositions(tick, position);
+                let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
+                if (tick.lastPrice < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+                    this._closeTodayShortPositions(tick, position);
                 } else {
                     // if (global.Balance > 110000 && global.withdrawQuota < 90000) {
                     if (global.availableFund < 0) {
-                        this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+                        this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Buy, OpenCloseFlagType.CloseToday);
                         this.flag = null;
                     }
                 }
@@ -122,7 +117,7 @@ class GoldLongStrategy extends BaseStrategy {
                 let availablesSum = this._getAvailabelSum(tick);
                 if (availablesSum >= 1) {
                     let price = tick.lastPrice;
-                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Open);
+                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Open);
                     this.flag = null;
                 }
             }
@@ -131,9 +126,9 @@ class GoldLongStrategy extends BaseStrategy {
             if (this.flag === false) {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
-                    let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
-                    if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
-                        this._closeTodayLongPositions(tick, position);
+                    let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
+                    if (tick.lastPrice < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+                        this._closeTodayShortPositions(tick, position);
                     }
                 }
             }
@@ -145,4 +140,4 @@ class GoldLongStrategy extends BaseStrategy {
     }
 }
 
-module.exports = GoldLongStrategy;
+module.exports = GoldShortStrategy;
