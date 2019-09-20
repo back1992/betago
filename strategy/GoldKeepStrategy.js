@@ -61,13 +61,7 @@ class GoldOutStrategy extends BaseStrategy {
                 } else if (todayLongPositions > 0) {
                     this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
                     this.flag = null;
-                } else {
-                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-                    this.flag = null;
                 }
-            } else {
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-                this.flag = null;
             }
         }
     }

@@ -41,14 +41,15 @@ class InfluxShortIIStrategy extends BaseStrategy {
             this.signal = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
             this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
         }
-        if (this.signal >= 2) {
-            this.flag = false;
-        } else if (this.signal <= -2) {
+
+        if (this.signal <= -2) {
             if (global.actionScore[closedBar.symbol] <= -2) {
                 this.flag = true;
             } else {
                 this.flag = null;
             }
+        } else if (this.signal >= 2) {
+            this.flag = false;
         } else {
             this.flag = null;
         }

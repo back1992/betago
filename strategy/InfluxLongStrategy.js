@@ -116,35 +116,37 @@ class InfluxLongStrategy extends BaseStrategy {
     }
 
     _profitTodayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.MyGetLongTodayPosition();
-        let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
-        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-        if (todayLongPositions > 0 && price > longTodayPostionAveragePrice) {
-            let exchangeName = this._getExchange(tick);
-            if (exchangeName === "SHF") {
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
-            } else {
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+        let todayLongPositions = position.GetLongTodayPosition();
+        if (todayLongPositions > 0) {
+            let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            if (price > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                let exchangeName = this._getExchange(tick);
+                if (exchangeName === "SHF") {
+                    this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.CloseToday);
+                } else {
+                    this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
+                }
+                let subject = "Today Action Profit Long  " + this.name + " signal: " + this.signal;
+                let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
+                message += `price ${price}  longTodayPostionAveragePrice  ${longTodayPostionAveragePrice} todayLongPositions  ${todayLongPositions}`
+                console.log(message);
+                this._sendMessage(subject, message);
             }
-            let subject = "Today Action Profit Long  " + this.name + " signal: " + this.signal;
-            let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
-            message += `price ${price}  longTodayPostionAveragePrice  ${longTodayPostionAveragePrice} todayLongPositions  ${todayLongPositions}`
-            console.log(message);
-            this._sendMessage(subject, message);
         }
     }
 
 
     _profitYesterdayLongPositions(tick, position, up = 0) {
-        let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
-        let longYesterdayPostionAveragePrice = position.MyGetLongYesterdayPositionAveragePrice();
-        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-        if (yesterdayLongPositions > 0 && price > longYesterdayPostionAveragePrice) {
-            let exchangeName = this._getExchange(tick);
-            if (exchangeName === "SHF") {
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseYesterday);
-            } else {
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+        let yesterdayLongPositions = position.GetLongYesterdayPosition();
+        if (yesterdayLongPositions > 0) {
+            let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
+                let subject = "Yesterday Action Profit Long " + this.name + " signal: " + this.signal;
+                let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
+                this._sendMessage(subject, message);
             }
             let subject = "Yesterday Action Profit Long " + this.name + " signal: " + this.signal;
             let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;

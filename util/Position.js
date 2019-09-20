@@ -121,7 +121,7 @@ class Position {
         }
         let longPositionAveragePrice = 0;
         if (longPositionSumVolume !== 0) {
-            longPositionAveragePrice = longPositionSumAmount / longPositionSumVolume;
+            longPositionAveragePrice = Math.ceil(longPositionSumAmount / longPositionSumVolume);
         }
         return longPositionAveragePrice;
     }
@@ -180,7 +180,7 @@ class Position {
         }
         let shortPositionAveragePrice = 0;
         if (shortPositionSumVolume !== 0) {
-            shortPositionAveragePrice = shortPositionSumAmount / shortPositionSumVolume;
+            shortPositionAveragePrice = Math.floor(shortPositionSumAmount / shortPositionSumVolume);
         }
         return shortPositionAveragePrice;
     }
