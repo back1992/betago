@@ -116,9 +116,9 @@ class InfluxLongStrategy extends BaseStrategy {
     }
 
     _profitTodayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.GetLongTodayPosition();
+        let todayLongPositions = position.MyGetLongTodayPosition();
         if (todayLongPositions > 0) {
-            let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
+            let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 let exchangeName = this._getExchange(tick);
@@ -138,9 +138,9 @@ class InfluxLongStrategy extends BaseStrategy {
 
 
     _profitYesterdayLongPositions(tick, position, up = 0) {
-        let yesterdayLongPositions = position.GetLongYesterdayPosition();
+        let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
         if (yesterdayLongPositions > 0) {
-            let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
+            let longYesterdayPostionAveragePrice = position.MyGetLongYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
