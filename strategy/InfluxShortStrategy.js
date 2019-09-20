@@ -110,7 +110,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let todayShortPositions = position.MyGetShortTodayPosition();
         let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-        if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice) {
+        if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
             let exchangeName = this._getExchange(tick);
             if (exchangeName === "SHF") {
                 this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseToday);
@@ -129,7 +129,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let yesterdayShortPositions = position.MyGetShortYesterdayPosition();
         let shortYesterdayPostionAveragePrice = position.MyGetShortYesterdayPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-        if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
+        if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
             let exchangeName = this._getExchange(tick);
             if (exchangeName === "SHF") {
                 this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseYesterday);
