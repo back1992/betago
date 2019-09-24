@@ -41,6 +41,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let closePrice = this.closedBarList.map(e => e["closePrice"]);
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+            this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
         }
 
         if (this.signal >= 2) {
@@ -48,10 +49,11 @@ class InfluxShortIIStrategy extends BaseStrategy {
         } else if (this.signal <= -2) {
             if (global.actionScore[closedBar.symbol] <= -2) {
                 this.flag = true;
-                this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
             } else {
                 this.flag = null;
             }
+        } else {
+            this.flag = null;
         }
     }
 
@@ -99,6 +101,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let subject = "Today Action Open Short " + this.name + " signal: " + this.signal;
             let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
             this._sendMessage(subject, message);
+            console.log(message);
             this.flag = null;
         }
     }
@@ -117,10 +120,16 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (price < shortTodayPostionAveragePrice) {
-                this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+                let exchangeName = this._getExchange(tick);
+                if (exchangeName === "SHF") {
+                    this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
+                } else {
+                    this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+                }
                 let subject = "Today Action Profit Short  " + this.name + " signal: " + this.signal;
                 let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
                 message += `price ${price}  shortTodayPostionAveragePrice  ${shortTodayPostionAveragePrice} todayShortPositions  ${todayShortPositions}`
+                console.log(message);
                 this._sendMessage(subject, message);
             }
         }
@@ -132,8 +141,12 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (price < shortYesterdayPostionAveragePrice) {
-                // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
-                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
+                let exchangeName = this._getExchange(tick);
+                if (exchangeName === "SHF") {
+                    this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+                } else {
+                    this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+                }
                 let subject = "Yesterday Action Profit Short  " + this.name + " signal: " + this.signal;
                 let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice price ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}}`;
                 this._sendMessage(subject, message);
