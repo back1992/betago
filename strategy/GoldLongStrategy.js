@@ -30,11 +30,6 @@ class GoldLongStrategy extends BaseStrategy {
         let lowerLeader = bottom - closedBar.lowPrice;
         let upperLeader = closedBar.highPrice - top;
         let flagIndex = lowerLeader - upperLeader;
-        // if (lowerLeader > cylinder || upperLeader > cylinder) {
-        //     this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
-        // } else {
-        //     this.flag = null;
-        // }
         this.flag = flagIndex > cylinder ? true : flagIndex < -1 * cylinder ? false : null;
         console.log(`this.flag: ${this.flag}  openPrice: ${closedBar.openPrice}  highPrice: ${closedBar.highPrice}  lowPrice: ${closedBar.lowPrice}  closePrice: ${closedBar.closePrice}, lowerLeader: ${lowerLeader}, cylinder: ${cylinder}, upperLeader: ${upperLeader}`);
     }
@@ -76,6 +71,17 @@ class GoldLongStrategy extends BaseStrategy {
     }
 
 
+    _ladderCloseTodayLongPositions(tick, position, up = 0) {
+        let todayLongPositions = position.MyGetLongTodayPosition();
+        if (todayLongPositions > 0) {
+            for (let up = 0; up < todayLongPositions; up++) {
+                let price = this.PriceDown(tick.symbol, tick.lastPrice, Direction.Sell, up);
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+            }
+        }
+    }
+
+
     //js Date对象从0开始的月份
     _getTimeToGold(tick, breakOffsetSec = 288) {
         require("../systemConfig");
@@ -100,19 +106,13 @@ class GoldLongStrategy extends BaseStrategy {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         super.OnTick(tick);
-<<<<<<< HEAD
-        console.log(tick);
-        this.QueryTradingAccount(tick.clientName);
-        this.lastTick = this.tick;
-        this.tick = tick;
-=======
         if (this.flag === false) {
             this._cancelOrder();
             let position = this.GetPosition(tick.symbol);
             if (position != undefined) {
                 let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
                 if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
-                    this._closeTodayLongPositions(tick, position);
+                    this._ladderCloseTodayLongPositions(tick, position);
                 } else {
                     // if (global.Balance > 110000 && global.withdrawQuota < 90000) {
                     if (global.availableFund < 0) {
@@ -122,7 +122,6 @@ class GoldLongStrategy extends BaseStrategy {
                 }
             }
         }
->>>>>>> 9ed16a24cf8b58d723eee3229e7f16ef507f72f1
         if (!this._getTimeToGold(tick)) {
             if (this.flag) {
                 this.QueryTradingAccount(tick.clientName);
