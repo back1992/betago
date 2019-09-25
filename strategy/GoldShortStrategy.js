@@ -95,6 +95,9 @@ class GoldShortStrategy extends BaseStrategy {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         super.OnTick(tick);
+<<<<<<< HEAD:strategy/GoldLongIIStrategy.js
+        console.log(tick);
+=======
         if (this.flag === false) {
             this._cancelOrder();
             let position = this.GetPosition(tick.symbol);
@@ -111,6 +114,7 @@ class GoldShortStrategy extends BaseStrategy {
                 }
             }
         }
+>>>>>>> 9ed16a24cf8b58d723eee3229e7f16ef507f72f1:strategy/GoldShortStrategy.js
         if (!this._getTimeToGold(tick)) {
             if (this.flag) {
                 this.QueryTradingAccount(tick.clientName);
