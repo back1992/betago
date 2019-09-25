@@ -71,6 +71,17 @@ class GoldShortStrategy extends BaseStrategy {
     }
 
 
+    _ladderCloseTodayShortPositions(tick, position, up = 0) {
+        let todayShortPositions = position.MyGetShortTodayPosition();
+        if (todayShortPositions > 0) {
+            for (let up = 0; up < todayLongPositions; up++) {
+                let price = this.PriceDown(tick.symbol, tick.lastPrice, Direction.Buy, up);
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseToday);
+            }
+        }
+    }
+
+
     //js Date对象从0开始的月份
     _getTimeToGold(tick, breakOffsetSec = 28) {
         require("../systemConfig");
@@ -95,16 +106,14 @@ class GoldShortStrategy extends BaseStrategy {
         //调用基类的OnTick函数,否则无法触发OnNewBar、OnClosedBar等事件响应函数
         //如果策略不需要计算K线,只用到Tick行情,可以把super.OnTick(tick);这句代码去掉,加快速度
         super.OnTick(tick);
-<<<<<<< HEAD:strategy/GoldLongIIStrategy.js
-        console.log(tick);
-=======
         if (this.flag === false) {
             this._cancelOrder();
             let position = this.GetPosition(tick.symbol);
             if (position != undefined) {
                 let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
                 if (tick.lastPrice < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
-                    this._closeTodayShortPositions(tick, position);
+                    this._ladderCloseTodayShortPositions(tick, position);
+                    this.flag = null;
                 } else {
                     // if (global.Balance > 110000 && global.withdrawQuota < 90000) {
                     if (global.availableFund < 0) {
@@ -114,7 +123,6 @@ class GoldShortStrategy extends BaseStrategy {
                 }
             }
         }
->>>>>>> 9ed16a24cf8b58d723eee3229e7f16ef507f72f1:strategy/GoldShortStrategy.js
         if (!this._getTimeToGold(tick)) {
             if (this.flag) {
                 this.QueryTradingAccount(tick.clientName);
@@ -127,13 +135,13 @@ class GoldShortStrategy extends BaseStrategy {
             }
         } else {
             this._cancelOrder();
-                let position = this.GetPosition(tick.symbol);
-                if (position != undefined) {
-                    let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
-                    if (tick.lastPrice < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
-                        this._closeTodayShortPositions(tick, position);
-                    }
+            let position = this.GetPosition(tick.symbol);
+            if (position != undefined) {
+                let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
+                if (tick.lastPrice < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+                    this._closeTodayShortPositions(tick, position);
                 }
+            }
         }
     }
 
