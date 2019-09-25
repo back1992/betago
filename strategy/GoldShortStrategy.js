@@ -72,7 +72,7 @@ class GoldShortStrategy extends BaseStrategy {
 
 
     //js Date对象从0开始的月份
-    _getTimeToGold(tick, breakOffsetSec = 288) {
+    _getTimeToGold(tick, breakOffsetSec = 28) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -123,7 +123,6 @@ class GoldShortStrategy extends BaseStrategy {
             }
         } else {
             this._cancelOrder();
-            if (this.flag === false) {
                 let position = this.GetPosition(tick.symbol);
                 if (position != undefined) {
                     let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
@@ -131,7 +130,6 @@ class GoldShortStrategy extends BaseStrategy {
                         this._closeTodayShortPositions(tick, position);
                     }
                 }
-            }
         }
     }
 
