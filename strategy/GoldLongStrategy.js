@@ -113,6 +113,7 @@ class GoldLongStrategy extends BaseStrategy {
                 let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
                 if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                     this._ladderCloseTodayLongPositions(tick, position);
+                    this.flag = null;
                 } else {
                     // if (global.Balance > 110000 && global.withdrawQuota < 90000) {
                     if (global.availableFund < 0) {
@@ -135,13 +136,13 @@ class GoldLongStrategy extends BaseStrategy {
             // }
         } else {
             this._cancelOrder();
-                let position = this.GetPosition(tick.symbol);
-                if (position != undefined) {
-                    let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
-                    if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
-                        this._closeTodayLongPositions(tick, position);
-                    }
+            let position = this.GetPosition(tick.symbol);
+            if (position != undefined) {
+                let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
+                if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                    this._closeTodayLongPositions(tick, position);
                 }
+            }
         }
     }
 
