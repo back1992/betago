@@ -30,11 +30,6 @@ class GoldLongStrategy extends BaseStrategy {
         let lowerLeader = bottom - closedBar.lowPrice;
         let upperLeader = closedBar.highPrice - top;
         let flagIndex = lowerLeader - upperLeader;
-        // if (lowerLeader > cylinder || upperLeader > cylinder) {
-        //     this.flag = flagIndex > 0 ? true : flagIndex < 0 ? false : null;
-        // } else {
-        //     this.flag = null;
-        // }
         this.flag = flagIndex > cylinder ? true : flagIndex < -1 * cylinder ? false : null;
         console.log(`this.flag: ${this.flag}  openPrice: ${closedBar.openPrice}  highPrice: ${closedBar.highPrice}  lowPrice: ${closedBar.lowPrice}  closePrice: ${closedBar.closePrice}, lowerLeader: ${lowerLeader}, cylinder: ${cylinder}, upperLeader: ${upperLeader}`);
     }
@@ -76,8 +71,19 @@ class GoldLongStrategy extends BaseStrategy {
     }
 
 
+    _ladderCloseTodayLongPositions(tick, position, up = 0) {
+        let todayLongPositions = position.MyGetLongTodayPosition();
+        if (todayLongPositions > 0) {
+            for (let up = 0; up < todayLongPositions; up++) {
+                let price = this.PriceDown(tick.symbol, tick.lastPrice, Direction.Sell, up);
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+            }
+        }
+    }
+
+
     //js Date对象从0开始的月份
-    _getTimeToGold(tick, breakOffsetSec = 288) {
+    _getTimeToGold(tick, breakOffsetSec = 28) {
         require("../systemConfig");
         let NowDateTime = new Date();
         let NowDateStr = NowDateTime.toLocaleDateString();
@@ -106,11 +112,18 @@ class GoldLongStrategy extends BaseStrategy {
             if (position != undefined) {
                 let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
                 if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
-                    this._closeTodayLongPositions(tick, position);
+                    this._ladderCloseTodayLongPositions(tick, position);
+                    this.flag = null;
                 } else {
                     // if (global.Balance > 110000 && global.withdrawQuota < 90000) {
                     if (global.availableFund < 0) {
-                        this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+                        let todayLongPositions = position.MyGetLongTodayPosition();
+                        let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
+                        if (todayLongPositions > 0) {
+                            this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.CloseToday);
+                        } else if (yesterdayLongPositions > 0) {
+                            this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.Close);
+                        }
                         this.flag = null;
                     }
                 }
@@ -126,15 +139,14 @@ class GoldLongStrategy extends BaseStrategy {
                     this.flag = null;
                 }
             }
+            // }
         } else {
             this._cancelOrder();
-            if (this.flag === false) {
-                let position = this.GetPosition(tick.symbol);
-                if (position != undefined) {
-                    let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
-                    if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
-                        this._closeTodayLongPositions(tick, position);
-                    }
+            let position = this.GetPosition(tick.symbol);
+            if (position != undefined) {
+                let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
+                if (tick.lastPrice > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                    this._closeTodayLongPositions(tick, position);
                 }
             }
         }

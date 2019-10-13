@@ -7,7 +7,7 @@ package-lock.json
 *.out
 /forever.log
 /model/client/CTP/
-run_in_linux.sh
+/run_in_linux.sh
 /userConfig.js
 /test/
 /util/MyPostMan.js
