@@ -50,6 +50,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             }
         } else if (this.signal >= 2) {
             this.flag = false;
+            console.log(`${closedBar.symbol} signal: ${this.signal} flag: ${this.flag}`);
         } else {
             this.flag = null;
         }
@@ -107,10 +108,11 @@ class InfluxShortIIStrategy extends BaseStrategy {
     }
 
     _profitTodayShortPositions(tick, position, up = 0) {
-        let todayShortPositions = position.MyGetShortTodayPosition();
-        let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
+        let todayShortPositions = position.GetShortTodayPosition();
+        let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-        if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        // if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice) {
             let exchangeName = this._getExchange(tick);
             if (exchangeName === "SHF") {
                 this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseToday);
@@ -126,10 +128,11 @@ class InfluxShortIIStrategy extends BaseStrategy {
     }
 
     _profitYesterdayShortPositions(tick, position, up = 0) {
-        let yesterdayShortPositions = position.MyGetShortYesterdayPosition();
-        let shortYesterdayPostionAveragePrice = position.MyGetShortYesterdayPositionAveragePrice();
+        let yesterdayShortPositions = position.GetShortYesterdayPosition();
+        let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-        if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
             let exchangeName = this._getExchange(tick);
             if (exchangeName === "SHF") {
                 this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseYesterday);
@@ -147,8 +150,11 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let shortPositions = position.GetShortPosition();
         let shortPostionAveragePrice = position.GetShortPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-        if (shortPositions > 0 && price > shortPostionAveragePrice) {
+        console.log(`shortPositions: ${shortPositions}, shortPostionAveragePrice: ${shortPostionAveragePrice}, price: ${price}`);
+        if (shortPositions > 0 && price < shortPostionAveragePrice) {
+            console.log(`profit short today: ${tick.symbol}`);
             this._profitTodayShortPositions(tick, position, up);
+            console.log(`profit short yesterday: ${tick.symbol}`);
             this._profitYesterdayShortPositions(tick, position, up);
         }
     }
@@ -176,9 +182,6 @@ class InfluxShortIIStrategy extends BaseStrategy {
         if (this.flag === false) {
             let position = this.GetPosition(tick.symbol);
             if (position) {
-                // if (yesterdayShortPositions === 0 && todayShortPositions === 0) {
-                //     this.flag = null;
-                // }
                 let exchangeName = this._getExchange(tick);
                 if (exchangeName === "SHF") {
                     this._profitYesterdayShortPositions(tick, position, 0);
@@ -217,7 +220,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
                         if (position === undefined) {
                             this._openShort(tick);
                         } else {
-                            let todayShortPositions = position.MyGetShortTodayPosition();
+                            let todayShortPositions = position.GetShortTodayPosition();
                             if (todayShortPositions < this.total) {
                                 this._openShort(tick);
                             }

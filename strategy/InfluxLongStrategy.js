@@ -84,8 +84,8 @@ class InfluxLongStrategy extends BaseStrategy {
             var filtered = _.pickBy(global.actionScore, function (score) {
                 return score > 2 || score < -2;
             });
-            console.log(actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1]);
-            console.log(global.actionScore);
+            // console.log(actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1]);
+            // console.log(global.actionScore);
         });
     }
 
@@ -116,9 +116,9 @@ class InfluxLongStrategy extends BaseStrategy {
     }
 
     _profitTodayLongPositions(tick, position, up = 0) {
-        let todayLongPositions = position.MyGetLongTodayPosition();
+        let todayLongPositions = position.GetLongTodayPosition();
         if (todayLongPositions > 0) {
-            let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
+            let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 let exchangeName = this._getExchange(tick);
@@ -138,9 +138,9 @@ class InfluxLongStrategy extends BaseStrategy {
 
 
     _profitYesterdayLongPositions(tick, position, up = 0) {
-        let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
+        let yesterdayLongPositions = position.GetLongYesterdayPosition();
         if (yesterdayLongPositions > 0) {
-            let longYesterdayPostionAveragePrice = position.MyGetLongYesterdayPositionAveragePrice();
+            let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
@@ -148,9 +148,6 @@ class InfluxLongStrategy extends BaseStrategy {
                 let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
                 this._sendMessage(subject, message);
             }
-            let subject = "Yesterday Action Profit Long " + this.name + " signal: " + this.signal;
-            let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
-            this._sendMessage(subject, message);
         }
     }
 
@@ -221,7 +218,7 @@ class InfluxLongStrategy extends BaseStrategy {
                         if (position === undefined) {
                             this._openLong(tick);
                         } else {
-                            let todayLongPositions = position.MyGetLongTodayPosition();
+                            let todayLongPositions = position.GetLongTodayPosition();
                             if (todayLongPositions < this.total) {
                                 this._openLong(tick);
                             }
