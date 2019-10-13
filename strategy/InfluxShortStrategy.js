@@ -20,7 +20,6 @@ class InfluxShortIIStrategy extends BaseStrategy {
         this.total = strategyConfig.total;
         this.sum = 0;
         this.flag = null;
-        this.needCloseYesterday = strategyConfig.needCloseYesterday;
         this.signal = 0;
         this.closedBarList = [];
         global.actionScore = {};
@@ -35,55 +34,52 @@ class InfluxShortIIStrategy extends BaseStrategy {
             if (this.closedBarList.length > 50) {
                 this.closedBarList.shift();
             }
-            let openPrice = this.closedBarList.map(e => e["openPrice"]);
             let highPrice = this.closedBarList.map(e => e["highPrice"]);
             let lowPrice = this.closedBarList.map(e => e["lowPrice"]);
             let closePrice = this.closedBarList.map(e => e["closePrice"]);
             let volume = this.closedBarList.map(e => e["volume"]);
             this.signal = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+            this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
         }
 
-        if (this.signal >= 2) {
-            this.flag = false;
-        } else if (this.signal <= -2) {
+        if (this.signal <= -2) {
             if (global.actionScore[closedBar.symbol] <= -2) {
-                this.flag = (this.flag != true) ? true : null;
-                this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
+                this.flag = true;
             } else {
                 this.flag = null;
             }
+        } else if (this.signal >= 2) {
+            this.flag = false;
+            console.log(`${closedBar.symbol} signal: ${this.signal} flag: ${this.flag}`);
+        } else {
+            this.flag = null;
         }
     }
 
     OnNewBar(newBar) {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        let intervalArray = [5, 15, 30, 60, 0, 0, 0, 0];
+        // let BarInterval = 5;
+        let intervalArray = [5, 15, 30, 60];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
-        if (BarInterval != 0) {
-            global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
-                if (err) {
-                    console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
-                    //没完成收集固定K线个数
-                    MyOnFinishLoadBar(strategy, newBar.symbol, BarType, BarInterval, undefined);
-                    return;
-                }
-                let openPrice = ClosedBarList.map(e => e["openPrice"]);
-                let highPrice = ClosedBarList.map(e => e["highPrice"]);
-                let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
-                let closePrice = ClosedBarList.map(e => e["closePrice"]);
-                let actionDate = ClosedBarList.map(e => e["actionDate"]);
-                let timeStr = ClosedBarList.map(e => e["timeStr"]);
-                let volume = ClosedBarList.map(e => e["volume"]);
-                let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                if (score >= 2 || score <= -2) {
-                    global.actionScore[newBar.symbol] = score;
-                    global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-                    global.actionBarInterval[newBar.symbol] = BarInterval;
-                }
-            });
-
-        }
+        global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
+            if (err) {
+                console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
+                //没完成收集固定K线个数
+                MyOnFinishLoadBar(strategy, newBar.symbol, BarType, BarInterval, undefined);
+                return;
+            }
+            let highPrice = ClosedBarList.map(e => e["highPrice"]);
+            let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
+            let closePrice = ClosedBarList.map(e => e["closePrice"]);
+            let actionDate = ClosedBarList.map(e => e["actionDate"]);
+            let timeStr = ClosedBarList.map(e => e["timeStr"]);
+            let volume = ClosedBarList.map(e => e["volume"]);
+            let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+            global.actionScore[newBar.symbol] = score;
+            global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
+            global.actionBarInterval[newBar.symbol] = BarInterval;
+        });
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
@@ -98,6 +94,8 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let subject = "Today Action Open Short " + this.name + " signal: " + this.signal;
             let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
             this._sendMessage(subject, message);
+            console.log(message);
+            this.flag = null;
         }
     }
 
@@ -111,31 +109,53 @@ class InfluxShortIIStrategy extends BaseStrategy {
 
     _profitTodayShortPositions(tick, position, up = 0) {
         let todayShortPositions = position.GetShortTodayPosition();
-        if (todayShortPositions > 0) {
-            let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-            if (price < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
-                this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseToday);
-                let subject = "Today Action Profit Short  " + this.name + " signal: " + this.signal;
-                let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
-                message += `price ${price}  shortTodayPostionAveragePrice  ${shortTodayPostionAveragePrice} todayShortPositions  ${todayShortPositions}`
-                this._sendMessage(subject, message);
+        let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+        // if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice) {
+            let exchangeName = this._getExchange(tick);
+            if (exchangeName === "SHF") {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseToday);
+            } else {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
             }
+            let subject = "Today Action Profit Short  " + this.name + " signal: " + this.signal;
+            let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
+            message += `price ${price}  shortTodayPostionAveragePrice  ${shortTodayPostionAveragePrice} todayShortPositions  ${todayShortPositions}`
+            console.log(message);
+            this._sendMessage(subject, message);
         }
     }
 
     _profitYesterdayShortPositions(tick, position, up = 0) {
         let yesterdayShortPositions = position.GetShortYesterdayPosition();
-        if (yesterdayShortPositions > 0) {
-            let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-            if (price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
-                // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
-                this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
-                let subject = "Yesterday Action Profit Short  " + this.name + " signal: " + this.signal;
-                let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice price ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}}`;
-                this._sendMessage(subject, message);
+        let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+        // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
+            let exchangeName = this._getExchange(tick);
+            if (exchangeName === "SHF") {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+            } else {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
             }
+            let subject = "Yesterday Action Profit Short  " + this.name + " signal: " + this.signal;
+            let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice price ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}}`;
+            this._sendMessage(subject, message);
+        }
+    }
+
+
+    _profitShortPositions(tick, position, up = 0) {
+        let shortPositions = position.GetShortPosition();
+        let shortPostionAveragePrice = position.GetShortPositionAveragePrice();
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+        console.log(`shortPositions: ${shortPositions}, shortPostionAveragePrice: ${shortPostionAveragePrice}, price: ${price}`);
+        if (shortPositions > 0 && price < shortPostionAveragePrice) {
+            console.log(`profit short today: ${tick.symbol}`);
+            this._profitTodayShortPositions(tick, position, up);
+            console.log(`profit short yesterday: ${tick.symbol}`);
+            this._profitYesterdayShortPositions(tick, position, up);
         }
     }
 
@@ -159,33 +179,36 @@ class InfluxShortIIStrategy extends BaseStrategy {
         this.lastTick = this.tick;
         this.tick = tick;
         let tradeState = this._getOffset(tick, 0, 30);
-        let position = this.GetPosition(tick.symbol);
-        this.tradePosition = position;
         if (this.flag === false) {
-            if (this.signal >= 2) {
-                if (this.lastTick && this.lastTick.lastPrice < tick.lastPrice) {
-                    if (position) {
-                        this._profitTodayShortPositions(tick, position);
-                        this._profitYesterdayShortPositions(tick, position);
-                        this.flag = null;
-                    }
+            let position = this.GetPosition(tick.symbol);
+            if (position) {
+                let exchangeName = this._getExchange(tick);
+                if (exchangeName === "SHF") {
+                    this._profitYesterdayShortPositions(tick, position, 0);
+                    this._profitTodayShortPositions(tick, position, 0);
+                } else {
+                    this._profitShortPositions(tick, position, 0);
                 }
+                this.flag = null;
             }
         }
         switch (tradeState) {
             // timeOffset
             case 0:
-                if (position) {
-                    this._closeYesterdayShortPositions(tick, position, 1);
-                    // // this._profitTodayShortPositions(tick, position, 1);
-                    // this._profitYesterdayShortPositions(tick, position, 1);
-                }
+                this._cancelOrder();
                 break;
             // time to close
             case -1:
+                this._cancelOrder();
+                let position = this.GetPosition(tick.symbol);
                 if (position) {
-                    this._profitTodayShortPositions(tick, position, 1);
-                    this._profitYesterdayShortPositions(tick, position, 1);
+                    let exchangeName = this._getExchange(tick);
+                    if (exchangeName === "SHF") {
+                        this._profitYesterdayShortPositions(tick, position, 0);
+                        this._profitTodayShortPositions(tick, position, 0);
+                    } else {
+                        this._profitShortPositions(tick, position, 0);
+                    }
                 }
                 break;
             // trade time
@@ -193,14 +216,13 @@ class InfluxShortIIStrategy extends BaseStrategy {
                 let unFinishOrderList = this.GetUnFinishOrderList();
                 if (unFinishOrderList.length === 0) {
                     if (this.flag === true) {
-                        if (this.lastTick && this.lastTick.lastPrice > tick.lastPrice) {
-                            if (position === undefined) {
+                        let position = this.GetPosition(tick.symbol);
+                        if (position === undefined) {
+                            this._openShort(tick);
+                        } else {
+                            let todayShortPositions = position.GetShortTodayPosition();
+                            if (todayShortPositions < this.total) {
                                 this._openShort(tick);
-                            } else {
-                                let todayShortPositions = position.GetShortTodayPosition();
-                                if (todayShortPositions < this.total) {
-                                    this._openShort(tick);
-                                }
                             }
                         }
                     }
