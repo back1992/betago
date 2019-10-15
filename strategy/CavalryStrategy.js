@@ -9,7 +9,7 @@ require("../util/Position");
 require("../systemConfig");
 
 /////////////////////// Private Method ///////////////////////////////////////////////
-class CavalryIIStrategy extends BaseStrategy {
+class CavalryStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -188,4 +188,4 @@ class CavalryIIStrategy extends BaseStrategy {
     }
 }
 
-module.exports = CavalryIIStrategy;
+module.exports = CavalryStrategy;
