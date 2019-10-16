@@ -7,6 +7,11 @@ require("../common");
 let NodeQuantError = require("../util/NodeQuantError");
 let KBar = require("../util/KBar");
 
+require("../systemConfig");
+require("../util/Position");
+require("../util/MyPostMan");
+var _ = require('lodash');
+
 
 //////////////////////////////// Private Method ////////////////////////////////////////////
 function _createBar(myStrategy, tick) {
@@ -298,6 +303,41 @@ class BaseStrategy {
             return 1;
         }
     }
+
+
+      _profitYesterdayLongPositions(tick, position, up = 0) {
+          let yesterdayLongPositions = position.GetLongYesterdayPosition();
+          if (yesterdayLongPositions > 0) {
+              let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
+              let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+              if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                  this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
+                  let subject = `Yesterday Action Profit Long ${this.name}`;
+                  let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
+                  this._sendMessage(subject, message);
+              }
+          }
+      }
+
+      _profitYesterdayShortPositions(tick, position, up = 0) {
+          let yesterdayShortPositions = position.GetShortYesterdayPosition();
+          let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
+          let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+          // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+          if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
+              let exchangeName = this._getExchange(tick);
+              if (exchangeName === "SHF") {
+                  this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+              } else {
+                  this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
+              }
+              let subject = `Yesterday Action Profit Short ${this.name}`;
+              let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}`;
+              this._sendMessage(subject, message);
+          }
+      }
+
+
 
 
     _cancelOrder() {
