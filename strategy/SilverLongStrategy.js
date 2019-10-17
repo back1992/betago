@@ -24,14 +24,6 @@ class SilverLongStrategy extends BaseStrategy {
         this.closedBarList = [];
     }
 
-    //
-    // OnClosedBar(closedBar) {
-    //     if (closedBar.closePrice > closedBar.openPrice) {
-    //         this.flag = true;
-    //     } else {
-    //         this.flag = false;
-    //     }
-    // }
 
     _checkLongCondition(closedBarList) {
         let condition = null;
@@ -188,26 +180,6 @@ class SilverLongStrategy extends BaseStrategy {
             this._profitTodayLongPositions(tick, position, up);
             this._profitYesterdayLongPositions(tick, position, up);
         }
-    }
-
-
-    //js Date对象从0开始的月份
-    _getTimeToGold(tick, breakOffsetSec = 28) {
-        require("../systemConfig");
-        let NowDateTime = new Date();
-        let NowDateStr = NowDateTime.toLocaleDateString();
-        let TickDateTimeStr = NowDateStr + " " + tick.timeStr;
-        let TickDateTime = new Date(TickDateTimeStr);
-        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
-        let upperFutureName = contract.futureName.toUpperCase();
-        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-        let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
-        var PMCloseTime = new Date(PMCloseTimeStr);
-        var PMStopTime = new Date(PMCloseTime.getTime() - breakOffsetSec * 1000);
-        let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
-        var NightCloseTime = new Date(NightCloseTimeStr);
-        var NightStopTime = new Date(NightCloseTime.getTime() - breakOffsetSec * 1000);
-        return (TickDateTime > PMStopTime && TickDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
     }
 
 
