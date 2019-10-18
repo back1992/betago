@@ -49,14 +49,14 @@ class SinaLongStrategy extends BaseStrategy {
                 let volume = closedBarList.map(e => e["5"]);
                 let actionDate = closedBarList.map(e => e["0"]);
                 let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                console.log(`${closedBar.symbol}: ${score}`);
-                console.log(closedBarList[closedBarList.length - 1]);
-                global.actionScore[closedBar.symbol] = score;
-                global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
-                global.actionBarInterval[closedBar.symbol] = 15;
-                if (score > 1 || score < -1) {
-                    console.log(global.actionDatetime)
-                    console.log(global.actionScore);
+                var myDate = new Date(actionDate[actionDate.length - 1]);
+                var hours = myDate.getHours();
+                if (hours != 15) {
+                    global.actionScore[closedBar.symbol] = score;
+                    global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
+                    global.actionBarInterval[closedBar.symbol] = 15;
+                } else {
+                    console.log("no nignt trade data");
                 }
             }
         })
@@ -127,7 +127,6 @@ class SinaLongStrategy extends BaseStrategy {
             let subject = `Sina Today Action Profit Long  ${this.name}`;
             let message = `${this.name}  时间:  ${tick.date}  ${tick.timeStr} price ${price}  longTodayPostionAveragePrice  ${longTodayPostionAveragePrice} todayLongPositions  ${todayLongPositions}`
             console.log(message);
-            this._sendMessage(subject, message);
             if (price > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 let exchangeName = this._getExchange(tick);
                 if (exchangeName === "SHF") {
@@ -135,6 +134,7 @@ class SinaLongStrategy extends BaseStrategy {
                 } else {
                     this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
                 }
+                this._sendMessage(subject, message);
             }
         }
     }
