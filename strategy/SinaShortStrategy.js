@@ -49,9 +49,21 @@ class SinaShortStrategy extends BaseStrategy {
                 let volume = closedBarList.map(e => e["5"]);
                 let actionDate = closedBarList.map(e => e["0"]);
                 let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                global.actionScore[closedBar.symbol] = score;
-                global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
-                global.actionBarInterval[closedBar.symbol] = 15;
+                var myDate = new Date(actionDate[actionDate.length - 1]);
+                var hours = myDate.getHours();
+                if (hours != 15) {
+                    console.log(`${closedBar.symbol}: ${score}`);
+                    console.log(closedBarList[closedBarList.length - 1]);
+                    global.actionScore[closedBar.symbol] = score;
+                    global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
+                    global.actionBarInterval[closedBar.symbol] = 15;
+                    if (score > 1 || score < -1) {
+                        console.log(global.actionDatetime)
+                        console.log(global.actionScore);
+                    }
+                } else {
+                    console.log("no nignt trade data");
+                }
             }
         })
     }
@@ -94,9 +106,9 @@ class SinaShortStrategy extends BaseStrategy {
         }
     }
 
-    _profitTodayShortPositions(tick, position, up = 0) {
-        let todayShortPositions = position.GetShortTodayPosition();
-        let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
+    _profitMyTodayShortPositions(tick, position, up = 0) {
+        let todayShortPositions = position.MyGetShortTodayPosition();
+        let shortTodayPostionAveragePrice = position.MyGetShortTodayPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
         // if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
         if (todayShortPositions > 0 && price < shortTodayPostionAveragePrice) {
@@ -114,9 +126,9 @@ class SinaShortStrategy extends BaseStrategy {
         }
     }
 
-    _profitYesterdayShortPositions(tick, position, up = 0) {
-        let yesterdayShortPositions = position.GetShortYesterdayPosition();
-        let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
+    _profitMyYesterdayShortPositions(tick, position, up = 0) {
+        let yesterdayShortPositions = position.MyGetShortYesterdayPosition();
+        let shortYesterdayPostionAveragePrice = position.MyGetShortYesterdayPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
         // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
         if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
@@ -139,15 +151,15 @@ class SinaShortStrategy extends BaseStrategy {
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
         if (shortPositions > 0 && price < shortPostionAveragePrice) {
             console.log(`profit short today: ${tick.symbol}`);
-            this._profitTodayShortPositions(tick, position, up);
+            this._profitMyTodayShortPositions(tick, position, up);
             console.log(`profit short yesterday: ${tick.symbol}`);
-            this._profitYesterdayShortPositions(tick, position, up);
+            this._profitMyYesterdayShortPositions(tick, position, up);
         }
     }
 
 
     _closeYesterdayShortPositions(tick, position, up = 0) {
-        let todayShortPositions = position.GetShortYesterdayPosition();
+        let todayShortPositions = position.MyGetShortYesterdayPosition();
         if (todayShortPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             this.SendOrder(tick.clientName, tick.symbol, price, todayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
@@ -163,8 +175,8 @@ class SinaShortStrategy extends BaseStrategy {
             if (position) {
                 let exchangeName = this._getExchange(tick);
                 if (exchangeName === "SHF") {
-                    this._profitYesterdayShortPositions(tick, position, 0);
-                    this._profitTodayShortPositions(tick, position, 0);
+                    this._profitMyYesterdayShortPositions(tick, position, 0);
+                    this._profitMyTodayShortPositions(tick, position, 0);
                 } else {
                     this._profitShortPositions(tick, position, 0);
                 }
@@ -183,8 +195,8 @@ class SinaShortStrategy extends BaseStrategy {
                 if (position) {
                     let exchangeName = this._getExchange(tick);
                     if (exchangeName === "SHF") {
-                        this._profitYesterdayShortPositions(tick, position, 0);
-                        this._profitTodayShortPositions(tick, position, 0);
+                        this._profitMyYesterdayShortPositions(tick, position, 0);
+                        this._profitMyTodayShortPositions(tick, position, 0);
                     } else {
                         this._profitShortPositions(tick, position, 0);
                     }
@@ -199,7 +211,7 @@ class SinaShortStrategy extends BaseStrategy {
                         if (position === undefined) {
                             this._openShort(tick);
                         } else {
-                            let todayShortPositions = position.GetShortTodayPosition();
+                            let todayShortPositions = position.MyGetShortTodayPosition();
                             if (todayShortPositions < this.total) {
                                 this._openShort(tick);
                             }
