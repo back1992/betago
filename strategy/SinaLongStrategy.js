@@ -55,6 +55,11 @@ class SinaLongStrategy extends BaseStrategy {
                     global.actionScore[closedBar.symbol] = score;
                     global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
                     global.actionBarInterval[closedBar.symbol] = 15;
+                    if (score > 1 || score < -1) {
+                        console.log(`${closedBar.symbol}: ${score}  ${global.actionDatetime}`);
+                        console.log(closedBarList[closedBarList.length - 1]);
+                        console.log(global.actionScore);
+                    }
                 } else {
                     console.log("no nignt trade data");
                 }
@@ -124,9 +129,6 @@ class SinaLongStrategy extends BaseStrategy {
         if (todayLongPositions > 0) {
             let longTodayPostionAveragePrice = position.MyGetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            let subject = `Sina Today Action Profit Long  ${this.name}`;
-            let message = `${this.name}  时间:  ${tick.date}  ${tick.timeStr} price ${price}  longTodayPostionAveragePrice  ${longTodayPostionAveragePrice} todayLongPositions  ${todayLongPositions}`
-            console.log(message);
             if (price > longTodayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 let exchangeName = this._getExchange(tick);
                 if (exchangeName === "SHF") {
@@ -134,6 +136,9 @@ class SinaLongStrategy extends BaseStrategy {
                 } else {
                     this.SendOrder(tick.clientName, tick.symbol, price, todayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
                 }
+                let subject = `Sina Today Action Profit Long  ${this.name}`;
+                let message = `${this.name}  时间:  ${tick.date}  ${tick.timeStr} price ${price}  longTodayPostionAveragePrice  ${longTodayPostionAveragePrice} todayLongPositions  ${todayLongPositions}`
+                console.log(message);
                 this._sendMessage(subject, message);
             }
         }

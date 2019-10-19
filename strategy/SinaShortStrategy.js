@@ -52,15 +52,9 @@ class SinaShortStrategy extends BaseStrategy {
                 var myDate = new Date(actionDate[actionDate.length - 1]);
                 var hours = myDate.getHours();
                 if (hours != 15) {
-                    console.log(`${closedBar.symbol}: ${score}`);
-                    console.log(closedBarList[closedBarList.length - 1]);
                     global.actionScore[closedBar.symbol] = score;
                     global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
                     global.actionBarInterval[closedBar.symbol] = 15;
-                    if (score > 1 || score < -1) {
-                        console.log(global.actionDatetime)
-                        console.log(global.actionScore);
-                    }
                 } else {
                     console.log("no nignt trade data");
                 }
