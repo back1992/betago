@@ -1,4 +1,5 @@
 let talib = require('talib-binding');
+
 function _get_signal(mfi, cci, cmo, aroonosc, adx, rsi) {
     let score = 0;
     if (cci > 100) {
@@ -29,7 +30,7 @@ function _get_signal(mfi, cci, cmo, aroonosc, adx, rsi) {
     return score
 }
 
-function _get_talib_indicator(strategy, highPrice, lowPrice, closePrice, volume) {
+function _get_talib_indicator(highPrice, lowPrice, closePrice, volume) {
     let retMFI = talib.MFI(highPrice, lowPrice, closePrice, volume, 14);
     let retCCI = talib.CCI(highPrice, lowPrice, closePrice, 14);
     let retCMO = talib.CMO(closePrice, 14);
