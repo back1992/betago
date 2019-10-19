@@ -31,11 +31,11 @@
     "ejs": "~2.5.6",
     "express": "^4.17.1",
     "fixed-array": "^1.0.0",
-    "influx": "^5.4.1",
+    "influx": "^5.4.2",
     "lodash": "^4.17.15",
     "mongodb": "^3.3.2",
     "morgan": "^1.9.1",
-    "nodemailer": "^6.3.0",
+    "nodemailer": "^6.3.1",
     "redis": "^2.7.1",
     "serve-favicon": "~2.4.2",
     "talib-binding": "^0.4.0"

@@ -59,27 +59,33 @@ class InfluxShortIIStrategy extends BaseStrategy {
     OnNewBar(newBar) {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
-        // let BarInterval = 5;
+        // let BarInterval = 15;
+        // let intervalArray = [5, 15, 30, 60];
+        // let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         let intervalArray = [5, 15, 30, 60];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
-        global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
-            if (err) {
-                console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
-                //没完成收集固定K线个数
-                MyOnFinishLoadBar(strategy, newBar.symbol, BarType, BarInterval, undefined);
-                return;
-            }
-            let highPrice = ClosedBarList.map(e => e["highPrice"]);
-            let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
-            let closePrice = ClosedBarList.map(e => e["closePrice"]);
-            let actionDate = ClosedBarList.map(e => e["actionDate"]);
-            let timeStr = ClosedBarList.map(e => e["timeStr"]);
-            let volume = ClosedBarList.map(e => e["volume"]);
-            let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-            global.actionScore[newBar.symbol] = score;
-            global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-            global.actionBarInterval[newBar.symbol] = BarInterval;
-        });
+        // query every four  to low down the db stress
+        if(BarInterval === 30){
+          global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
+              if (err) {
+                  console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
+                  //没完成收集固定K线个数
+                  MyOnFinishLoadBar(strategy, newBar.symbol, BarType, BarInterval, undefined);
+                  return;
+              }
+              let highPrice = ClosedBarList.map(e => e["highPrice"]);
+              let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
+              let closePrice = ClosedBarList.map(e => e["closePrice"]);
+              let actionDate = ClosedBarList.map(e => e["actionDate"]);
+              let timeStr = ClosedBarList.map(e => e["timeStr"]);
+              let volume = ClosedBarList.map(e => e["volume"]);
+              let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
+              global.actionScore[newBar.symbol] = score;
+              global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
+              global.actionBarInterval[newBar.symbol] = BarInterval;
+              console.log(`${newBar.symbol} : ${score}  ${global.actionDatetime[newBar.symbol]}`);
+          });
+        }
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
@@ -91,8 +97,8 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let sum = this._getAvailabelSum(tick);
         if (sum >= 1) {
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.Open);
-            let subject = "Today Action Open Short " + this.name + " signal: " + this.signal;
-            let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
+            let subject = `Today Action Open Short ${this.name}   signal: ${this.signal}`;
+            let message = `${this.name}  signal: ${this.signal} ${this.signalTime} ${global.actionBarInterval[tick.symbol]}M:  ${global.actionScore[tick.symbol]} ${global.actionDatetime[tick.symbol]}  flag: ${this.flag}  时间: ${tick.date} ${tick.timeStr}`;
             this._sendMessage(subject, message);
             console.log(message);
             this.flag = null;
@@ -119,8 +125,8 @@ class InfluxShortIIStrategy extends BaseStrategy {
             } else {
                 this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
             }
-            let subject = "Today Action Profit Short  " + this.name + " signal: " + this.signal;
-            let message = this.name + " signal: " + this.signal + " " + this.signalTime + " " + global.actionBarInterval[tick.symbol] + "M: " + global.actionScore[tick.symbol] + " " + global.actionDatetime[tick.symbol] + " flag: " + this.flag + " 时间: " + tick.date + " " + tick.timeStr;
+            let subject = `Today Action Profit Short  ${this.name}  signal: ${this.signal}`;
+            let message = `${this.name}  signal:  ${this.signal} ${this.signalTime} ${global.actionBarInterval[tick.symbol]}M: ${global.actionScore[tick.symbol]} ${global.actionDatetime[tick.symbol]}  flag: ${this.flag}  时间: ${tick.date} ${tick.timeStr}`;
             message += `price ${price}  shortTodayPostionAveragePrice  ${shortTodayPostionAveragePrice} todayShortPositions  ${todayShortPositions}`
             console.log(message);
             this._sendMessage(subject, message);
@@ -139,7 +145,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             } else {
                 this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
             }
-            let subject = "Yesterday Action Profit Short  " + this.name + " signal: " + this.signal;
+            let subject = `Yesterday Action Profit Short  ${this.name}  signal: ${this.signal}`;
             let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice price ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}}`;
             this._sendMessage(subject, message);
         }
