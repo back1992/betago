@@ -46,10 +46,10 @@ class InfluxLongStrategy extends BaseStrategy {
             this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
         }
         if (this.signal >= 2) {
+          console.log(this.name+"策略的"+closedBar.symbol+"K线结束,结束时间:"+closedBar.endDatetime.toLocaleString()+",Close价:"+closedBar.closePrice);
+          console.log(`${closedBar.symbol} signal: ${this.signal} global.actionScore: ${global.actionScore[closedBar.symbol]}  flag: ${this.flag}`);
             if (global.actionScore[closedBar.symbol] >= 2) {
                 this.flag = true;
-            } else {
-                this.flag = null;
             }
         } else if (this.signal <= -2) {
             this.flag = false;
@@ -62,10 +62,11 @@ class InfluxLongStrategy extends BaseStrategy {
         let LookBackCount = 50;
         let BarType = KBarType.Minute;
         // let BarInterval = 15;
-        let intervalArray = [5, 15, 30, 60];
+        let intervalArray = [2, 5, 15, 30];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         // query every four  to low down the db stress
-        if(BarInterval === 15){
+        if(BarInterval === 2){
+        // if(true){
           global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
             if (err) {
               console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
@@ -86,6 +87,9 @@ class InfluxLongStrategy extends BaseStrategy {
             var filtered = _.pickBy(global.actionScore, function (score) {
               return score > 2 || score < -2;
             });
+            if(score>=2 || score <= -2) {
+                  console.log(`${newBar.symbol} : ${score}  ${global.actionDatetime[newBar.symbol]}`);
+            }
             // console.log(actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1]);
             // console.log(global.actionScore);
           });

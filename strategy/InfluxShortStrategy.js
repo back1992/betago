@@ -50,7 +50,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             }
         } else if (this.signal >= 2) {
             this.flag = false;
-            console.log(`${closedBar.symbol} signal: ${this.signal} flag: ${this.flag}`);
+
         } else {
             this.flag = null;
         }
@@ -65,7 +65,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let intervalArray = [5, 15, 30, 60];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         // query every four  to low down the db stress
-        if(BarInterval === 30){
+        if(BarInterval === 5){
           global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
               if (err) {
                   console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
@@ -83,7 +83,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
               global.actionScore[newBar.symbol] = score;
               global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
               global.actionBarInterval[newBar.symbol] = BarInterval;
-              console.log(`${newBar.symbol} : ${score}  ${global.actionDatetime[newBar.symbol]}`);
+
           });
         }
     }
@@ -100,7 +100,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let subject = `Today Action Open Short ${this.name}   signal: ${this.signal}`;
             let message = `${this.name}  signal: ${this.signal} ${this.signalTime} ${global.actionBarInterval[tick.symbol]}M:  ${global.actionScore[tick.symbol]} ${global.actionDatetime[tick.symbol]}  flag: ${this.flag}  时间: ${tick.date} ${tick.timeStr}`;
             this._sendMessage(subject, message);
-            console.log(message);
+            // console.log(message);
             this.flag = null;
         }
     }
@@ -128,7 +128,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
             let subject = `Today Action Profit Short  ${this.name}  signal: ${this.signal}`;
             let message = `${this.name}  signal:  ${this.signal} ${this.signalTime} ${global.actionBarInterval[tick.symbol]}M: ${global.actionScore[tick.symbol]} ${global.actionDatetime[tick.symbol]}  flag: ${this.flag}  时间: ${tick.date} ${tick.timeStr}`;
             message += `price ${price}  shortTodayPostionAveragePrice  ${shortTodayPostionAveragePrice} todayShortPositions  ${todayShortPositions}`
-            console.log(message);
+            // console.log(message);
             this._sendMessage(subject, message);
         }
     }
@@ -156,7 +156,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let shortPositions = position.GetShortPosition();
         let shortPostionAveragePrice = position.GetShortPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-        console.log(`shortPositions: ${shortPositions}, shortPostionAveragePrice: ${shortPostionAveragePrice}, price: ${price}`);
+        // console.log(`shortPositions: ${shortPositions}, shortPostionAveragePrice: ${shortPostionAveragePrice}, price: ${price}`);
         if (shortPositions > 0 && price < shortPostionAveragePrice) {
             console.log(`profit short today: ${tick.symbol}`);
             this._profitTodayShortPositions(tick, position, up);
