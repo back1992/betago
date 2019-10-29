@@ -28,7 +28,7 @@ class SinaLongStrategy extends BaseStrategy {
         this.flag = null;
         global.actionFlag = {};
         global.actionScore = {};
-        // global.actionDatetime = {};
+        global.actionDatetime = {};
         // global.actionBarInterval = {};
     }
 
@@ -52,11 +52,13 @@ class SinaLongStrategy extends BaseStrategy {
                 var myDate = new Date(actionDate[actionDate.length - 1]);
                 var hours = myDate.getHours();
                 if (hours != 15) {
-                    console.log(`${closedBar.symbol}: ${score}  ${global.actionDatetime}`);
-                    console.log(closedBarList[closedBarList.length - 1]);
-                    console.log(global.actionScore);
                     global.actionScore[closedBar.symbol] = score;
-                    // global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
+                    global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
+                    console.log(`${closedBar.symbol}: ${score}  ${actionDate[actionDate.length - 1]}`);
+                    console.log(closedBarList[closedBarList.length - 1]);
+                    if (score >= 2 || score <= -2) {
+                        console.log(global.actionScore);
+                    }
                     // global.actionBarInterval[closedBar.symbol] = 15;
                     // if (score > 1 || score < -1) {
                     //     console.log(`${closedBar.symbol}: ${score}  ${global.actionDatetime}`);
@@ -72,15 +74,14 @@ class SinaLongStrategy extends BaseStrategy {
 
     OnNewBar(newBar) {
         this._cancelOrder();
-        if (global.actionScore[newBar.symbol] != undefined) {
-            if (global.actionScore[newBar.symbol] >= 2) {
-                this.flag = true;
-            } else if (global.actionScore[newBar.symbol] <= -2) {
-                this.flag = false;
-            } else {
-                this.flag = null;
-            }
+        if (global.actionScore[newBar.symbol] >= 2) {
+            this.flag = true;
+        } else if (global.actionScore[newBar.symbol] <= -2) {
+            this.flag = false;
+        } else {
+            this.flag = null;
         }
+        console.log(`${newBar.symbol}: ${global.actionScore[newBar.symbol]}  ${global.actionDatetime[newBar.symbol] }`);
     }
 
     // OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
@@ -108,6 +109,7 @@ class SinaLongStrategy extends BaseStrategy {
             let subject = `Sina Money is Out ${this.name}`;
             let message = `${tick.symbol}  的Tick,时间: ${tick.date}  ${tick.timeStr} availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`;
             this._sendMessage(subject, message);
+            this.flag = null;
         }
         return availabelSum;
     }
@@ -162,7 +164,6 @@ class SinaLongStrategy extends BaseStrategy {
     }
 
 
-
     _profitMyLongPositions(tick, position, up = 0) {
         let longPositions = position.GetLongPosition();
         let longPostionAveragePrice = position.GetLongPositionAveragePrice();
@@ -176,7 +177,7 @@ class SinaLongStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        let tradeState = this._getOffset(tick, 0, 300);
+        let tradeState = this._getOffset(tick, 0, 100);
         if (this.flag === false) {
             let position = this.GetPosition(tick.symbol);
             if (position) {
