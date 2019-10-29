@@ -29,7 +29,7 @@ class SinaLongStrategy extends BaseStrategy {
         global.actionFlag = {};
         global.actionScore = {};
         global.actionDatetime = {};
-        global.actionBarInterval = {};
+        // global.actionBarInterval = {};
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
@@ -54,12 +54,17 @@ class SinaLongStrategy extends BaseStrategy {
                 if (hours != 15) {
                     global.actionScore[closedBar.symbol] = score;
                     global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
-                    global.actionBarInterval[closedBar.symbol] = 15;
-                    if (score > 1 || score < -1) {
-                        console.log(`${closedBar.symbol}: ${score}  ${global.actionDatetime}`);
-                        console.log(closedBarList[closedBarList.length - 1]);
+                    console.log(`${closedBar.symbol}: ${score}  ${actionDate[actionDate.length - 1]}`);
+                    console.log(closedBarList[closedBarList.length - 1]);
+                    if (score >= 2 || score <= -2) {
                         console.log(global.actionScore);
                     }
+                    // global.actionBarInterval[closedBar.symbol] = 15;
+                    // if (score > 1 || score < -1) {
+                    //     console.log(`${closedBar.symbol}: ${score}  ${global.actionDatetime}`);
+                    //     console.log(closedBarList[closedBarList.length - 1]);
+                    //     console.log(global.actionScore);
+                    // }
                 } else {
                     console.log("no nignt trade data");
                 }
@@ -69,20 +74,19 @@ class SinaLongStrategy extends BaseStrategy {
 
     OnNewBar(newBar) {
         this._cancelOrder();
-        if (global.actionScore[newBar.symbol] != undefined) {
-            if (global.actionScore[newBar.symbol] >= 2) {
-                this.flag = true;
-            } else if (global.actionScore[newBar.symbol] <= -2) {
-                this.flag = false;
-            } else {
-                this.flag = null;
-            }
+        if (global.actionScore[newBar.symbol] >= 2) {
+            this.flag = true;
+        } else if (global.actionScore[newBar.symbol] <= -2) {
+            this.flag = false;
+        } else {
+            this.flag = null;
         }
+        console.log(`${newBar.symbol}: ${global.actionScore[newBar.symbol]}  ${global.actionDatetime[newBar.symbol] }`);
     }
 
-    OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
-        this.closedBarList = ClosedBarList;
-    }
+    // OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
+    //     this.closedBarList = ClosedBarList;
+    // }
 
 
     OnQueryTradingAccount(tradingAccountInfo) {
@@ -105,8 +109,8 @@ class SinaLongStrategy extends BaseStrategy {
             let subject = `Sina Money is Out ${this.name}`;
             let message = `${tick.symbol}  的Tick,时间: ${tick.date}  ${tick.timeStr} availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`;
             this._sendMessage(subject, message);
+            this.flag = null;
         }
-        // console.log(`${tick.symbol}  的Tick,时间: ${tick.date}  ${tick.timeStr} availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`);
         return availabelSum;
     }
 
@@ -150,21 +154,13 @@ class SinaLongStrategy extends BaseStrategy {
         if (yesterdayLongPositions > 0) {
             let longYesterdayPostionAveragePrice = position.MyGetLongYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            let subject = `Sina Yesterday Action Profit Long ${this.name}`;
-            let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
-            this._sendMessage(subject, message);
             if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
+                let subject = `Sina Yesterday Action Profit Long ${this.name}`;
+                let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
+                this._sendMessage(subject, message);
             }
         }
-    }
-
-
-    _checkPrice(tick, position, up = 0) {
-        let longPositions = position.GetLongPosition();
-        let longPostionAveragePrice = position.GetLongPositionAveragePrice();
-        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-        return price > longPostionAveragePrice;
     }
 
 
@@ -181,7 +177,7 @@ class SinaLongStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        let tradeState = this._getOffset(tick, 0, 300);
+        let tradeState = this._getOffset(tick, 0, 100);
         if (this.flag === false) {
             let position = this.GetPosition(tick.symbol);
             if (position) {
@@ -192,6 +188,35 @@ class SinaLongStrategy extends BaseStrategy {
                 } else {
                     this._profitMyLongPositions(tick, position, 0);
                 }
+                this.QueryTradingAccount(tick.clientName);
+                if (global.availableFund < 0) {
+                    let todayShortPositions = position.MyGetShortTodayPosition();
+                    let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
+                    if (todayShortPositions > 0) {
+                        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+                        if (tick.lastPrice > tick.lowerLimit) {
+                            let exchangeName = this._getExchange(tick);
+                            if (exchangeName === "SHF") {
+                                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseToday);
+                            } else {
+                                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
+                            }
+                            let subject = `Sina Account money  is negetive  ${this.name}`;
+                            let message = `${this.name}  时间:  ${tick.date}  ${tick.timeStr} price ${price}  todayShortPositions  1`
+                            console.log(message);
+                            this._sendMessage(subject, message);
+                        }
+                    } else if (yesterdayLongPositions > 0) {
+                        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+                        if (tick.lastPrice < tick.upperLimit) {
+                            this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+                            let subject = `Sina Account money  is negetive Yesterday Action Close Long ${this.name}`;
+                            let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}   yesterdayLongPositions 1`;
+                            this._sendMessage(subject, message);
+                        }
+                    }
+                }
+
                 this.flag = null;
             }
         }

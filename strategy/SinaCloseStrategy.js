@@ -73,6 +73,59 @@ class SinaCloseStrategy extends BaseStrategy {
         this.closedBarList = ClosedBarList;
     }
 
+    _profitMyYesterdayLongPositions(tick, position, up = 0) {
+        let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
+        if (yesterdayLongPositions > 0) {
+            let longYesterdayPostionAveragePrice = position.MyGetLongYesterdayPositionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
+                let subject = `Sina Yesterday Action Profit Long ${this.name}`;
+                let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
+                this._sendMessage(subject, message);
+            }
+        }
+    }
+
+
+    _profitMyLongPositions(tick, position, up = 0) {
+        let longPositions = position.GetLongPosition();
+        let longPostionAveragePrice = position.GetLongPositionAveragePrice();
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+        if (longPositions > 0 && price > longPostionAveragePrice) {
+            this._profitMyYesterdayLongPositions(tick, position, up);
+        }
+    }
+
+    _profitMyYesterdayShortPositions(tick, position, up = 0) {
+        let yesterdayShortPositions = position.MyGetShortYesterdayPosition();
+        let shortYesterdayPostionAveragePrice = position.MyGetShortYesterdayPositionAveragePrice();
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+        // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
+            let exchangeName = this._getExchange(tick);
+            if (exchangeName === "SHF") {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+            } else {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
+            }
+            let subject = `Yesterday Action Profit Short ${this.name}`;
+            let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}`;
+            this._sendMessage(subject, message);
+        }
+    }
+
+
+    _profitShortPositions(tick, position, up = 0) {
+        let shortPositions = position.GetShortPosition();
+        let shortPostionAveragePrice = position.GetShortPositionAveragePrice();
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+        if (shortPositions > 0 && price < shortPostionAveragePrice) {
+            console.log(`profit short yesterday: ${tick.symbol}`);
+            this._profitMyYesterdayShortPositions(tick, position, up);
+        }
+    }
+
 
     OnTick(tick) {
         super.OnTick(tick);
@@ -104,6 +157,19 @@ class SinaCloseStrategy extends BaseStrategy {
                     let position = this.GetPosition(tick.symbol);
                     if (position) {
                         this._profitLongPositions(tick, position, 0);
+                        this.QueryTradingAccount(tick.clientName);
+                        if (global.availableFund < 0) {
+                            let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
+                            if (yesterdayLongPositions > 0) {
+                                let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+                                if (tick.lastPrice < tick.upperLimit) {
+                                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+                                    let subject = `Sina Account money  is negetive Yesterday Action Close Long ${this.name}`;
+                                    let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}   yesterdayLongPositions 1`;
+                                    this._sendMessage(subject, message);
+                                }
+                            }
+                        }
                         this.flag = null;
                     }
                 }
