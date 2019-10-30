@@ -89,9 +89,9 @@ class InfluxLongStrategy extends BaseStrategy {
             });
             if(score>=2 || score <= -2) {
                   console.log(`${newBar.symbol} : ${score}  ${global.actionDatetime[newBar.symbol]}`);
+                  // console.log(global.actionScore);
             }
             // console.log(actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1]);
-            // console.log(global.actionScore);
           });
         }
     }

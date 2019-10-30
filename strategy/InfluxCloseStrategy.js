@@ -51,13 +51,13 @@ class InfluxCloseStrategy extends BaseStrategy {
             }
         } else if (this.signal <= -2) {
             if (global.actionScore[closedBar.symbol] <= -2) {
-                console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-                console.log(`${closedBar.symbol} signal: ${this.signal} global.actionScore: ${global.actionScore[closedBar.symbol]}  flag: ${this.flag}`);
                 this.flag = "short";
             }
         } else {
             this.flag = null;
         }
+        console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
+        console.log(`${closedBar.symbol} signal: ${this.signal} global.actionScore: ${global.actionScore[closedBar.symbol]}  flag: ${this.flag}`);
     }
 
     OnNewBar(newBar) {
@@ -86,12 +86,12 @@ class InfluxCloseStrategy extends BaseStrategy {
                 global.actionScore[newBar.symbol] = score;
                 global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
                 global.actionBarInterval[newBar.symbol] = BarInterval;
-                var filtered = _.pickBy(global.actionScore, function (score) {
-                    return score > 2 || score < -2;
-                });
-                if (score >= 2 || score <= -2) {
-                    console.log(`${newBar.symbol} : ${score}  ${global.actionDatetime[newBar.symbol]}`);
-                }
+                console.log(`${newBar.symbol} : ${score}  ${global.actionDatetime[newBar.symbol]}`);
+                // var filtered = _.pickBy(global.actionScore, function (score) {
+                //     return score > 2 || score < -2;
+                // });
+                // if (score >= 2 || score <= -2) {
+                // }
                 // console.log(actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1]);
                 // console.log(global.actionScore);
             });
@@ -123,20 +123,40 @@ class InfluxCloseStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        if (this.flag === "long") {
-            let position = this.GetPosition(tick.symbol);
-            if (position) {
+        let tradeState = this._getOffset(tick, 0, 300);
+
+        switch (tradeState) {
+            // timeOffset
+            case 0:
                 this._cancelOrder();
-                this._closeYesterdayLongPositions(tick, position, 0)
-                this.flag = null;
-            }
-        } else if (this.flag === "short") {
-            let position = this.GetPosition(tick.symbol);
-            if (position) {
+                break;
+            // time to close
+            case -1:
                 this._cancelOrder();
-                this._closeYesterdayShortPositions(tick, position, 0)
-                this.flag = null;
-            }
+                let position = this.GetPosition(tick.symbol);
+                if (position) {
+                  this._cancelOrder();
+                  this._closeYesterdayLongPositions(tick, position, 0)
+                }
+                break;
+            // trade time
+            default :
+              if (this.flag === "long") {
+                  let position = this.GetPosition(tick.symbol);
+                  if (position) {
+                      this._cancelOrder();
+                      this._closeYesterdayLongPositions(tick, position, 0)
+                      this.flag = null;
+                  }
+              } else if (this.flag === "short") {
+                  let position = this.GetPosition(tick.symbol);
+                  if (position) {
+                      this._cancelOrder();
+                      this._closeYesterdayShortPositions(tick, position, 0)
+                      this.flag = null;
+                  }
+              }
+
         }
 
     }

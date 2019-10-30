@@ -23,7 +23,7 @@ class SinaCloseStrategy extends BaseStrategy {
         // define as infinte large
         this.total = 1000000;
         this.sinaSymbol = strategyConfig.sinaSymbol;
-        this.BarInterval = strategyConfig.BarInterval;
+        this.BarInterval = (strategyConfig.BarInterval==5) ? strategyConfig.BarInterval : 5 ;
         this.sum = 0;
         this.flag = null;
         global.actionFlag = {};
