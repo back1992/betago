@@ -52,15 +52,15 @@ class SinaCloseStrategy extends BaseStrategy {
                 global.actionScore[closedBar.symbol] = score;
                 global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
                 global.actionBarInterval[closedBar.symbol] = 15;
-                console.log(`${closedBar.symbol}: ${score}  ${actionDate[actionDate.length - 1]} flag: ${this.flag}`);
-                console.log(global.actionScore);
             }
+            console.log(`${closedBar.symbol}: score: ${global.actionScore[closedBar.symbol]} datetime:  ${global.actionDatetime[closedBar.symbol]} falg: ${this.flag}`);
+            console.log(global.actionScore);
         })
     }
 
     OnNewBar(newBar) {
         this._cancelOrder();
-        if (global.actionScore[newBar.symbol] != undefined) {
+        if (global.actionScore[newBar.symbol] !== undefined) {
             if (global.actionScore[newBar.symbol] >= 2) {
                 this.flag = "long";
             } else if (global.actionScore[newBar.symbol] <= -2) {
