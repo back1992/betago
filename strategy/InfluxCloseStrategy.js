@@ -46,56 +46,17 @@ class InfluxCloseStrategy extends BaseStrategy {
             this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
         }
         if (this.signal >= 2) {
-            if (global.actionScore[closedBar.symbol] >= 2) {
-                this.flag = "long";
-            }
+              this.flag = "long";
         } else if (this.signal <= -2) {
-            if (global.actionScore[closedBar.symbol] <= -2) {
-                this.flag = "short";
-            }
+              this.flag = "short";
         } else {
             this.flag = null;
         }
         console.log(this.name + "策略的" + closedBar.symbol + "K线结束,结束时间:" + closedBar.endDatetime.toLocaleString() + ",Close价:" + closedBar.closePrice);
-        console.log(`${closedBar.symbol} signal: ${this.signal} global.actionScore: ${global.actionScore[closedBar.symbol]}  flag: ${this.flag}`);
+        console.log(`${closedBar.symbol} signal: ${this.signal}  flag: ${this.flag}`);
     }
 
     OnNewBar(newBar) {
-        let LookBackCount = 50;
-        let BarType = KBarType.Minute;
-        // let BarInterval = 15;
-        let intervalArray = [2, 5, 15, 30];
-        let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
-        // query every four  to low down the db stress
-        if (BarInterval === 2) {
-            // if(true){
-            global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
-                if (err) {
-                    console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
-                    //没完成收集固定K线个数
-                    MyOnFinishLoadBar(strategy, newBar.symbol, BarType, BarInterval, undefined);
-                    return;
-                }
-                let highPrice = ClosedBarList.map(e => e["highPrice"]);
-                let lowPrice = ClosedBarList.map(e => e["lowPrice"]);
-                let closePrice = ClosedBarList.map(e => e["closePrice"]);
-                let volume = ClosedBarList.map(e => e["volume"]);
-                let actionDate = ClosedBarList.map(e => e["actionDate"]);
-                let timeStr = ClosedBarList.map(e => e["timeStr"]);
-                let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
-                global.actionScore[newBar.symbol] = score;
-                global.actionDatetime[newBar.symbol] = actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1];
-                global.actionBarInterval[newBar.symbol] = BarInterval;
-                console.log(`${newBar.symbol} : ${score}  ${global.actionDatetime[newBar.symbol]}`);
-                // var filtered = _.pickBy(global.actionScore, function (score) {
-                //     return score > 2 || score < -2;
-                // });
-                // if (score >= 2 || score <= -2) {
-                // }
-                // console.log(actionDate[actionDate.length - 1] + " " + timeStr[timeStr.length - 1]);
-                // console.log(global.actionScore);
-            });
-        }
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
@@ -106,17 +67,21 @@ class InfluxCloseStrategy extends BaseStrategy {
 
     _closeYesterdayLongPositions(tick, position, up = 0) {
         let yesterdayLongPositions = position.GetLongYesterdayPosition();
+        console.log(yesterdayLongPositions);
         if (yesterdayLongPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
+            // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
+            this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
         }
     }
 
     _closeYesterdayShortPositions(tick, position, up = 0) {
         let yesterdayShortPositions = position.GetShortYesterdayPosition();
+        console.log(yesterdayLongPositions);
         if (yesterdayShortPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-            this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+            // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+            this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
         }
     }
 
@@ -141,21 +106,18 @@ class InfluxCloseStrategy extends BaseStrategy {
                 break;
             // trade time
             default :
-              if (this.flag === "long") {
-                  let position = this.GetPosition(tick.symbol);
-                  if (position) {
-                      this._cancelOrder();
-                      this._closeYesterdayLongPositions(tick, position, 0)
-                      this.flag = null;
-                  }
-              } else if (this.flag === "short") {
-                  let position = this.GetPosition(tick.symbol);
-                  if (position) {
-                      this._cancelOrder();
-                      this._closeYesterdayShortPositions(tick, position, 0)
-                      this.flag = null;
-                  }
-              }
+
+              if (this.total > 0 ) {
+                if (this.flag === "long" ) {
+                  this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1 , Direction.Buy, OpenCloseFlagType.CloseYesterday);
+                  this.total -= 1;
+                  this.flag = null;
+                } else if (this.flag === "short") {
+                    this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1 , Direction.Sell, OpenCloseFlagType.CloseYesterday);
+                    this.total -= 1;
+                    this.flag = null
+                }
+            }
 
         }
 

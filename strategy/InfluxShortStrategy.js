@@ -65,7 +65,7 @@ class InfluxShortIIStrategy extends BaseStrategy {
         let intervalArray = [5, 15, 30, 60];
         let BarInterval = intervalArray[Math.floor(Math.random() * intervalArray.length)];
         // query every four  to low down the db stress
-        if(BarInterval === 5){
+        if(BarInterval === 15){
           global.NodeQuant.MarketDataDBClient.barrange([newBar.symbol, BarInterval, LookBackCount, -1], function (err, ClosedBarList) {
               if (err) {
                   console.log("从" + newBar.symbol + "的行情数据库LoadBar失败原因:" + err);
