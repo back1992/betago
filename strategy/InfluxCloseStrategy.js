@@ -46,9 +46,9 @@ class InfluxCloseStrategy extends BaseStrategy {
             this.signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
         }
         if (this.signal >= 2) {
-              this.flag = "long";
+            this.flag = "long";
         } else if (this.signal <= -2) {
-              this.flag = "short";
+            this.flag = "short";
         } else {
             this.flag = null;
         }
@@ -57,6 +57,7 @@ class InfluxCloseStrategy extends BaseStrategy {
     }
 
     OnNewBar(newBar) {
+
     }
 
     OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
@@ -67,40 +68,42 @@ class InfluxCloseStrategy extends BaseStrategy {
 
     _closeYesterdayLongPositions(tick, position, up = 0) {
         let yesterdayLongPositions = position.GetLongYesterdayPosition();
-        console.log(yesterdayLongPositions);
+        console.log(`yesterdayLongPositions : ${yesterdayLongPositions}`)
         if (yesterdayLongPositions > 0) {
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-            // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.CloseYesterday);
             this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
         }
     }
 
     _closeYesterdayShortPositions(tick, position, up = 0) {
         let yesterdayShortPositions = position.GetShortYesterdayPosition();
-        console.log(yesterdayLongPositions);
+        console.log(`yesterdayShortPositions : ${yesterdayShortPositions}`)
         if (yesterdayShortPositions > 0) {
-            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-            // this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.CloseYesterday);
-            this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.buy, up);
+            this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.buy, OpenCloseFlagType.Close);
         }
     }
 
 
     OnTick(tick) {
         super.OnTick(tick);
-        let tradeState = this._getOffset(tick, 0, 300);
+        let tradeState = this._getOffset(tick, 30, 300);
 
         switch (tradeState) {
             // timeOffset
             case 0:
-                this._cancelOrder();
+                let position = this.GetPosition(tick.symbol);
+                console.log(position);
+                if (position) {
+                  this._closeYesterdayLongPositions(tick, position, 0)
+                }
                 break;
             // time to close
             case -1:
                 this._cancelOrder();
                 let position = this.GetPosition(tick.symbol);
+                console.log(position);
                 if (position) {
-                  this._cancelOrder();
                   this._closeYesterdayLongPositions(tick, position, 0)
                 }
                 break;

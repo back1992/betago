@@ -53,12 +53,14 @@ class SinaCloseStrategy extends BaseStrategy {
                 global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
                 global.actionBarInterval[closedBar.symbol] = 15;
             }
+            console.log(`${closedBar.symbol}: score: ${global.actionScore[closedBar.symbol]} datetime:  ${global.actionDatetime[closedBar.symbol]} falg: ${this.flag}`);
+            console.log(global.actionScore);
         })
     }
 
     OnNewBar(newBar) {
         this._cancelOrder();
-        if (global.actionScore[newBar.symbol] != undefined) {
+        if (global.actionScore[newBar.symbol] !== undefined) {
             if (global.actionScore[newBar.symbol] >= 2) {
                 this.flag = "long";
             } else if (global.actionScore[newBar.symbol] <= -2) {
@@ -73,10 +75,10 @@ class SinaCloseStrategy extends BaseStrategy {
         this.closedBarList = ClosedBarList;
     }
 
-    _profitMyYesterdayLongPositions(tick, position, up = 0) {
-        let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
+    _profitYesterdayLongPositions(tick, position, up = 0) {
+        let yesterdayLongPositions = position.GetLongYesterdayPosition();
         if (yesterdayLongPositions > 0) {
-            let longYesterdayPostionAveragePrice = position.MyGetLongYesterdayPositionAveragePrice();
+            let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
                 this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
@@ -88,18 +90,18 @@ class SinaCloseStrategy extends BaseStrategy {
     }
 
 
-    _profitMyLongPositions(tick, position, up = 0) {
+    _profitLongPositions(tick, position, up = 0) {
         let longPositions = position.GetLongPosition();
         let longPostionAveragePrice = position.GetLongPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
         if (longPositions > 0 && price > longPostionAveragePrice) {
-            this._profitMyYesterdayLongPositions(tick, position, up);
+            this._profitYesterdayLongPositions(tick, position, up);
         }
     }
 
-    _profitMyYesterdayShortPositions(tick, position, up = 0) {
-        let yesterdayShortPositions = position.MyGetShortYesterdayPosition();
-        let shortYesterdayPostionAveragePrice = position.MyGetShortYesterdayPositionAveragePrice();
+    _profitYesterdayShortPositions(tick, position, up = 0) {
+        let yesterdayShortPositions = position.GetShortYesterdayPosition();
+        let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
         // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
         if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
@@ -122,7 +124,7 @@ class SinaCloseStrategy extends BaseStrategy {
         let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
         if (shortPositions > 0 && price < shortPostionAveragePrice) {
             console.log(`profit short yesterday: ${tick.symbol}`);
-            this._profitMyYesterdayShortPositions(tick, position, up);
+            this._profitYesterdayShortPositions(tick, position, up);
         }
     }
 
@@ -159,7 +161,7 @@ class SinaCloseStrategy extends BaseStrategy {
                         this._profitLongPositions(tick, position, 0);
                         this.QueryTradingAccount(tick.clientName);
                         if (global.availableFund < 0) {
-                            let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
+                            let yesterdayLongPositions = position.GetLongYesterdayPosition();
                             if (yesterdayLongPositions > 0) {
                                 let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
                                 if (tick.lastPrice < tick.upperLimit) {
