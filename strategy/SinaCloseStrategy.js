@@ -53,7 +53,7 @@ class SinaCloseStrategy extends BaseStrategy {
                 global.actionDatetime[closedBar.symbol] = actionDate[actionDate.length - 1];
                 global.actionBarInterval[closedBar.symbol] = 15;
             }
-            console.log(`${closedBar.symbol}: score: ${global.actionScore[closedBar.symbol]} datetime:  ${global.actionDatetime[closedBar.symbol]} falg: ${this.flag}`);
+            console.log(`${closedBar.symbol}: score: ${global.actionScore[closedBar.symbol]} datetime:  ${global.actionDatetime[closedBar.symbol]} flag: ${this.flag}`);
             console.log(global.actionScore);
         })
     }
@@ -65,6 +65,8 @@ class SinaCloseStrategy extends BaseStrategy {
                 this.flag = "long";
             } else if (global.actionScore[newBar.symbol] <= -2) {
                 this.flag = "short";
+            } else if (global.actionScore[newBar.symbol] == -1) {
+                this.flag = "semiShort";
             } else {
                 this.flag = null;
             }
@@ -156,6 +158,25 @@ class SinaCloseStrategy extends BaseStrategy {
                         this.flag = null;
                     }
                 } else if (this.flag === "short") {
+                    let position = this.GetPosition(tick.symbol);
+                    if (position) {
+                        this._profitLongPositions(tick, position, 0);
+                        this.QueryTradingAccount(tick.clientName);
+                        if (global.availableFund < 0) {
+                            let yesterdayLongPositions = position.GetLongYesterdayPosition();
+                            if (yesterdayLongPositions > 0) {
+                                let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+                                if (tick.lastPrice < tick.upperLimit) {
+                                    this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Sell, OpenCloseFlagType.Close);
+                                    let subject = `Sina Account money  is negetive Yesterday Action Close Long ${this.name}`;
+                                    let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}   yesterdayLongPositions 1`;
+                                    this._sendMessage(subject, message);
+                                }
+                            }
+                        }
+                        this.flag = null;
+                    }
+                } else if (this.flag === "semiShort") {
                     let position = this.GetPosition(tick.symbol);
                     if (position) {
                         this._profitLongPositions(tick, position, 0);
