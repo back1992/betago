@@ -27,10 +27,12 @@ class HaiCloseStrategy extends BaseStrategy {
         this.BarInterval = strategyConfig.BarInterval;
         this.sum = 0;
         this.flag = null;
+        this.closedBarList = [];
     }
 
     /////////////////////////////// Public Method /////////////////////////////////////
     OnClosedBar(closedBar) {
+      // console.log(this.closedBarList);
       if (this.closedBarList) {
           this.closedBarList.push(closedBar);
           if (this.closedBarList.length > 50) {
@@ -42,23 +44,24 @@ class HaiCloseStrategy extends BaseStrategy {
           let volume = this.closedBarList.map(e => e["volume"]);
           let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
           let signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
-      }
-      if (score > 2) {
-          this._cancelOrder();
-          if (closedBar.closePrice>this.thresholdPrice) {
+          console.log(`${this.name}  ${closedBar.symbol} socre : ${score}`)
+          if (score > 2) {
+            this._cancelOrder();
+            if (closedBar.closePrice>this.thresholdPrice) {
               this.flag = "long";
-          } else {
+            } else {
               this.flag = null;
-          }
-      } else if (score <= -2) {
-        this._cancelOrder();
-        if (closedBar.closePrice>this.thresholdPrice) {
-            this.flag = "short";
-        } else {
+            }
+          } else if (score <= -2) {
+            this._cancelOrder();
+            if (closedBar.closePrice>this.thresholdPrice) {
+              this.flag = "short";
+            } else {
+              this.flag = null;
+            }
+          } else {
             this.flag = null;
-        }
-      } else {
-          this.flag = null;
+          }
       }
     }
 
