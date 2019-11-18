@@ -45,18 +45,13 @@ class CopperLongStrategy extends BaseStrategy {
 
     OnNewBar(newBar) {
 
+        console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
         if (this.signal >= 2) {
             this._cancelOrder();
             this.flag = true;
-            // if (this.lastSignal < 2) {
-            // }
-            console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice} signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
         } else if (this.signal <= -2) {
             this._cancelOrder();
             this.flag = this.needCloseYesterday ? "close" : false;
-            // if (this.lastSignal > -2) {
-            // }
-            console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
         } else {
             this.flag = null;
         }
@@ -144,7 +139,7 @@ class CopperLongStrategy extends BaseStrategy {
     OnTick(tick) {
         super.OnTick(tick);
         // global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
-        let tradeState = this._getOffset(tick, 0, 8);
+        let tradeState = this._getOffset(tick, 168, 18);
 
         if (this.flag === false) {
             let position = this.GetPosition(tick.symbol);
@@ -166,6 +161,22 @@ class CopperLongStrategy extends BaseStrategy {
             // timeOffset
             case 0:
                 this._cancelOrder();
+                if(this.canOpenToday === false  && this.signal!= 0){
+                  let position = this.GetPosition(tick.symbol);
+                  if (position) {
+                      let exchangeName = this._getExchange(tick);
+                      if (exchangeName === "SHF") {
+                          this._profitYesterdayLongPositions(tick, position, 0);
+                          this._profitTodayLongPositions(tick, position, 0);
+                      } else {
+                          this._profitLongPositions(tick, position, 0);
+                      }
+                      let longPositions = position.GetLongPosition();
+                      if(longPositions === 0){
+                        this.canOpenToday = true;
+                      }
+                  }
+                }
                 break;
             // time to close
             case -1:
