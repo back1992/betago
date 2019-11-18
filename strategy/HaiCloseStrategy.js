@@ -14,7 +14,7 @@ var request = require("request")
 
 
 /////////////////////// Private Method ///////////////////////////////////////////////
-class HaiStrategy extends BaseStrategy {
+class HaiCloseStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -24,7 +24,6 @@ class HaiStrategy extends BaseStrategy {
         this.total = 1000000;
         this.sinaSymbol = strategyConfig.sinaSymbol;
         this.thresholdPrice = strategyConfig.thresholdPrice;
-        this.total = strategyConfig.total;
         this.BarInterval = strategyConfig.BarInterval;
         this.sum = 0;
         this.flag = null;
@@ -45,19 +44,24 @@ class HaiStrategy extends BaseStrategy {
           let volume = this.closedBarList.map(e => e["volume"]);
           let score = Indicator._get_talib_indicator(highPrice, lowPrice, closePrice, volume);
           let signalTime = this.closedBarList[this.closedBarList.length - 1]["date"] + " " + this.closedBarList[this.closedBarList.length - 1]["timeStr"];
-          console.log(`${this.name}  ${closedBar.symbol} socre : ${score}, time: ${signalTime}`)
-          if (score > 1) {
+          console.log(`${this.name}  ${closedBar.symbol} socre : ${score}`)
+          if (score > 2) {
+            this._cancelOrder();
             if (closedBar.closePrice>this.thresholdPrice) {
               this.flag = "long";
+            } else {
+              this.flag = null;
             }
-          } else if (score < -1) {
-            if (closedBar.closePrice<this.thresholdPrice) {
+          } else if (score <= -2) {
+            this._cancelOrder();
+            if (closedBar.closePrice>this.thresholdPrice) {
               this.flag = "short";
+            } else {
+              this.flag = null;
             }
           } else {
             this.flag = null;
           }
-          console.log(`${closedBar.closePrice>this.thresholdPrice} closePrice: ${closedBar.closePrice}, thresholdPrice: ${this.thresholdPrice}  flag ${this.flag} , time: ${signalTime}`)
       }
     }
 
@@ -90,7 +94,7 @@ class HaiStrategy extends BaseStrategy {
         let marginRate = tickFutureConfig.MarginRate;
         let priceUnit = tick.lastPrice * unit * marginRate;
         let availabelSum = Math.floor(global.availableFund / priceUnit);
-        if (availabelSum  < 1) {
+        if (availabelSum < 1) {
             let subject = `Sina Money is Out ${this.name}`;
             let message = `${tick.symbol}  的Tick,时间: ${tick.date}  ${tick.timeStr} availabelSum： ${availabelSum},  global.availableFund  ${global.availableFund}, unit ${unit}, marginRate ${marginRate}, tick.lastPrice ${tick.lastPrice}, priceUnit ${priceUnit}`;
             this._sendMessage(subject, message);
@@ -169,12 +173,11 @@ class HaiStrategy extends BaseStrategy {
     _closeMyYesterdayLongPositions(tick, position, up = 0) {
         let yesterdayLongPositions = position.MyGetLongYesterdayPosition();
         if (yesterdayLongPositions > 0) {
-          let subject = `Hai Yesterday Action Close Long ${this.name}`;
-          let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}   yesterdayLongPositions  ${yesterdayLongPositions}`;
-          console.log(message);
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (tick.lastPrice < tick.upperLimit) {
                 this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
+                let subject = `Hai Yesterday Action Close Long ${this.name}`;
+                let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}   yesterdayLongPositions  ${yesterdayLongPositions}`;
                 this._sendMessage(subject, message);
             }
         }
@@ -184,12 +187,11 @@ class HaiStrategy extends BaseStrategy {
     _closeMyYesterdayShortPositions(tick, position, up = 0) {
         let yesterdayShortPositions = position.MyGetShortYesterdayPosition();
         if (yesterdayShortPositions > 0) {
-          let subject = `Hai Yesterday Action Close Short ${this.name}`;
-          let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}   yesterdayShortPositions  ${yesterdayShortPositions}`;
-          console.log(message);
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (tick.lastPrice < tick.upperLimit) {
                 this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
+                let subject = `Hai Yesterday Action Close Short ${this.name}`;
+                let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}   yesterdayShortPositions  ${yesterdayShortPositions}`;
                 this._sendMessage(subject, message);
             }
         }
@@ -226,26 +228,23 @@ class HaiStrategy extends BaseStrategy {
 
     OnTick(tick) {
         super.OnTick(tick);
-        global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
         let tradeState = this._getOffset(tick, 0, 30);
         if (this.flag === "short") {
             let position = this.GetPosition(tick.symbol);
             if (position) {
                 let exchangeName = this._getExchange(tick);
                 if (exchangeName === "SHF") {
-                    this._closeMyYesterdayLongPositions(tick, position, 0);
-                    this._closeMyTodayLongPositions(tick, position, 0);
+                    this._profitMyYesterdayLongPositions(tick, position, 0);
+                    this._profitMyTodayLongPositions(tick, position, 0);
                 } else {
-                    this._closeMyLongPositions(tick, position, 0);
+                    this._profitMyLongPositions(tick, position, 0);
                 }
                 let shortPositions = position.GetShortPosition();
-                console.log(total: ${this.total} shortPositions: ${shortPositions});
                 if (shortPositions < this.total) {
                   this._openShort(tick);
                 }
 
             } else {
-
               let unFinishOrderList = this.GetUnFinishOrderList();
               if (unFinishOrderList.length === 0) {
                   this._openShort(tick);
@@ -265,7 +264,6 @@ class HaiStrategy extends BaseStrategy {
                     this._closeMyShortPositions(tick, position, 0);
                 }
                 let longPositions = position.GetLongPosition();
-                console.log(`total: ${this.total} longPositions: ${longPositions}` );
                 if (longPositions < this.total) {
                   this._openLong(tick);
                 }
@@ -289,4 +287,4 @@ class HaiStrategy extends BaseStrategy {
     }
 }
 
-module.exports = HaiStrategy;
+module.exports = HaiCloseStrategy;
