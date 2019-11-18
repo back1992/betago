@@ -191,23 +191,15 @@ class CopperLongStrategy extends BaseStrategy {
                             this._openLong(tick);
                         }else {
                             let longPositions = position.GetLongPosition();
-                            // if(longPositions < 1) {
-                            //   this._openLong(tick);
-                            //   this.canOpenToday = true;
-                            // } else {
-                            //   if (this.canOpenToday === true && longPositions < this.total) {
-                            //       this._openLong(tick);
-                            //     }
-                            // }
                             if(this.canOpenToday === true) {
                               if (longPositions < this.total) {
                                   this._openLong(tick);
                                 }
                             } else {
-                              if(longPositions < 1) {
-                                this._openLong(tick);
-                                this.canOpenToday = true;
-                              }
+                              // if(longPositions < 1) {
+                              //   this._openLong(tick);
+                              //   this.canOpenToday = true;
+                              // }
                             }
                         }
                     }

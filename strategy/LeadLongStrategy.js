@@ -203,12 +203,13 @@ class LeadLongStrategy extends BaseStrategy {
                               if (longPositions < this.total) {
                                   this._openLong(tick);
                                 }
-                            } else {
-                              if(longPositions < 1) {
-                                this._openLong(tick);
-                                this.canOpenToday = true;
-                              }
                             }
+                            // else {
+                            //   if(longPositions < 1) {
+                            //     this._openLong(tick);
+                            //     this.canOpenToday = true;
+                            //   }
+                            // }
                         }
                     }
                 // }
