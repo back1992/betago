@@ -136,6 +136,53 @@ class CopperLongStrategy extends BaseStrategy {
     }
 
 
+        //js Date对象从0开始的月份
+        _getOffset(tick, breakOffsetSec = 180, closeOffsetSec = 30) {
+            let NowDateTime = new Date();
+            // var hour = NowDateTime.getHours();
+            let NowDateStr = NowDateTime.toLocaleDateString();
+            let TickDateTimeStr = NowDateStr + " " + tick.timeStr;
+            let TickDateTime = new Date(TickDateTimeStr);
+            let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
+            let upperFutureName = contract.futureName.toUpperCase();
+            let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
+            let AMOpenTimeStr = NowDateStr + " " + tickFutureConfig.AMOpen;
+            var AMOpenTime = new Date(AMOpenTimeStr);
+            var AMOpenTimeOffset = new Date(AMOpenTime.getTime() + breakOffsetSec * 1000);
+            let AMResumeTimeStr = NowDateStr + " " + tickFutureConfig.AMResume;
+            var AMResumeTime = new Date(AMResumeTimeStr);
+            var AMResumeTimeOffset = new Date(AMResumeTime.getTime() + breakOffsetSec * 1000);
+            let PMOpenTimeStr = NowDateStr + " " + tickFutureConfig.PMOpen;
+            var PMOpenTime = new Date(PMOpenTimeStr);
+            var PMOpenTimeOffset = new Date(PMOpenTime.getTime() + breakOffsetSec * 1000);
+            let NightOpenTimeStr = NowDateStr + " " + tickFutureConfig.NightOpen;
+            var NightOpenTime = new Date(NightOpenTimeStr);
+            var NightOpenTimeOffset = new Date(NightOpenTime.getTime() + breakOffsetSec * 1000);
+            let isTimeOffset = (NowDateTime > AMOpenTime && NowDateTime < AMOpenTimeOffset) || (NowDateTime > AMResumeTime && NowDateTime < AMResumeTimeOffset) || (NowDateTime > PMOpenTime && NowDateTime < PMOpenTimeOffset) || (NowDateTime > NightOpenTime && NowDateTime < NightOpenTimeOffset);
+            let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
+            var PMCloseTime = new Date(PMCloseTimeStr);
+            var PMStopTime = new Date(PMCloseTime.getTime() - closeOffsetSec * 1000);
+            let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
+            var NightCloseTime = new Date(NightCloseTimeStr);
+            var NightCancelTime = new Date(NightCloseTime.getTime() - 3 * 1000);
+            var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
+            let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCancelTime);
+            let isTimeToCancel = (TickDateTime > NightCancelTime && TickDateTime < NightCloseTime);
+            if (isTimeOffset) {
+                return 0;
+
+            } else if (isTimeToClose) {
+                return -1;
+
+            } else if (isTimeToCancel) {
+                return -2;
+            } else {
+                return 1;
+            }
+        }
+
+
+
     OnTick(tick) {
         super.OnTick(tick);
         // global.NodeQuant.MarketDataDBClient.RecordTick(tick.symbol, tick);
@@ -192,6 +239,10 @@ class CopperLongStrategy extends BaseStrategy {
                     }
                 }
                 break;
+            // time to cancel
+            case -2:
+                this._cancelOrder();
+                break;
             // trade time
             default :
                 // let unFinishOrderList = this.GetUnFinishOrderList();
@@ -207,10 +258,10 @@ class CopperLongStrategy extends BaseStrategy {
                                   this._openLong(tick);
                                 }
                             } else {
-                              // if(longPositions < 1) {
-                              //   this._openLong(tick);
-                              //   this.canOpenToday = true;
-                              // }
+                              if(longPositions < 1) {
+                                this._openLong(tick);
+                                this.canOpenToday = true;
+                              }
                             }
                         }
                     }
