@@ -13,7 +13,7 @@ var BaseStrategy = require("./baseStrategy");
 
 
 /////////////////////// Private Method ///////////////////////////////////////////////
-class CopperLongStrategy extends BaseStrategy {
+class CopperLongTestStrategy extends BaseStrategy {
     //初始化
     constructor(strategyConfig) {
         //一定要使用super()初始化基类,这样无论基类还是子类的this都是指向子类实例
@@ -46,21 +46,17 @@ class CopperLongStrategy extends BaseStrategy {
     }
 
     OnNewBar(newBar) {
-
         if (this.signal >= 2) {
-            // this.flag = (this.lastSignal<1) ? true:this.flag;
-            if (this.lastSignal < 1) {
-                this.flag = true;
-                this._cancelOrder();
-                console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
-
-            }
+            this._cancelOrder();
+            this.flag = (this.lastSignal>1) ? true:this.flag;
         } else if (this.signal <= -2) {
             this._cancelOrder();
             this.flag = this.needCloseYesterday ? "close" : false;
-            console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
         } else {
             this.flag = null;
+        }
+        if(Math.abs(this.signal) != 0) {
+          console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
         }
     }
 
@@ -68,6 +64,7 @@ class CopperLongStrategy extends BaseStrategy {
     _openLong(tick) {
         this.QueryTradingAccount(tick.clientName);
         let sum = this._getAvailabelSum(tick);
+        console.lof(`sum: ${sum}`);
         if (sum >= 1) {
             let subject = `Today Action Open Long ${this.name}  signal: ${this.signal}`;
             let message = `${this.name}  signal: ${this.signal}   flag: ${this.flag}  时间: ${tick.date}  ${tick.timeStr}`;
@@ -143,61 +140,51 @@ class CopperLongStrategy extends BaseStrategy {
     }
 
 
-    //js Date对象从0开始的月份
-    _getOffset(tick, breakOffsetSec = 180, closeOffsetSec = 30) {
-        let NowDateTime = new Date();
-        // var hour = NowDateTime.getHours();
-        let NowDateStr = NowDateTime.toLocaleDateString();
-        let TickDateTimeStr = NowDateStr + " " + tick.timeStr;
-        let TickDateTime = new Date(TickDateTimeStr);
-        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
-        let upperFutureName = contract.futureName.toUpperCase();
-        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-        let AMOpenTimeStr = NowDateStr + " " + tickFutureConfig.AMOpen;
-        var AMOpenTime = new Date(AMOpenTimeStr);
-        var AMOpenTimeOffset = new Date(AMOpenTime.getTime() + breakOffsetSec * 1000);
-        let AMResumeTimeStr = NowDateStr + " " + tickFutureConfig.AMResume;
-        var AMResumeTime = new Date(AMResumeTimeStr);
-        var AMResumeTimeOffset = new Date(AMResumeTime.getTime() + breakOffsetSec * 1000);
-        let PMOpenTimeStr = NowDateStr + " " + tickFutureConfig.PMOpen;
-        var PMOpenTime = new Date(PMOpenTimeStr);
-        var PMOpenTimeOffset = new Date(PMOpenTime.getTime() + breakOffsetSec * 1000);
-        let NightOpenTimeStr = NowDateStr + " " + tickFutureConfig.NightOpen;
-        var NightOpenTime = new Date(NightOpenTimeStr);
-        var NightOpenTimeOffset = new Date(NightOpenTime.getTime() + breakOffsetSec * 1000);
-        let isTimeOffset = (NowDateTime > AMOpenTime && NowDateTime < AMOpenTimeOffset) || (NowDateTime > AMResumeTime && NowDateTime < AMResumeTimeOffset) || (NowDateTime > PMOpenTime && NowDateTime < PMOpenTimeOffset) || (NowDateTime > NightOpenTime && NowDateTime < NightOpenTimeOffset);
-        let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
-        var PMCloseTime = new Date(PMCloseTimeStr);
-        var PMStopTime = new Date(PMCloseTime.getTime() - closeOffsetSec * 1000);
-        let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
-        var NightCloseTime = new Date(NightCloseTimeStr);
-        var NightCancelTime = new Date(NightCloseTime.getTime() - 3 * 1000);
-        var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
-        let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCancelTime);
-        let isTimeToCancel = (TickDateTime > NightCancelTime && TickDateTime < NightCloseTime);
-        if (isTimeOffset) {
-            return 0;
-        } else if (isTimeToClose) {
-            return -1;
-        } else if (isTimeToCancel) {
-            return -2;
-        } else {
-            return 1;
+        //js Date对象从0开始的月份
+        _getOffset(tick, breakOffsetSec = 180, closeOffsetSec = 30) {
+            let NowDateTime = new Date();
+            // var hour = NowDateTime.getHours();
+            let NowDateStr = NowDateTime.toLocaleDateString();
+            let TickDateTimeStr = NowDateStr + " " + tick.timeStr;
+            let TickDateTime = new Date(TickDateTimeStr);
+            let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
+            let upperFutureName = contract.futureName.toUpperCase();
+            let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
+            let AMOpenTimeStr = NowDateStr + " " + tickFutureConfig.AMOpen;
+            var AMOpenTime = new Date(AMOpenTimeStr);
+            var AMOpenTimeOffset = new Date(AMOpenTime.getTime() + breakOffsetSec * 1000);
+            let AMResumeTimeStr = NowDateStr + " " + tickFutureConfig.AMResume;
+            var AMResumeTime = new Date(AMResumeTimeStr);
+            var AMResumeTimeOffset = new Date(AMResumeTime.getTime() + breakOffsetSec * 1000);
+            let PMOpenTimeStr = NowDateStr + " " + tickFutureConfig.PMOpen;
+            var PMOpenTime = new Date(PMOpenTimeStr);
+            var PMOpenTimeOffset = new Date(PMOpenTime.getTime() + breakOffsetSec * 1000);
+            let NightOpenTimeStr = NowDateStr + " " + tickFutureConfig.NightOpen;
+            var NightOpenTime = new Date(NightOpenTimeStr);
+            var NightOpenTimeOffset = new Date(NightOpenTime.getTime() + breakOffsetSec * 1000);
+            let isTimeOffset = (NowDateTime > AMOpenTime && NowDateTime < AMOpenTimeOffset) || (NowDateTime > AMResumeTime && NowDateTime < AMResumeTimeOffset) || (NowDateTime > PMOpenTime && NowDateTime < PMOpenTimeOffset) || (NowDateTime > NightOpenTime && NowDateTime < NightOpenTimeOffset);
+            let PMCloseTimeStr = NowDateStr + " " + tickFutureConfig.PMClose;
+            var PMCloseTime = new Date(PMCloseTimeStr);
+            var PMStopTime = new Date(PMCloseTime.getTime() - closeOffsetSec * 1000);
+            let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
+            var NightCloseTime = new Date(NightCloseTimeStr);
+            var NightCancelTime = new Date(NightCloseTime.getTime() - 3 * 1000);
+            var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
+            let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCancelTime);
+            let isTimeToCancel = (TickDateTime > NightCancelTime && TickDateTime < NightCloseTime);
+            if (isTimeOffset) {
+                return 0;
+
+            } else if (isTimeToClose) {
+                return -1;
+
+            } else if (isTimeToCancel) {
+                return -2;
+            } else {
+                return 1;
+            }
         }
-    }
 
-
-    _getAvailabelSum(tick) {
-        let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
-        let upperFutureName = contract.futureName.toUpperCase();
-        let tickFutureConfig = FuturesConfig[tick.clientName][upperFutureName];
-        let unit = tickFutureConfig.Unit;
-        let marginRate = tickFutureConfig.MarginRate;
-        let priceUnit = tick.lastPrice * unit * marginRate;
-        let availabelSum = Math.floor(global.availableFund / priceUnit);
-        console.log(`${tick.symbol} availableFund: ${global.availableFund}  priceUnit: ${priceUnit} availabelSum ${availabelSum}`);
-        return availabelSum;
-    }
 
 
     OnTick(tick) {
@@ -225,21 +212,21 @@ class CopperLongStrategy extends BaseStrategy {
             // timeOffset
             case 0:
                 this._cancelOrder();
-                if (this.canOpenToday === false && this.signal != 0) {
-                    let position = this.GetPosition(tick.symbol);
-                    if (position) {
-                        let exchangeName = this._getExchange(tick);
-                        if (exchangeName === "SHF") {
-                            this._profitYesterdayLongPositions(tick, position, 0);
-                            this._profitTodayLongPositions(tick, position, 0);
-                        } else {
-                            this._profitLongPositions(tick, position, 0);
-                        }
-                        let longPositions = position.GetLongPosition();
-                        if (longPositions === 0) {
-                            this.canOpenToday = true;
-                        }
-                    }
+                if(this.canOpenToday === false  && this.signal!= 0){
+                  let position = this.GetPosition(tick.symbol);
+                  if (position) {
+                      let exchangeName = this._getExchange(tick);
+                      if (exchangeName === "SHF") {
+                          this._profitYesterdayLongPositions(tick, position, 0);
+                          this._profitTodayLongPositions(tick, position, 0);
+                      } else {
+                          this._profitLongPositions(tick, position, 0);
+                      }
+                      let longPositions = position.GetLongPosition();
+                      if(longPositions === 0){
+                        this.canOpenToday = true;
+                      }
+                  }
                 }
                 break;
             // time to close
@@ -264,25 +251,27 @@ class CopperLongStrategy extends BaseStrategy {
             default :
                 // let unFinishOrderList = this.GetUnFinishOrderList();
                 // if (unFinishOrderList.length === 0) {
-                if (this.flag === true) {
-                    let position = this.GetPosition(tick.symbol);
-                    if (position === undefined) {
-                        this._openLong(tick);
-                    } else {
-                        let longPositions = position.GetLongPosition();
-                        if (this.canOpenToday === true) {
-                            if (longPositions < this.total) {
-                                this._openLong(tick);
-                            }
-                        } else {
-                            if (longPositions < 1) {
+                    if (this.flag === true) {
+                        let position = this.GetPosition(tick.symbol);
+                        console.log(position);
+                        if (position === undefined) {
+                            this._openLong(tick);
+                        }else {
+                            let longPositions = position.GetLongPosition();
+                            consoel.log(`longPositions: ${longPositions}, total: ${this.total}`);
+                            if(this.canOpenToday === true) {
+                              if (longPositions < this.total) {
+                                  this._openLong(tick);
+                                }
+                            } else {
+                              if(longPositions < 1) {
                                 this._openLong(tick);
                                 this.canOpenToday = true;
+                              }
                             }
                         }
                     }
-                }
-            // }
+                // }
         }
     }
 
@@ -292,4 +281,4 @@ class CopperLongStrategy extends BaseStrategy {
     }
 }
 
-module.exports = CopperLongStrategy;
+module.exports = CopperLongTestStrategy;
