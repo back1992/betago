@@ -85,7 +85,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         CY:{
             name:"棉纱",
@@ -99,7 +99,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         CJ:{
             name:"红枣",
@@ -125,7 +125,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         JR:{
             name:"粳稻",
@@ -149,7 +149,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         PM:{
             name:"普麦",
@@ -183,7 +183,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         RS:{
             name:"菜籽",
@@ -231,7 +231,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         TA:{
             name:"PTA",
@@ -245,7 +245,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         WH:{
             name:"郑麦",
@@ -269,7 +269,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         UR:{
             name:"尿素",
@@ -867,7 +867,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         CY:{
             name:"棉纱",
@@ -879,7 +879,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         FG:{
             name:"玻璃",
@@ -891,7 +891,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         JR:{
             name:"粳稻",
@@ -913,7 +913,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         OI:{
             name:"郑油",
@@ -925,7 +925,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         PM:{
             name:"普麦",
@@ -957,7 +957,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         RS:{
             name:"菜籽",
@@ -999,7 +999,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         TA:{
             name:"PTA",
@@ -1011,7 +1011,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         WH:{
             name:"郑麦",
@@ -1033,7 +1033,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         A:{
             name:"豆一",
@@ -1045,7 +1045,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         B:{
             name:"豆二",
@@ -1057,7 +1057,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         BB:{
             name:"胶板",
@@ -1109,7 +1109,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         J:{
             name:"焦炭",
@@ -1121,7 +1121,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         JD:{
             name:"鸡蛋",
@@ -1143,7 +1143,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         L:{
             name:"塑料",
@@ -1165,7 +1165,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         P:{
             name:"棕榈",
@@ -1177,7 +1177,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         PP:{
             name:"丙烯",
@@ -1209,7 +1209,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         AG:{
             name:"白银",
@@ -1281,7 +1281,7 @@ FuturesConfig={
             PMOpen:"13:30:00",
             PMClose:"15:00:00",
             NightOpen:"21:00:00",
-            NightClose:"23:30:00"
+            NightClose:"23:00:00"
         },
         HC:{
             name:"热卷",

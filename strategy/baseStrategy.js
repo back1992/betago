@@ -239,6 +239,10 @@ class BaseStrategy {
         return availabelSum;
     }
 
+
+
+
+
     _getExchange(tick) {
         let contract = global.NodeQuant.MainEngine.GetContract(tick.clientName, tick.symbol);
         let upperFutureName = contract.futureName.toUpperCase();
@@ -292,52 +296,52 @@ class BaseStrategy {
         var PMStopTime = new Date(PMCloseTime.getTime() - closeOffsetSec * 1000);
         let NightCloseTimeStr = NowDateStr + " " + tickFutureConfig.NightClose;
         var NightCloseTime = new Date(NightCloseTimeStr);
+        var NightCancelTime = new Date(NightCloseTime.getTime() - 3 * 1000);
         var NightStopTime = new Date(NightCloseTime.getTime() - closeOffsetSec * 1000);
-        let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCloseTime);
+        let isTimeToClose = (NowDateTime > PMStopTime && NowDateTime < PMCloseTime) || (TickDateTime > NightStopTime && TickDateTime < NightCancelTime);
+        let isTimeToCancel = (TickDateTime > NightCancelTime && TickDateTime < NightCloseTime);
         if (isTimeOffset) {
             return 0;
-
         } else if (isTimeToClose) {
             return -1;
+        } else if (isTimeToCancel) {
+            return -2;
         } else {
             return 1;
         }
     }
 
+    _profitYesterdayLongPositions(tick, position, up = 0) {
+        let yesterdayLongPositions = position.GetLongYesterdayPosition();
+        if (yesterdayLongPositions > 0) {
+            let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
+            let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
+            if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
+                this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
+                let subject = `Yesterday Action Profit Long ${this.name}`;
+                let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
+                this._sendMessage(subject, message);
+            }
+        }
+    }
 
-      _profitYesterdayLongPositions(tick, position, up = 0) {
-          let yesterdayLongPositions = position.GetLongYesterdayPosition();
-          if (yesterdayLongPositions > 0) {
-              let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
-              let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
-              if (price > longYesterdayPostionAveragePrice && tick.lastPrice < tick.upperLimit) {
-                  this.SendOrder(tick.clientName, tick.symbol, price, yesterdayLongPositions, Direction.Sell, OpenCloseFlagType.Close);
-                  let subject = `Yesterday Action Profit Long ${this.name}`;
-                  let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
-                  this._sendMessage(subject, message);
-              }
-          }
-      }
-
-      _profitYesterdayShortPositions(tick, position, up = 0) {
-          let yesterdayShortPositions = position.GetShortYesterdayPosition();
-          let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
-          let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
-          // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
-          if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
-              let exchangeName = this._getExchange(tick);
-              if (exchangeName === "SHF") {
-                  this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseYesterday);
-              } else {
-                  this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
-              }
-              let subject = `Yesterday Action Profit Short ${this.name}`;
-              let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}`;
-              this._sendMessage(subject, message);
-          }
-      }
-
-
+    _profitYesterdayShortPositions(tick, position, up = 0) {
+        let yesterdayShortPositions = position.GetShortYesterdayPosition();
+        let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
+        let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
+        // if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice && tick.lastPrice > tick.lowerLimit) {
+        if (yesterdayShortPositions > 0 && price < shortYesterdayPostionAveragePrice) {
+            let exchangeName = this._getExchange(tick);
+            if (exchangeName === "SHF") {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.CloseYesterday);
+            } else {
+                this.SendOrder(tick.clientName, tick.symbol, price, 1, Direction.Buy, OpenCloseFlagType.Close);
+            }
+            let subject = `Yesterday Action Profit Short ${this.name}`;
+            let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}`;
+            this._sendMessage(subject, message);
+        }
+    }
 
 
     _cancelOrder() {
