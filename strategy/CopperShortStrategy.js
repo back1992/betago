@@ -48,17 +48,18 @@ class CopperShortStrategy extends BaseStrategy {
             if (this.lastSignal > -2) {
                 this._cancelOrder();
                 this.flag = true;
-                // console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice} signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
+                console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice} signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
 
             }
         } else if (this.signal >= 2) {
             this._cancelOrder();
-            this.flag = this.needCloseYesterday ? "close" : false;
-            // console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice} signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
+            // this.flag = this.needCloseYesterday ? "close" : false;
+            this.flag = global.availableFund < 0  ? "close" : false;
+            console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice} signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
         } else {
             this.flag = null;
         }
-        console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice} signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
+        // console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice} signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
     }
 
     // OnFinishPreLoadBar(symbol, BarType, BarInterval, ClosedBarList) {
@@ -70,7 +71,7 @@ class CopperShortStrategy extends BaseStrategy {
         let sum = this._getAvailabelSum(tick);
         if (sum >= 1) {
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Sell, OpenCloseFlagType.Open);
-            let subject = `Today Action Open Short ${this.name}   signal: ${this.signal}`;
+            let subject = `Today ${Math.floor(global.Balance)}  Short ${this.name}   signal: ${this.signal}`;
             let message = `${this.name}  signal: ${this.signal} flag: ${this.flag}  时间: ${tick.date} ${tick.timeStr}`;
             this._sendMessage(subject, message);
             this.flag = null;
@@ -84,7 +85,7 @@ class CopperShortStrategy extends BaseStrategy {
             let shortTodayPostionAveragePrice = position.GetShortTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (price < shortTodayPostionAveragePrice) {
-                let subject = `Today Action Profit Short  ${this.name}  signal: ${this.signal}`;
+                let subject = `Today ${Math.floor(global.Balance)}  Profit Short  ${this.name}  signal: ${this.signal}`;
                 let message = `${this.name}  signal:  ${this.signal}  flag: ${this.flag}  时间: ${tick.date} ${tick.timeStr}`;
                 message += `price ${price}  shortTodayPostionAveragePrice  ${shortTodayPostionAveragePrice} todayShortPositions  ${todayShortPositions}`
                 todayShortPositions = 1;
@@ -107,7 +108,7 @@ class CopperShortStrategy extends BaseStrategy {
             let shortYesterdayPostionAveragePrice = position.GetShortYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Buy, up);
             if (price < shortYesterdayPostionAveragePrice) {
-                let subject = `Yesterday Action Profit Short  ${this.name}  signal: ${this.signal}`;
+                let subject = `YesterdayProfit Short  ${this.name}  signal: ${this.signal}`;
                 let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice price ${price}  shortYesterdayPostionAveragePrice  ${shortYesterdayPostionAveragePrice} yesterdayShortPositions  ${yesterdayShortPositions}}`;
                 yesterdayShortPositions = 1;
                 this.SendOrder(tick.clientName, tick.symbol, price, yesterdayShortPositions, Direction.Buy, OpenCloseFlagType.Close);
@@ -173,12 +174,14 @@ class CopperShortStrategy extends BaseStrategy {
                 break;
             // time to close
             case -1:
+                this._cancelOrder();
                 let position = this.GetPosition(tick.symbol);
                 if (position) {
-                    this._profitShortPositions(tick, position, 0);
+                    this._profitShortPositions(tick, position, 1);
                 }
                 break;
                 //    time to cancel
+            case -2:
                 this._cancelOrder();
                 break;
             // trade time

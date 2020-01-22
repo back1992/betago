@@ -52,12 +52,13 @@ class CopperLongStrategy extends BaseStrategy {
             if (this.lastSignal < 2) {
                 this.flag = true;
                 this._cancelOrder();
-                // console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
+                console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
 
             }
         } else if (this.signal <= -2) {
             this._cancelOrder();
-            this.flag = this.needCloseYesterday ? "close" : false;
+            // this.flag = this.needCloseYesterday ? "close" : false;
+            this.flag = global.availableFund < 0  ? "close" : false;
             console.log(`${this.name}  策略的  ${newBar.symbol}  K线结束,结束时间: ${newBar.endDatetime.toLocaleString()}  Close价: ${newBar.closePrice}  signal: ${this.signal}  flag: ${this.flag} canOpenToday : ${this.canOpenToday}`);
         } else {
             this.flag = null;
@@ -69,7 +70,7 @@ class CopperLongStrategy extends BaseStrategy {
         this.QueryTradingAccount("CTP");
         let sum = this._getAvailabelSum(tick);
         if (sum >= 1) {
-            let subject = `Today Action Open Long ${this.name}  signal: ${this.signal}`;
+            let subject = `Today ${Math.floor(global.Balance)} Long ${this.name}  signal: ${this.signal}`;
             let message = `${this.name}  signal: ${this.signal}   flag: ${this.flag}  时间: ${tick.date}  ${tick.timeStr}`;
             console.log(message);
             this.SendOrder(tick.clientName, tick.symbol, tick.lastPrice, 1, Direction.Buy, OpenCloseFlagType.Open);
@@ -85,7 +86,7 @@ class CopperLongStrategy extends BaseStrategy {
             let longTodayPostionAveragePrice = position.GetLongTodayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longTodayPostionAveragePrice) {
-                let subject = `Today Action Profit Long  ${this.name} signal: ${this.signal}`;
+                let subject = `Today  ${Math.floor(global.Balance)}  Profit Long  ${this.name} signal: ${this.signal}`;
                 let message = `${this.name}  signal: ${this.signal} flag: ${this.flag}   时间: ${tick.date} ${tick.timeStr}`;
                 message += `price ${price}  longTodayPostionAveragePrice  ${longTodayPostionAveragePrice} todayLongPositions  ${todayLongPositions}`
                 console.log(message);
@@ -109,7 +110,7 @@ class CopperLongStrategy extends BaseStrategy {
             let longYesterdayPostionAveragePrice = position.GetLongYesterdayPositionAveragePrice();
             let price = this.PriceUp(tick.symbol, tick.lastPrice, Direction.Sell, up);
             if (price > longYesterdayPostionAveragePrice) {
-                let subject = `Yesterday Action Profit Long ${this.name}  signal: ${this.signal}`;
+                let subject = `Yesterday ${Math.floor(global.Balance)} Profit Long ${this.name}  signal: ${this.signal}`;
                 let message = `${this.name}  时间: ${tick.date}   ${tick.timeStr} closePrice ${price}  longYesterdayPostionAveragePrice  ${longYesterdayPostionAveragePrice} yesterdayLongPositions  ${yesterdayLongPositions}`;
                 // position need debug;
                 yesterdayLongPositions = 1;
@@ -175,9 +176,10 @@ class CopperLongStrategy extends BaseStrategy {
                 break;
             // time to close
             case -1:
+                this._cancelOrder();
                 let position = this.GetPosition(tick.symbol);
                 if (position) {
-                    this._profitLongPositions(tick, position, 0);
+                    this._profitLongPositions(tick, position, 1);
                 }
                 break;
             // time to cancel
